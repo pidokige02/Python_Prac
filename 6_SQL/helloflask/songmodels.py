@@ -31,7 +31,7 @@ class SongRank(Base):
     id = Column(Integer, primary_key=True)
     rankdt = Column(String)
     songno = Column(String, ForeignKey('Song.songno'), nullable=False)
-    rank = Column(Integer)
+    srank = Column(Integer)
     song = relationship('Song')
 
 

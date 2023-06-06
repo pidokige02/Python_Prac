@@ -4,7 +4,7 @@ from copy import copy, deepcopy
 import sys
 
 add_file_name = "osprey_issues_FW07.xlsx"
-master_file_name = "osprey_issues_master.xlsx"
+master_file_name = "Osprey\osprey_issues_master.xlsx"
 
 if len(sys.argv) == 1:
     txt = "running : Python xl_master.py {}".format(add_file_name)

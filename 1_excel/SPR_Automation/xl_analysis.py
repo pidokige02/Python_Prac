@@ -7,12 +7,28 @@ import re
 def get_position (base_position, index):
     digit =  re.findall("[0-9]+", base_position)
     character = re.findall("[A-Z]+", base_position)
+
     ascii_code = ord(character[0])
 
     new_ascii_code = ascii_code + 2 * index
 
+    # 0x41 means "A" in ascii code.
+    dividen = int((new_ascii_code - 0X41) / 0X1A)  # 0x1B meadn total# of capital
+    modulus = (new_ascii_code - 0X41) % 0X1A
+
+    new_ascii_code = 0x41 + modulus
     new_character = chr(new_ascii_code)
-    new_position = new_character[0] + digit[0]
+
+    # print("jinha", dividen, modulus, new_character)
+
+    if (dividen): 
+        addedcharcode = 0x41 + (dividen - 1)   #make AA. AC if index is beyond Z  
+        appended_character = chr(addedcharcode)
+        new_position = appended_character[0] + new_character[0] + digit[0]
+    else:
+        new_position = new_character[0] + digit[0]
+
+    # print("jinha2", new_position)
     return new_position
 
 def get_delta_position (base_position):
@@ -20,22 +36,39 @@ def get_delta_position (base_position):
     digit =  re.findall("[0-9]+", base_position)
     character = re.findall("[A-Z]+", base_position)
 
-    ascii_code = ord(character[0])
+    # print ("jinha5", character[0], digit )
 
-    delta_ascii_code = ascii_code - 1  #  delta position is the previous one 
-    prev_ascii_code = ascii_code  - 2   #  pre position is the two column back
+    if(len(character[0]) > 1 ):
+        ascii_code = ord(character[0][1:])
+        appendedchar = character[0][:1]  # In case AA, AB, A 
+        # print ("jinha7", appendedchar, ascii_code )
+    else:
+        ascii_code = ord(character[0])
 
-    delta_character = chr(delta_ascii_code)
-    prev_character = chr(prev_ascii_code)
+    delta_ascii_code =  ascii_code - 1  #  delta position is the previous one 
+    prev_ascii_code =  ascii_code  - 2   #  pre position is the two column back
 
-    delta_position = delta_character[0] + digit[0]
-    prev_position = prev_character[0] + digit[0]
+    if((len(character[0]) > 1) and (prev_ascii_code < 0x41) ):
+        delta_character = chr(delta_ascii_code)
+        prev_character = chr(prev_ascii_code + 0x1A)
+        delta_position = appendedchar + delta_character[0] + digit[0]
+        prev_position =  prev_character[0] + digit[0]
+    elif((len(character[0]) > 1) and (prev_ascii_code >= 0x41) ):
+        delta_character = chr(delta_ascii_code)
+        prev_character = chr(prev_ascii_code)
+        delta_position = appendedchar + delta_character[0] + digit[0]
+        prev_position = appendedchar + prev_character[0] + digit[0]
+    else:
+        delta_character = chr(delta_ascii_code)
+        prev_character = chr(prev_ascii_code)
+        delta_position = delta_character[0] + digit[0]
+        prev_position =  prev_character[0] + digit[0]
 
-    return [delta_position,prev_position] 
+    return [delta_position, prev_position] 
 
 def update_delta(ws_summary, new_position):
     return_position = get_delta_position (new_position)
-    txt = "={0}-{1}".format(new_position, return_position[1]) 
+    txt = "={0}-{1}".format(new_position, return_position[1])
     ws_summary[return_position[0]] = txt
 
 
@@ -184,11 +217,12 @@ ascii = 0
 for ws_src in reversed(ws_srcs):
 
     new_position = get_position (total_spr_table['total'], index)
+    # print("jinha4", new_position);
     txt = "=COUNTA('{}'!A2:A3000)".format(ws_src.title)
     ws_summary[new_position] = txt
     if (index != 0):
         update_delta(ws_summary, new_position)
-             
+           
 
     #NC from ALL SPR
     new_position = get_position (total_spr_table['total_NC'], index)

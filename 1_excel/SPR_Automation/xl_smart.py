@@ -1,5 +1,7 @@
 from openpyxl import load_workbook
 from openpyxl.utils import get_column_letter, column_index_from_string
+from openpyxl.styles import PatternFill
+
 from copy import copy, deepcopy
 import sys
 
@@ -39,6 +41,14 @@ ws_previous = wb_old[wb_old.sheetnames[0]] #previous weeks SPR
 print(ws_new)
 print(ws_previous)
 
+def mark_newly_closed_cell (cellrow, new_value):
+  for row in ws_previous.iter_rows(min_row=cellrow, max_row=cellrow, min_col=13, max_col=13):  # status column
+    for cell in row:
+        pre_val = ws_previous["M"+str(cellrow)].value
+        if (pre_val != new_value):
+          if((new_value == "Verified") or (new_value == "Resolved") or (new_value == "Closed")):
+            ws_new["M"+str(cellrow)].fill = PatternFill(fgColor="00FF00", fill_type = "solid")
+
 for row in ws_previous.iter_rows(min_row=1, min_col=28, max_col=30):
     for cell in row:
         ws_new[cell.coordinate].value = ws_previous[cell.coordinate].value
@@ -48,7 +58,9 @@ for row in ws_previous.iter_rows(min_row=1, min_col=28, max_col=30):
         ws_new[cell.coordinate].number_format = copy(ws_previous[cell.coordinate].number_format)
         ws_new[cell.coordinate].protection = copy(ws_previous[cell.coordinate].protection)
         ws_new[cell.coordinate].alignment = copy(ws_previous[cell.coordinate].alignment)
-   
+    
+    mark_newly_closed_cell(cell.row, ws_new["M"+str(cell.row)].value)
+
 # Critical	Triage	Comments column
 ws_new.column_dimensions[get_column_letter(28)].width = ws_previous.column_dimensions[get_column_letter(27)].width    
 ws_new.column_dimensions[get_column_letter(29)].width = ws_previous.column_dimensions[get_column_letter(28)].width    

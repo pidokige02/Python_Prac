@@ -441,7 +441,7 @@ def mark_newly_closed_cell (newcellrow, cellrow, new_value):
   for row in ws_previous.iter_rows(min_row=cellrow, max_row=cellrow, min_col=13, max_col=13):  # status column
     for cell in row:
         pre_val = ws_previous["M"+str(cellrow)].value
-        if (pre_val != new_value):
+        if ((pre_val != new_value) and (pre_val != "Verified") and (pre_val != "Resolved") and (pre_val != "Closed")):
           if((new_value == "Verified") or (new_value == "Resolved") or (new_value == "Closed")):
             ws_new["M"+str(newcellrow)].fill = PatternFill(fgColor="00FF00", fill_type = "solid")
 

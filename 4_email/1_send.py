@@ -12,5 +12,5 @@ with smtplib.SMTP("smtp.gmail.com", 587) as smtp:
     msg = f"Subject: {subject}\n{body}"
 
     # 발신자, 수신자, 정해진 형식의 메시지
-    # smtp.sendmail(EMAIL_ADDRESS, "pidokige@naver.com", msg)
-    smtp.sendmail(EMAIL_ADDRESS, "jinha.hwang@ge.com", msg)
+    smtp.sendmail(EMAIL_ADDRESS, "pidokige@naver.com", msg)
+    # smtp.sendmail(EMAIL_ADDRESS, "jinha.hwang@ge.com", msg)

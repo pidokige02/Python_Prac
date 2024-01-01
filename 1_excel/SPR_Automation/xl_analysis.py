@@ -78,75 +78,39 @@ txt = ""
 total_spr_table = {
     'total' : 'B2',
     'total_NC' : 'B3',
-    'total_NC_No_DRB' : 'B4',
-    'total_NC_Major' : 'B5',
-    'total_NC_Minor' : 'B6',
-    'total_IO' : 'B7',
-    'Not Started' : 'B8',
-    'Not Started_NC' : 'B9',
-    'Not Started_NC_No_DRB' : 'B10',
-    'Not Started_NC_Major' : 'B11',
-    'Not Started_NC_Minor' : 'B12',
-    'Not Started_IO' : 'B13',
-    'in Prog' : 'B14',
-    'in Prog_NC' : 'B15',
-    'in Prog_NC_No_DRB' : 'B16',
-    'in Prog_NC_Major' : 'B17',
-    'in Prog_NC_Minor' : 'B18',
-    'in Prog_IO' : 'B19',
-    'Resolved' : 'B20',
-    'Verified' : 'B21',
-    'Closed' : 'B22',
+    'total_IO' : 'B4',
+    'Open' : 'B5',
+    'Open_NC' : 'B6',
+    'Open_IO' : 'B7',
+    'Resolved' : 'B8',
+    'Verified' : 'B9',
+    'Closed' : 'B10',
 }
 
 
 sw_spr_table = {
-    'SW_total' : 'B27',
-    'SW_total_NC' : 'B28',
-    'SW_total_NC_No_DRB' : 'B29',
-    'SW_total_NC_Major' : 'B30',
-    'SW_total_NC_Minor' : 'B31',
-    'SW_total_IO' : 'B32',
-    'SW_Not Started' : 'B33',
-    'SW_Not Started_NC' : 'B34',
-    'SW_Not Started_NC_No_DRB' : 'B35',
-    'SW_Not Started_NC_Major' : 'B36',
-    'SW_Not Started_NC_Minor' : 'B37',
-    'SW_Not Started_IO' : 'B38',
-    'SW_in Prog' : 'B39',
-    'SW_in Prog_NC' : 'B40',
-    'SW_in Prog_NC_No_DRB' : 'B41',
-    'SW_in Prog_NC_Major' : 'B42',
-    'SW_in Prog_NC_Minor' : 'B43',
-    'SW_in Prog_IO' : 'B44',
-    'SW_Resolved' : 'B45',
-    'SW_Verified' : 'B46',
-    'SW_Closed' : 'B47',
+    'SW_total' : 'B15',
+    'SW_total_NC' : 'B16',
+    'SW_total_IO' : 'B17',
+    'SW_Open' : 'B18',
+    'SW_Open_NC' : 'B19',
+    'SW_Open_IO' : 'B20',
+    'SW_Resolved' : 'B21',
+    'SW_Verified' : 'B22',
+    'SW_Closed' : 'B23',
 }
 
 
 system_spr_table = {
-    'system_total' : 'B53',
-    'system_total_NC' : 'B54',
-    'system_total_NC_No_DRB' : 'B55',
-    'system_total_NC_Major' : 'B56',
-    'system_total_NC_Minor' : 'B57',
-    'system_total_IO' : 'B58',
-    'system_Not Started' : 'B59',
-    'system_Not Started_NC' : 'B60',
-    'system_Not Started_NC_No_DRB' : 'B61',
-    'system_Not Started_NC_Major' : 'B62',
-    'system_Not Started_NC_Minor' : 'B63',
-    'system_Not Started_IO' : 'B64',
-    'system_in Prog' : 'B65',
-    'system_in Prog_NC' : 'B66',
-    'system_in Prog_NC_No_DRB' : 'B67',
-    'system_in Prog_NC_Major' : 'B68',
-    'system_in Prog_NC_Minor' : 'B69',
-    'system_in Prog_IO' : 'B70',
-    'system_Resolved' : 'B71',
-    'system_Verified' : 'B72',
-    'system_Closed' : 'B73',
+    'system_total' : 'B29',
+    'system_total_NC' : 'B30',
+    'system_total_IO' : 'B31',
+    'system_Open' : 'B32',
+    'system_Open_NC' : 'B33',
+    'system_Open_IO' : 'B34',
+    'system_Resolved' : 'B35',
+    'system_Verified' : 'B36',
+    'system_Closed' : 'B37',
 }
 
 sw_members = [
@@ -231,27 +195,6 @@ for ws_src in reversed(ws_srcs):
     if (index != 0):
         update_delta(ws_summary, new_position)
 
-    #NC No_DRB from ALL SPR
-    new_position = get_position (total_spr_table['total_NC_No_DRB'], index)
-    txt = "=COUNTIFS('{0}'!J2:J3000,\"=NC - Design Non-Conformance\", '{0}'!AC2:AC3000, \"=No DRB\")".format(ws_src.title)
-    ws_summary[new_position] = txt
-    if (index != 0):
-        update_delta(ws_summary, new_position)
-
-    #NC Major from ALL SPR
-    new_position = get_position (total_spr_table['total_NC_Major'], index)
-    txt = "=COUNTIFS('{0}'!J2:J3000,\"=NC - Design Non-Conformance\", '{0}'!AC2:AC3000, \"=Major\")".format(ws_src.title)
-    ws_summary[new_position] = txt
-    if (index != 0):
-        update_delta(ws_summary, new_position)
-
-    #NC Minor from ALL SPR
-    new_position = get_position (total_spr_table['total_NC_Minor'], index)
-    txt = "=COUNTIFS('{0}'!J2:J3000,\"=NC - Design Non-Conformance\", '{0}'!AC2:AC3000, \"=Minor\")".format(ws_src.title)
-    ws_summary[new_position] = txt
-    if (index != 0):
-        update_delta(ws_summary, new_position)
-
     #IO from ALL SPR
     new_position = get_position (total_spr_table['total_IO'], index)
     txt = "=COUNTIFS('{0}'!J2:J3000,\"=IO - Improvement Opportunity\")".format(ws_src.title)
@@ -259,104 +202,36 @@ for ws_src in reversed(ws_srcs):
     if (index != 0):
         update_delta(ws_summary, new_position)
 
-    # Not Started from  ALL SPR
-    new_position = get_position (total_spr_table['Not Started'], index)
+    # Open from  ALL SPR
+    new_position = get_position (total_spr_table['Open'], index)
     txt = "=COUNTIFS('{0}'!M2:M3000,\"=Submitted\")\
     +COUNTIFS('{0}'!M2:M3000,\"=Accepted\")\
+    +COUNTIFS('{0}'!M2:M3000,\"=In Progress\")\
     +COUNTIFS('{0}'!M2:M3000,\"=In Review\")\
     +COUNTIFS('{0}'!M2:M3000,\"=Postponed\")".format(ws_src.title)
     ws_summary[new_position] = txt
     if (index != 0):
         update_delta(ws_summary, new_position)
 
-    #NC for Not Started
-    new_position = get_position (total_spr_table['Not Started_NC'], index)
+    #NC for Open
+    new_position = get_position (total_spr_table['Open_NC'], index)
     txt = "=COUNTIFS('{0}'!M2:M3000,\"=Submitted\",'{0}'!J2:J3000,\"=NC - Design Non-Conformance\")\
     +COUNTIFS('{0}'!M2:M3000,\"=Accepted\",'{0}'!J2:J3000,\"=NC - Design Non-Conformance\")\
+    +COUNTIFS('{0}'!M2:M3000,\"=In Progress\",'{0}'!J2:J3000,\"=NC - Design Non-Conformance\")\
     +COUNTIFS('{0}'!M2:M3000,\"=In Review\",'{0}'!J2:J3000,\"=NC - Design Non-Conformance\")\
     +COUNTIFS('{0}'!M2:M3000,\"=Postponed\",'{0}'!J2:J3000,\"=NC - Design Non-Conformance\")".format(ws_src.title)
     ws_summary[new_position] = txt
     if (index != 0):
         update_delta(ws_summary, new_position)
 
-    #NC No_DRB for Not Started
-    new_position = get_position (total_spr_table['Not Started_NC_No_DRB'], index)
-    txt = "=COUNTIFS('{0}'!M2:M3000,\"=Submitted\",'{0}'!J2:J3000, \"=NC - Design Non-Conformance\",'{0}'!AC2:AC3000,\"=No DRB\")\
-    +COUNTIFS('{0}'!M2:M3000,\"=Accepted\",'{0}'!J2:J3000, \"=NC - Design Non-Conformance\",'{0}'!AC2:AC3000, \"=No DRB\")\
-    +COUNTIFS('{0}'!M2:M3000,\"=In Review\",'{0}'!J2:J3000, \"=NC - Design Non-Conformance\",'{0}'!AC2:AC3000, \"=No DRB\")\
-    +COUNTIFS('{0}'!M2:M3000,\"=Postponed\",'{0}'!J2:J3000, \"=NC - Design Non-Conformance\",'{0}'!AC2:AC3000, \"=No DRB\")".format(ws_src.title)
-    ws_summary[new_position] = txt
-    if (index != 0):
-        update_delta(ws_summary, new_position)
 
-    #NC Major for Not Started
-    new_position = get_position (total_spr_table['Not Started_NC_Major'], index)
-    txt = "=COUNTIFS('{0}'!M2:M3000, \"=Submitted\",'{0}'!J2:J3000,\"=NC - Design Non-Conformance\", '{0}'!AC2:AC3000, \"=Major\")\
-    +COUNTIFS('{0}'!M2:M3000,\"=Accepted\",'{0}'!J2:J3000,\"=NC - Design Non-Conformance\",'{0}'!AC2:AC3000,\"=Major\")\
-    +COUNTIFS('{0}'!M2:M3000,\"=In Review\",'{0}'!J2:J3000,\"=NC - Design Non-Conformance\",'{0}'!AC2:AC3000,\"=Major\")\
-    +COUNTIFS('{0}'!M2:M3000,\"=Postponed\",'{0}'!J2:J3000,\"=NC - Design Non-Conformance\",'{0}'!AC2:AC3000,\"=Major\")".format(ws_src.title)
-    ws_summary[new_position] = txt
-    if (index != 0):
-        update_delta(ws_summary, new_position)
-
-    #NC Minor for Not Started
-    new_position = get_position (total_spr_table['Not Started_NC_Minor'], index)
-    txt = "=COUNTIFS('{0}'!M2:M3000,\"=Submitted\", '{0}'!J2:J3000, \"=NC - Design Non-Conformance\",'{0}'!AC2:AC3000, \"=Minor\")\
-    +COUNTIFS('{0}'!M2:M3000,\"=Accepted\",'{0}'!J2:J3000,\"=NC - Design Non-Conformance\",'{0}'!AC2:AC3000, \"=Minor\")\
-    +COUNTIFS('{0}'!M2:M3000,\"=In Review\",'{0}'!J2:J3000,\"=NC - Design Non-Conformance\",'{0}'!AC2:AC3000, \"=Minor\")\
-    +COUNTIFS('{0}'!M2:M3000,\"=Postponed\",'{0}'!J2:J3000,\"=NC - Design Non-Conformance\",'{0}'!AC2:AC3000, \"=Minor\")".format(ws_src.title)
-    ws_summary[new_position] = txt
-    if (index != 0):
-        update_delta(ws_summary, new_position)
-
-    #IO for Not Strated
-    new_position = get_position (total_spr_table['Not Started_IO'], index)
+    #IO for Open
+    new_position = get_position (total_spr_table['Open_IO'], index)
     txt = "=COUNTIFS('{0}'!M2:M3000,\"=Submitted\",'{0}'!J2:J3000,\"=IO - Improvement Opportunity\")\
     +COUNTIFS('{0}'!M2:M3000,\"=Accepted\",'{0}'!J2:J3000,\"=IO - Improvement Opportunity\")\
+    +COUNTIFS('{0}'!M2:M3000,\"=In Progress\",'{0}'!J2:J3000,\"=IO - Improvement Opportunity\")\
     +COUNTIFS('{0}'!M2:M3000,\"=In Review\",'{0}'!J2:J3000,\"=IO - Improvement Opportunity\")\
     +COUNTIFS('{0}'!M2:M3000,\"=Postponed\",'{0}'!J2:J3000,\"=IO - Improvement Opportunity\")".format(ws_src.title)
-    ws_summary[new_position] = txt
-    if (index != 0):
-        update_delta(ws_summary, new_position)
-
-    # In Progress from ALL SPR
-    new_position = get_position (total_spr_table['in Prog'], index)
-    txt = "=COUNTIFS('{0}'!M2:M3000,\"=In Progress\")".format(ws_src.title)
-    ws_summary[new_position] = txt
-    if (index != 0):
-        update_delta(ws_summary, new_position)
-
-    #NC for In Progress 
-    new_position = get_position (total_spr_table['in Prog_NC'], index)
-    txt = "=COUNTIFS('{0}'!M2:M3000,\"=In Progress\" ,'{0}'!J2:J3000,\"=NC - Design Non-Conformance\")".format(ws_src.title)
-    ws_summary[new_position] = txt
-    if (index != 0):
-        update_delta(ws_summary, new_position)
-
-    #NC No_DRB for In Progress 
-    new_position = get_position (total_spr_table['in Prog_NC_No_DRB'], index)
-    txt = "=COUNTIFS('{0}'!M2:M3000,\"=In Progress\" ,'{0}'!J2:J3000,\"=NC - Design Non-Conformance\", '{0}'!AC2:AC3000,\"=No DRB\")".format(ws_src.title)
-    ws_summary[new_position] = txt
-    if (index != 0):
-        update_delta(ws_summary, new_position)
-
-    #NC Major for In Progress 
-    new_position = get_position (total_spr_table['in Prog_NC_Major'], index)
-    txt = "=COUNTIFS('{0}'!M2:M3000,\"=In Progress\" ,'{0}'!J2:J3000,\"=NC - Design Non-Conformance\", '{0}'!AC2:AC3000,\"=Major\")".format(ws_src.title)
-    ws_summary[new_position] = txt
-    if (index != 0):
-        update_delta(ws_summary, new_position)
-
-    #NC Minor for In Progress 
-    new_position = get_position (total_spr_table['in Prog_NC_Minor'], index)
-    txt = "=COUNTIFS('{0}'!M2:M3000,\"=In Progress\" ,'{0}'!J2:J3000,\"=NC - Design Non-Conformance\", '{0}'!AC2:AC3000,\"=Minor\")".format(ws_src.title)
-    ws_summary[new_position] = txt
-    if (index != 0):
-        update_delta(ws_summary, new_position)
-
-    #IO for In Progress 
-    new_position = get_position (total_spr_table['in Prog_IO'], index)
-    txt = "=COUNTIFS('{0}'!M2:M3000,\"=In Progress\" ,'{0}'!J2:J3000,\"IO - Improvement Opportunity\")".format(ws_src.title)
     ws_summary[new_position] = txt
     if (index != 0):
         update_delta(ws_summary, new_position)
@@ -405,38 +280,6 @@ for ws_src in reversed(ws_srcs):
         update_delta(ws_summary, new_position)
 
 
-    # NC NO DRB SPRs owned by s/w team
-    temp_txt="="
-    for sw_member in sw_members:
-        temp_txt += "COUNTIFS({0}!N2:N3000,".format(ws_src.title) + sw_member + ",{0}!J2:J3000,\"=NC - Design Non-Conformance\"".format(ws_src.title) + ",{0}!AC2:AC3000,\"=No_DRB\")".format(ws_src.title) + "+"
-    txt = temp_txt[0:len(temp_txt)-1]  # truncate last "+"
-    new_position = get_position (sw_spr_table['SW_total_NC_No_DRB'], index)
-    ws_summary[new_position] = txt
-    if (index != 0):
-        update_delta(ws_summary, new_position)
-
-
-    # NC Major SPRs owned by s/w team
-    temp_txt="="
-    for sw_member in sw_members:
-        temp_txt += "COUNTIFS({0}!N2:N3000,".format(ws_src.title) + sw_member + ",'{0}'!J2:J3000,\"=NC - Design Non-Conformance\"".format(ws_src.title) + ",'{0}'!AC2:AC3000,\"=Major\")".format(ws_src.title) + "+"
-    txt = temp_txt[0:len(temp_txt)-1]  # truncate last "+"
-    new_position = get_position (sw_spr_table['SW_total_NC_Major'], index)
-    ws_summary[new_position] = txt
-    if (index != 0):
-        update_delta(ws_summary, new_position)
-
-
-    # NC Minor SPRs owned by s/w team
-    temp_txt="="
-    for sw_member in sw_members:
-        temp_txt += "COUNTIFS({0}!N2:N3000,".format(ws_src.title) + sw_member + ",'{0}'!J2:J3000,\"=NC - Design Non-Conformance\"".format(ws_src.title) + ",'{0}'!AC2:AC3000,\"=Minor\")".format(ws_src.title) + "+"
-    txt = temp_txt[0:len(temp_txt)-1]  # truncate last "+"
-    new_position = get_position (sw_spr_table['SW_total_NC_Minor'], index)
-    ws_summary[new_position] = txt
-    if (index != 0):
-        update_delta(ws_summary, new_position)
-
     # IO  SPRs owned by s/w team
     temp_txt="="
     for sw_member in sw_members:
@@ -448,179 +291,68 @@ for ws_src in reversed(ws_srcs):
         update_delta(ws_summary, new_position)
 
 
-    # # Not Started SPRs owned by s/w team
+    # # Open SPRs owned by s/w team
     temp_txt="="
     temp_txt1=""
     temp_txt2=""
     temp_txt3=""
     temp_txt4=""
+    temp_txt5=""
     for sw_member in sw_members:
         temp_txt1 = "COUNTIFS({0}!N2:N3000,".format(ws_src.title) + sw_member + ",{0}!M2:M3000,\"=Submitted\")".format(ws_src.title) + "+" 
         temp_txt2 = "COUNTIFS({0}!N2:N3000,".format(ws_src.title) + sw_member + ",{0}!M2:M3000,\"=Accepted\")".format(ws_src.title) + "+"
         temp_txt3 = "COUNTIFS({0}!N2:N3000,".format(ws_src.title) + sw_member + ",{0}!M2:M3000,\"=In Review\")".format(ws_src.title) + "+"
         temp_txt4 = "COUNTIFS({0}!N2:N3000,".format(ws_src.title) + sw_member + ",{0}!M2:M3000,\"=Postponed\")".format(ws_src.title) + "+"
-        temp_txt += temp_txt1 + temp_txt2 + temp_txt3 + temp_txt4
+        temp_txt5 = "COUNTIFS({0}!N2:N3000,".format(ws_src.title) + sw_member + ",{0}!M2:M3000,\"=In Progress\")".format(ws_src.title) + "+"
+        temp_txt += temp_txt1 + temp_txt2 + temp_txt3 + temp_txt4 + temp_txt5
     txt = temp_txt[0:len(temp_txt)-1]  # truncate last "+"
-    new_position = get_position (sw_spr_table['SW_Not Started'], index)
+    new_position = get_position (sw_spr_table['SW_Open'], index)
     ws_summary[new_position] = txt
     if (index != 0):
         update_delta(ws_summary, new_position)
 
 
  
-    # # Not Started NC SPRs owned by s/w team
+    # # Open NC SPRs owned by s/w team
     temp_txt="="
     temp_txt1=""
     temp_txt2=""
     temp_txt3=""
     temp_txt4=""
+    temp_txt5=""
     for sw_member in sw_members:
         temp_txt1 = "COUNTIFS({0}!N2:N3000,".format(ws_src.title) + sw_member + ",{0}!M2:M3000,\"=Submitted\"".format(ws_src.title) + ",{0}!J2:J3000,\"=NC - Design Non-Conformance\")".format(ws_src.title) + "+" 
         temp_txt2 = "COUNTIFS({0}!N2:N3000,".format(ws_src.title) + sw_member + ",{0}!M2:M3000,\"=Accepted\"".format(ws_src.title) + ",{0}!J2:J3000,\"=NC - Design Non-Conformance\")".format(ws_src.title) + "+"
         temp_txt3 = "COUNTIFS({0}!N2:N3000,".format(ws_src.title) + sw_member + ",{0}!M2:M3000,\"=In Review\"".format(ws_src.title) + ",{0}!J2:J3000,\"=NC - Design Non-Conformance\")".format(ws_src.title) + "+"
         temp_txt4 = "COUNTIFS({0}!N2:N3000,".format(ws_src.title) + sw_member + ",{0}!M2:M3000,\"=Postponed\"".format(ws_src.title) + ",{0}!J2:J3000,\"=NC - Design Non-Conformance\")".format(ws_src.title) + "+"
-        temp_txt += temp_txt1 + temp_txt2 + temp_txt3 + temp_txt4
+        temp_txt5 = "COUNTIFS({0}!N2:N3000,".format(ws_src.title) + sw_member + ",{0}!M2:M3000,\"=In Progress\"".format(ws_src.title) + ",{0}!J2:J3000,\"=NC - Design Non-Conformance\")".format(ws_src.title) + "+"
+        temp_txt += temp_txt1 + temp_txt2 + temp_txt3 + temp_txt4 + temp_txt5
     txt = temp_txt[0:len(temp_txt)-1]  # truncate last "+"
-    new_position = get_position (sw_spr_table['SW_Not Started_NC'], index)
+    new_position = get_position (sw_spr_table['SW_Open_NC'], index)
     ws_summary[new_position] = txt
     if (index != 0):
         update_delta(ws_summary, new_position)
 
-    # # Not Started No DRB NC SPRs owned by s/w team
+    # # Open IO SPRs owned by s/w team
     temp_txt="="
     temp_txt1=""
     temp_txt2=""
     temp_txt3=""
     temp_txt4=""
-    for sw_member in sw_members:
-        temp_txt1 = "COUNTIFS({0}!N2:N3000,".format(ws_src.title) + sw_member + ",{0}!M2:M3000,\"=Submitted\"".format(ws_src.title) + ",{0}!J2:J3000,\"=NC - Design Non-Conformance\"".format(ws_src.title) + ",{0}!AC2:AC3000,\"=No DRB\")".format(ws_src.title) + "+" 
-        temp_txt2 = "COUNTIFS({0}!N2:N3000,".format(ws_src.title) + sw_member + ",{0}!M2:M3000,\"=Accepted\"".format(ws_src.title) + ",{0}!J2:J3000,\"=NC - Design Non-Conformance\"".format(ws_src.title) + ",{0}!AC2:AC3000,\"=No DRB\")".format(ws_src.title) + "+"
-        temp_txt3 = "COUNTIFS({0}!N2:N3000,".format(ws_src.title) + sw_member + ",{0}!M2:M3000,\"=In Review\"".format(ws_src.title) + ",{0}!J2:J3000,\"=NC - Design Non-Conformance\"".format(ws_src.title) + ",{0}!AC2:AC3000,\"=No DRB\")".format(ws_src.title) + "+"
-        temp_txt4 = "COUNTIFS({0}!N2:N3000,".format(ws_src.title) + sw_member + ",{0}!M2:M3000,\"=Postponed\"".format(ws_src.title) + ",{0}!J2:J3000,\"=NC - Design Non-Conformance\"".format(ws_src.title) + ",{0}!AC2:AC3000,\"=No DRB\")".format(ws_src.title) + "+"
-        temp_txt += temp_txt1 + temp_txt2 + temp_txt3 + temp_txt4
-    txt = temp_txt[0:len(temp_txt)-1]  # truncate last "+"
-    new_position = get_position (sw_spr_table['SW_Not Started_NC_No_DRB'], index)
-    ws_summary[new_position] = txt
-    if (index != 0):
-        update_delta(ws_summary, new_position)
-
-    # # Not Started Major NC SPRs owned by s/w team
-    temp_txt="="
-    temp_txt1=""
-    temp_txt2=""
-    temp_txt3=""
-    temp_txt4=""
-    for sw_member in sw_members:
-        temp_txt1 = "COUNTIFS({0}!N2:N3000,".format(ws_src.title) + sw_member + ",{0}!M2:M3000,\"=Submitted\"".format(ws_src.title) + ",{0}!J2:J3000,\"=NC - Design Non-Conformance\"".format(ws_src.title) + ",{0}!AC2:AC3000,\"=Major\")".format(ws_src.title) + "+" 
-        temp_txt2 = "COUNTIFS({0}!N2:N3000,".format(ws_src.title) + sw_member + ",{0}!M2:M3000,\"=Accepted\"".format(ws_src.title) + ",{0}!J2:J3000,\"=NC - Design Non-Conformance\"".format(ws_src.title) + ",{0}!AC2:AC3000,\"=Major\")".format(ws_src.title) + "+"
-        temp_txt3 = "COUNTIFS({0}!N2:N3000,".format(ws_src.title) + sw_member + ",{0}!M2:M3000,\"=In Review\"".format(ws_src.title) + ",{0}!J2:J3000,\"=NC - Design Non-Conformance\"".format(ws_src.title) + ",{0}!AC2:AC3000,\"=Major\")".format(ws_src.title) + "+"
-        temp_txt4 = "COUNTIFS({0}!N2:N3000,".format(ws_src.title) + sw_member + ",{0}!M2:M3000,\"=Postponed\"".format(ws_src.title) + ",{0}!J2:J3000,\"=NC - Design Non-Conformance\"".format(ws_src.title) + ",{0}!AC2:AC3000,\"=Major\")".format(ws_src.title) + "+"
-        temp_txt += temp_txt1 + temp_txt2 + temp_txt3 + temp_txt4
-    txt = temp_txt[0:len(temp_txt)-1]  # truncate last "+"
-    new_position = get_position (sw_spr_table['SW_Not Started_NC_Major'], index)
-    ws_summary[new_position] = txt
-    if (index != 0):
-        update_delta(ws_summary, new_position)
-
-    # # Not Started Minor NC SPRs owned by s/w team
-    temp_txt="="
-    temp_txt1=""
-    temp_txt2=""
-    temp_txt3=""
-    temp_txt4=""
-    for sw_member in sw_members:
-        temp_txt1 = "COUNTIFS({0}!N2:N3000,".format(ws_src.title) + sw_member + ",{0}!M2:M3000,\"=Submitted\"".format(ws_src.title) + ",{0}!J2:J3000,\"=NC - Design Non-Conformance\"".format(ws_src.title) + ",{0}!AC2:AC3000,\"=Minor\")".format(ws_src.title) + "+" 
-        temp_txt2 = "COUNTIFS({0}!N2:N3000,".format(ws_src.title) + sw_member + ",{0}!M2:M3000,\"=Accepted\"".format(ws_src.title) + ",{0}!J2:J3000,\"=NC - Design Non-Conformance\"".format(ws_src.title) + ",{0}!AC2:AC3000,\"=Minor\")".format(ws_src.title) + "+"
-        temp_txt3 = "COUNTIFS({0}!N2:N3000,".format(ws_src.title) + sw_member + ",{0}!M2:M3000,\"=In Review\"".format(ws_src.title) + ",{0}!J2:J3000,\"=NC - Design Non-Conformance\"".format(ws_src.title) + ",{0}!AC2:AC3000,\"=Minor\")".format(ws_src.title) + "+"
-        temp_txt4 = "COUNTIFS({0}!N2:N3000,".format(ws_src.title) + sw_member + ",{0}!M2:M3000,\"=Postponed\"".format(ws_src.title) + ",{0}!J2:J3000,\"=NC - Design Non-Conformance\"".format(ws_src.title) + ",{0}!AC2:AC3000,\"=Minor\")".format(ws_src.title) + "+"
-        temp_txt += temp_txt1 + temp_txt2 + temp_txt3 + temp_txt4
-    txt = temp_txt[0:len(temp_txt)-1]  # truncate last "+"
-    new_position = get_position (sw_spr_table['SW_Not Started_NC_Minor'], index)
-    ws_summary[new_position] = txt
-    if (index != 0):
-        update_delta(ws_summary, new_position)
-
-
-    # # Not Started IO SPRs owned by s/w team
-    temp_txt="="
-    temp_txt1=""
-    temp_txt2=""
-    temp_txt3=""
-    temp_txt4=""
+    temp_txt5=""
     for sw_member in sw_members:
         temp_txt1 = "COUNTIFS({0}!N2:N3000,".format(ws_src.title) + sw_member + ",{0}!M2:M3000,\"=Submitted\"".format(ws_src.title) + ",{0}!J2:J3000,\"=IO - Improvement Opportunity\")".format(ws_src.title) + "+" 
         temp_txt2 = "COUNTIFS({0}!N2:N3000,".format(ws_src.title) + sw_member + ",{0}!M2:M3000,\"=Accepted\"".format(ws_src.title) + ",{0}!J2:J3000,\"=IO - Improvement Opportunity\")".format(ws_src.title) + "+"
         temp_txt3 = "COUNTIFS({0}!N2:N3000,".format(ws_src.title) + sw_member + ",{0}!M2:M3000,\"=In Review\"".format(ws_src.title) + ",{0}!J2:J3000,\"=IO - Improvement Opportunity\")".format(ws_src.title) + "+"
         temp_txt4 = "COUNTIFS({0}!N2:N3000,".format(ws_src.title) + sw_member + ",{0}!M2:M3000,\"=Postponed\"".format(ws_src.title) + ",{0}!J2:J3000,\"=IO - Improvement Opportunity\")".format(ws_src.title) + "+"
-        temp_txt += temp_txt1 + temp_txt2 + temp_txt3 + temp_txt4
+        temp_txt5 = "COUNTIFS({0}!N2:N3000,".format(ws_src.title) + sw_member + ",{0}!M2:M3000,\"=In Progress\"".format(ws_src.title) + ",{0}!J2:J3000,\"=IO - Improvement Opportunity\")".format(ws_src.title) + "+"
+        temp_txt += temp_txt1 + temp_txt2 + temp_txt3 + temp_txt4 + temp_txt5
     txt = temp_txt[0:len(temp_txt)-1]  # truncate last "+"
-    new_position = get_position (sw_spr_table['SW_Not Started_IO'], index)
+    new_position = get_position (sw_spr_table['SW_Open_IO'], index)
     ws_summary[new_position] = txt
     if (index != 0):
         update_delta(ws_summary, new_position)
 
-    # # in Prog SPRs owned by s/w team
-    temp_txt="="
-    for sw_member in sw_members:
-        temp_txt += "COUNTIFS({0}!N2:N3000,".format(ws_src.title) + sw_member + ",{0}!M2:M3000, \"=In Progress\")".format(ws_src.title) +"+"
-    txt = temp_txt[0:len(temp_txt)-1]  # truncate last "+"
-    new_position = get_position (sw_spr_table['SW_in Prog'], index)
-    ws_summary[new_position] = txt
-    if (index != 0):
-        update_delta(ws_summary, new_position)
-
-
-    # # in Prog NC owned by s/w team
-    temp_txt="="
-    for sw_member in sw_members:
-        temp_txt += "COUNTIFS({0}!N2:N3000,".format(ws_src.title) + sw_member + ",{0}!M2:M3000, \"=In Progress\"".format(ws_src.title) + ",{0}!J2:J3000,\"=NC - Design Non-Conformance\")".format(ws_src.title) +"+"
-    txt = temp_txt[0:len(temp_txt)-1]  # truncate last "+"
-    new_position = get_position (sw_spr_table['SW_in Prog_NC'], index)
-    ws_summary[new_position] = txt
-    if (index != 0):
-        update_delta(ws_summary, new_position)
-
-
-    # # in Prog NC No_DRB owned by s/w team
-    temp_txt="="
-    for sw_member in sw_members:
-        temp_txt += "COUNTIFS({0}!N2:N3000,".format(ws_src.title) + sw_member + ",{0}!M2:M3000, \"=In Progress\"".format(ws_src.title) + ",{0}!J2:J3000,\"=NC - Design Non-Conformance\"".format(ws_src.title) + ",{0}!AC2:AC3000,\"=No_DRB\")".format(ws_src.title) + "+"
-    txt = temp_txt[0:len(temp_txt)-1]  # truncate last "+"
-    new_position = get_position (sw_spr_table['SW_in Prog_NC_No_DRB'], index)
-    ws_summary[new_position] = txt
-    if (index != 0):
-        update_delta(ws_summary, new_position)
-
-
-    # # in Prog NC Major owned by s/w team
-    temp_txt="="
-    for sw_member in sw_members:
-        temp_txt += "COUNTIFS({0}!N2:N3000,".format(ws_src.title) + sw_member + ",{0}!M2:M3000, \"=In Progress\"".format(ws_src.title) + ",{0}!J2:J3000,\"=NC - Design Non-Conformance\"".format(ws_src.title) + ",{0}!AC2:AC3000,\"=Major\")".format(ws_src.title) + "+"
-    txt = temp_txt[0:len(temp_txt)-1]  # truncate last "+"
-    new_position = get_position (sw_spr_table['SW_in Prog_NC_Major'], index)
-    ws_summary[new_position] = txt
-    if (index != 0):
-        update_delta(ws_summary, new_position)
-
-    # # in Prog NC Minor owned by s/w team
-    temp_txt="="
-    for sw_member in sw_members:
-        temp_txt += "COUNTIFS({0}!N2:N3000,".format(ws_src.title) + sw_member + ",{0}!M2:M3000, \"=In Progress\"".format(ws_src.title) + ",{0}!J2:J3000,\"=NC - Design Non-Conformance\"".format(ws_src.title) + ",{0}!AC2:AC3000,\"=Minor\")".format(ws_src.title) + "+"
-    txt = temp_txt[0:len(temp_txt)-1]  # truncate last "+"
-    new_position = get_position (sw_spr_table['SW_in Prog_NC_Minor'], index)
-    ws_summary[new_position] = txt
-    if (index != 0):
-        update_delta(ws_summary, new_position)
-
-    # # in Prog IO owned by s/w team
-    temp_txt="="
-    for sw_member in sw_members:
-        temp_txt += "COUNTIFS({0}!N2:N3000,".format(ws_src.title) + sw_member + ",{0}!M2:M3000, \"=In Progress\"".format(ws_src.title) + ",{0}!J2:J3000,\"=IO - Improvement Opportunity\")".format(ws_src.title) +"+"
-    txt = temp_txt[0:len(temp_txt)-1]  # truncate last "+"
-    new_position = get_position (sw_spr_table['SW_in Prog_IO'], index)
-    ws_summary[new_position] = txt
-    if (index != 0):
-        update_delta(ws_summary, new_position)
 
     # # Resolved SPRs owned by s/w team
     temp_txt="="
@@ -673,39 +405,6 @@ for ws_src in reversed(ws_srcs):
     if (index != 0):
         update_delta(ws_summary, new_position)
 
-
-    # NC NO DRB SPRs owned by system team
-    temp_txt="="
-    for system_member in system_members:
-        temp_txt += "COUNTIFS({0}!N2:N3000,".format(ws_src.title) + system_member + ",{0}!J2:J3000,\"=NC - Design Non-Conformance\"".format(ws_src.title) + ",{0}!AC2:AC3000,\"=No_DRB\")".format(ws_src.title) + "+"
-    txt = temp_txt[0:len(temp_txt)-1]  # truncate last "+"
-    new_position = get_position (system_spr_table['system_total_NC_No_DRB'], index)
-    ws_summary[new_position] = txt
-    if (index != 0):
-        update_delta(ws_summary, new_position)
-
-
-    # NC Major SPRs owned by system team
-    temp_txt="="
-    for system_member in system_members:
-        temp_txt += "COUNTIFS({0}!N2:N3000,".format(ws_src.title) + system_member + ",'{0}'!J2:J3000,\"=NC - Design Non-Conformance\"".format(ws_src.title) + ",'{0}'!AC2:AC3000,\"=Major\")".format(ws_src.title) + "+"
-    txt = temp_txt[0:len(temp_txt)-1]  # truncate last "+"
-    new_position = get_position (system_spr_table['system_total_NC_Major'], index)
-    ws_summary[new_position] = txt
-    if (index != 0):
-        update_delta(ws_summary, new_position)
-
-
-    # NC Minor SPRs owned by system team
-    temp_txt="="
-    for system_member in system_members:
-        temp_txt += "COUNTIFS({0}!N2:N3000,".format(ws_src.title) + system_member + ",'{0}'!J2:J3000,\"=NC - Design Non-Conformance\"".format(ws_src.title) + ",'{0}'!AC2:AC3000,\"=Minor\")".format(ws_src.title) + "+"
-    txt = temp_txt[0:len(temp_txt)-1]  # truncate last "+"
-    new_position = get_position (system_spr_table['system_total_NC_Minor'], index)
-    ws_summary[new_position] = txt
-    if (index != 0):
-        update_delta(ws_summary, new_position)
-
     # IO  SPRs owned by system team
     temp_txt="="
     for system_member in system_members:
@@ -717,20 +416,22 @@ for ws_src in reversed(ws_srcs):
         update_delta(ws_summary, new_position)
 
 
-    # # Not Started SPRs owned by system team
+    # # Open SPRs owned by system team
     temp_txt="="
     temp_txt1=""
     temp_txt2=""
     temp_txt3=""
     temp_txt4=""
+    temp_txt5=""
     for system_member in system_members:
         temp_txt1 = "COUNTIFS({0}!N2:N3000,".format(ws_src.title) + system_member + ",{0}!M2:M3000,\"=Submitted\")".format(ws_src.title) + "+" 
         temp_txt2 = "COUNTIFS({0}!N2:N3000,".format(ws_src.title) + system_member + ",{0}!M2:M3000,\"=Accepted\")".format(ws_src.title) + "+"
         temp_txt3 = "COUNTIFS({0}!N2:N3000,".format(ws_src.title) + system_member + ",{0}!M2:M3000,\"=In Review\")".format(ws_src.title) + "+"
         temp_txt4 = "COUNTIFS({0}!N2:N3000,".format(ws_src.title) + system_member + ",{0}!M2:M3000,\"=Postponed\")".format(ws_src.title) + "+"
-        temp_txt += temp_txt1 + temp_txt2 + temp_txt3 + temp_txt4
+        temp_txt5 = "COUNTIFS({0}!N2:N3000,".format(ws_src.title) + system_member + ",{0}!M2:M3000,\"=In Progress\")".format(ws_src.title) + "+"
+        temp_txt += temp_txt1 + temp_txt2 + temp_txt3 + temp_txt4 + temp_txt5
     txt = temp_txt[0:len(temp_txt)-1]  # truncate last "+"
-    new_position = get_position (system_spr_table['system_Not Started'], index)
+    new_position = get_position (system_spr_table['system_Open'], index)
     ws_summary[new_position] = txt
     if (index != 0):
         update_delta(ws_summary, new_position)
@@ -743,150 +444,37 @@ for ws_src in reversed(ws_srcs):
     temp_txt2=""
     temp_txt3=""
     temp_txt4=""
+    temp_txt5=""
     for system_member in system_members:
         temp_txt1 = "COUNTIFS({0}!N2:N3000,".format(ws_src.title) + system_member + ",{0}!M2:M3000,\"=Submitted\"".format(ws_src.title) + ",{0}!J2:J3000,\"=NC - Design Non-Conformance\")".format(ws_src.title) + "+" 
         temp_txt2 = "COUNTIFS({0}!N2:N3000,".format(ws_src.title) + system_member + ",{0}!M2:M3000,\"=Accepted\"".format(ws_src.title) + ",{0}!J2:J3000,\"=NC - Design Non-Conformance\")".format(ws_src.title) + "+"
         temp_txt3 = "COUNTIFS({0}!N2:N3000,".format(ws_src.title) + system_member + ",{0}!M2:M3000,\"=In Review\"".format(ws_src.title) + ",{0}!J2:J3000,\"=NC - Design Non-Conformance\")".format(ws_src.title) + "+"
         temp_txt4 = "COUNTIFS({0}!N2:N3000,".format(ws_src.title) + system_member + ",{0}!M2:M3000,\"=Postponed\"".format(ws_src.title) + ",{0}!J2:J3000,\"=NC - Design Non-Conformance\")".format(ws_src.title) + "+"
-        temp_txt += temp_txt1 + temp_txt2 + temp_txt3 + temp_txt4
+        temp_txt5 = "COUNTIFS({0}!N2:N3000,".format(ws_src.title) + system_member + ",{0}!M2:M3000,\"=In Progress\"".format(ws_src.title) + ",{0}!J2:J3000,\"=NC - Design Non-Conformance\")".format(ws_src.title) + "+"
+        temp_txt += temp_txt1 + temp_txt2 + temp_txt3 + temp_txt4 + temp_txt5
     txt = temp_txt[0:len(temp_txt)-1]  # truncate last "+"
-    new_position = get_position (system_spr_table['system_Not Started_NC'], index)
-    ws_summary[new_position] = txt
-    if (index != 0):
-        update_delta(ws_summary, new_position)
-
-    # # Not Started No DRB NC SPRs owned by system team
-    temp_txt="="
-    temp_txt1=""
-    temp_txt2=""
-    temp_txt3=""
-    temp_txt4=""
-    for system_member in system_members:
-        temp_txt1 = "COUNTIFS({0}!N2:N3000,".format(ws_src.title) + system_member + ",{0}!M2:M3000,\"=Submitted\"".format(ws_src.title) + ",{0}!J2:J3000,\"=NC - Design Non-Conformance\"".format(ws_src.title) + ",{0}!AC2:AC3000,\"=No DRB\")".format(ws_src.title) + "+" 
-        temp_txt2 = "COUNTIFS({0}!N2:N3000,".format(ws_src.title) + system_member + ",{0}!M2:M3000,\"=Accepted\"".format(ws_src.title) + ",{0}!J2:J3000,\"=NC - Design Non-Conformance\"".format(ws_src.title) + ",{0}!AC2:AC3000,\"=No DRB\")".format(ws_src.title) + "+"
-        temp_txt3 = "COUNTIFS({0}!N2:N3000,".format(ws_src.title) + system_member + ",{0}!M2:M3000,\"=In Review\"".format(ws_src.title) + ",{0}!J2:J3000,\"=NC - Design Non-Conformance\"".format(ws_src.title) + ",{0}!AC2:AC3000,\"=No DRB\")".format(ws_src.title) + "+"
-        temp_txt4 = "COUNTIFS({0}!N2:N3000,".format(ws_src.title) + system_member + ",{0}!M2:M3000,\"=Postponed\"".format(ws_src.title) + ",{0}!J2:J3000,\"=NC - Design Non-Conformance\"".format(ws_src.title) + ",{0}!AC2:AC3000,\"=No DRB\")".format(ws_src.title) + "+"
-        temp_txt += temp_txt1 + temp_txt2 + temp_txt3 + temp_txt4
-    txt = temp_txt[0:len(temp_txt)-1]  # truncate last "+"
-    new_position = get_position (system_spr_table['system_Not Started_NC_No_DRB'], index)
-    ws_summary[new_position] = txt
-    if (index != 0):
-        update_delta(ws_summary, new_position)
-
-    # # Not Started Major NC SPRs owned by system team
-    temp_txt="="
-    temp_txt1=""
-    temp_txt2=""
-    temp_txt3=""
-    temp_txt4=""
-    for system_member in system_members:
-        temp_txt1 = "COUNTIFS({0}!N2:N3000,".format(ws_src.title) + system_member + ",{0}!M2:M3000,\"=Submitted\"".format(ws_src.title) + ",{0}!J2:J3000,\"=NC - Design Non-Conformance\"".format(ws_src.title) + ",{0}!AC2:AC3000,\"=Major\")".format(ws_src.title) + "+" 
-        temp_txt2 = "COUNTIFS({0}!N2:N3000,".format(ws_src.title) + system_member + ",{0}!M2:M3000,\"=Accepted\"".format(ws_src.title) + ",{0}!J2:J3000,\"=NC - Design Non-Conformance\"".format(ws_src.title) + ",{0}!AC2:AC3000,\"=Major\")".format(ws_src.title) + "+"
-        temp_txt3 = "COUNTIFS({0}!N2:N3000,".format(ws_src.title) + system_member + ",{0}!M2:M3000,\"=In Review\"".format(ws_src.title) + ",{0}!J2:J3000,\"=NC - Design Non-Conformance\"".format(ws_src.title) + ",{0}!AC2:AC3000,\"=Major\")".format(ws_src.title) + "+"
-        temp_txt4 = "COUNTIFS({0}!N2:N3000,".format(ws_src.title) + system_member + ",{0}!M2:M3000,\"=Postponed\"".format(ws_src.title) + ",{0}!J2:J3000,\"=NC - Design Non-Conformance\"".format(ws_src.title) + ",{0}!AC2:AC3000,\"=Major\")".format(ws_src.title) + "+"
-        temp_txt += temp_txt1 + temp_txt2 + temp_txt3 + temp_txt4
-    txt = temp_txt[0:len(temp_txt)-1]  # truncate last "+"
-    new_position = get_position (system_spr_table['system_Not Started_NC_Major'], index)
-    ws_summary[new_position] = txt
-    if (index != 0):
-        update_delta(ws_summary, new_position)
-
-    # # Not Started Minor NC SPRs owned by system team
-    temp_txt="="
-    temp_txt1=""
-    temp_txt2=""
-    temp_txt3=""
-    temp_txt4=""
-    for system_member in system_members:
-        temp_txt1 = "COUNTIFS({0}!N2:N3000,".format(ws_src.title) + system_member + ",{0}!M2:M3000,\"=Submitted\"".format(ws_src.title) + ",{0}!J2:J3000,\"=NC - Design Non-Conformance\"".format(ws_src.title) + ",{0}!AC2:AC3000,\"=Minor\")".format(ws_src.title) + "+" 
-        temp_txt2 = "COUNTIFS({0}!N2:N3000,".format(ws_src.title) + system_member + ",{0}!M2:M3000,\"=Accepted\"".format(ws_src.title) + ",{0}!J2:J3000,\"=NC - Design Non-Conformance\"".format(ws_src.title) + ",{0}!AC2:AC3000,\"=Minor\")".format(ws_src.title) + "+"
-        temp_txt3 = "COUNTIFS({0}!N2:N3000,".format(ws_src.title) + system_member + ",{0}!M2:M3000,\"=In Review\"".format(ws_src.title) + ",{0}!J2:J3000,\"=NC - Design Non-Conformance\"".format(ws_src.title) + ",{0}!AC2:AC3000,\"=Minor\")".format(ws_src.title) + "+"
-        temp_txt4 = "COUNTIFS({0}!N2:N3000,".format(ws_src.title) + system_member + ",{0}!M2:M3000,\"=Postponed\"".format(ws_src.title) + ",{0}!J2:J3000,\"=NC - Design Non-Conformance\"".format(ws_src.title) + ",{0}!AC2:AC3000,\"=Minor\")".format(ws_src.title) + "+"
-        temp_txt += temp_txt1 + temp_txt2 + temp_txt3 + temp_txt4
-    txt = temp_txt[0:len(temp_txt)-1]  # truncate last "+"
-    new_position = get_position (system_spr_table['system_Not Started_NC_Minor'], index)
+    new_position = get_position (system_spr_table['system_Open_NC'], index)
     ws_summary[new_position] = txt
     if (index != 0):
         update_delta(ws_summary, new_position)
 
 
-    # # Not Started IO SPRs owned by system team
+    # # OPen IO SPRs owned by system team
     temp_txt="="
     temp_txt1=""
     temp_txt2=""
     temp_txt3=""
     temp_txt4=""
+    temp_txt5=""
     for system_member in system_members:
         temp_txt1 = "COUNTIFS({0}!N2:N3000,".format(ws_src.title) + system_member + ",{0}!M2:M3000,\"=Submitted\"".format(ws_src.title) + ",{0}!J2:J3000,\"=IO - Improvement Opportunity\")".format(ws_src.title) + "+" 
         temp_txt2 = "COUNTIFS({0}!N2:N3000,".format(ws_src.title) + system_member + ",{0}!M2:M3000,\"=Accepted\"".format(ws_src.title) + ",{0}!J2:J3000,\"=IO - Improvement Opportunity\")".format(ws_src.title) + "+"
         temp_txt3 = "COUNTIFS({0}!N2:N3000,".format(ws_src.title) + system_member + ",{0}!M2:M3000,\"=In Review\"".format(ws_src.title) + ",{0}!J2:J3000,\"=IO - Improvement Opportunity\")".format(ws_src.title) + "+"
         temp_txt4 = "COUNTIFS({0}!N2:N3000,".format(ws_src.title) + system_member + ",{0}!M2:M3000,\"=Postponed\"".format(ws_src.title) + ",{0}!J2:J3000,\"=IO - Improvement Opportunity\")".format(ws_src.title) + "+"
-        temp_txt += temp_txt1 + temp_txt2 + temp_txt3 + temp_txt4
+        temp_txt5 = "COUNTIFS({0}!N2:N3000,".format(ws_src.title) + system_member + ",{0}!M2:M3000,\"=In Progress\"".format(ws_src.title) + ",{0}!J2:J3000,\"=IO - Improvement Opportunity\")".format(ws_src.title) + "+"
+        temp_txt += temp_txt1 + temp_txt2 + temp_txt3 + temp_txt4 + temp_txt5
     txt = temp_txt[0:len(temp_txt)-1]  # truncate last "+"
-    new_position = get_position (system_spr_table['system_Not Started_IO'], index)
-    ws_summary[new_position] = txt
-    if (index != 0):
-        update_delta(ws_summary, new_position)
-
-    # # in Prog SPRs owned by system team
-    temp_txt="="
-    for system_member in system_members:
-        temp_txt += "COUNTIFS({0}!N2:N3000,".format(ws_src.title) + system_member + ",{0}!M2:M3000, \"=In Progress\")".format(ws_src.title) +"+"
-    txt = temp_txt[0:len(temp_txt)-1]  # truncate last "+"
-    new_position = get_position (system_spr_table['system_in Prog'], index)
-    ws_summary[new_position] = txt
-    if (index != 0):
-        update_delta(ws_summary, new_position)
-
-
-    # # in Prog NC owned by system team
-    temp_txt="="
-    for system_member in system_members:
-        temp_txt += "COUNTIFS({0}!N2:N3000,".format(ws_src.title) + system_member + ",{0}!M2:M3000, \"=In Progress\"".format(ws_src.title) + ",{0}!J2:J3000,\"=NC - Design Non-Conformance\")".format(ws_src.title) +"+"
-    txt = temp_txt[0:len(temp_txt)-1]  # truncate last "+"
-    new_position = get_position (system_spr_table['system_in Prog_NC'], index)
-    ws_summary[new_position] = txt
-    if (index != 0):
-        update_delta(ws_summary, new_position)
-
-
-    # # in Prog NC No_DRB owned by system team
-    temp_txt="="
-    for system_member in system_members:
-        temp_txt += "COUNTIFS({0}!N2:N3000,".format(ws_src.title) + system_member + ",{0}!M2:M3000, \"=In Progress\"".format(ws_src.title) + ",{0}!J2:J3000,\"=NC - Design Non-Conformance\"".format(ws_src.title) + ",{0}!AC2:AC3000,\"=No_DRB\")".format(ws_src.title) + "+"
-    txt = temp_txt[0:len(temp_txt)-1]  # truncate last "+"
-    new_position = get_position (system_spr_table['system_in Prog_NC_No_DRB'], index)
-    ws_summary[new_position] = txt
-    if (index != 0):
-        update_delta(ws_summary, new_position)
-
-
-    # # in Prog NC Major owned by system team
-    temp_txt="="
-    for system_member in system_members:
-        temp_txt += "COUNTIFS({0}!N2:N3000,".format(ws_src.title) + system_member + ",{0}!M2:M3000, \"=In Progress\"".format(ws_src.title) + ",{0}!J2:J3000,\"=NC - Design Non-Conformance\"".format(ws_src.title) + ",{0}!AC2:AC3000,\"=Major\")".format(ws_src.title) + "+"
-    txt = temp_txt[0:len(temp_txt)-1]  # truncate last "+"
-    new_position = get_position (system_spr_table['system_in Prog_NC_Major'], index)
-    ws_summary[new_position] = txt
-    if (index != 0):
-        update_delta(ws_summary, new_position)
-
-    # # in Prog NC Minor owned by system team
-    temp_txt="="
-    for system_member in system_members:
-        temp_txt += "COUNTIFS({0}!N2:N3000,".format(ws_src.title) + system_member + ",{0}!M2:M3000, \"=In Progress\"".format(ws_src.title) + ",{0}!J2:J3000,\"=NC - Design Non-Conformance\"".format(ws_src.title) + ",{0}!AC2:AC3000,\"=Minor\")".format(ws_src.title) + "+"
-    txt = temp_txt[0:len(temp_txt)-1]  # truncate last "+"
-    new_position = get_position (system_spr_table['system_in Prog_NC_Minor'], index)
-    ws_summary[new_position] = txt
-    if (index != 0):
-        update_delta(ws_summary, new_position)
-
-    # # in Prog IO owned by system team
-    temp_txt="="
-    for system_member in system_members:
-        temp_txt += "COUNTIFS({0}!N2:N3000,".format(ws_src.title) + system_member + ",{0}!M2:M3000, \"=In Progress\"".format(ws_src.title) + ",{0}!J2:J3000,\"=IO - Improvement Opportunity\")".format(ws_src.title) +"+"
-    txt = temp_txt[0:len(temp_txt)-1]  # truncate last "+"
-    new_position = get_position (system_spr_table['system_in Prog_IO'], index)
+    new_position = get_position (system_spr_table['system_Open_IO'], index)
     ws_summary[new_position] = txt
     if (index != 0):
         update_delta(ws_summary, new_position)

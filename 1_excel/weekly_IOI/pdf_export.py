@@ -42,7 +42,7 @@ def date_to_fw_format(input_date):
 def get_absolate_path (filepath):
     absolute_path = os.path.abspath(filepath)
 
-    print(f"절대 경로: {absolute_path}")
+    # print(f"절대 경로: {absolute_path}")
     return absolute_path
 
 

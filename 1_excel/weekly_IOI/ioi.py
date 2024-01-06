@@ -1,10 +1,12 @@
 from openpyxl import load_workbook, Workbook
 from openpyxl.styles import Alignment
+from openpyxl.worksheet.page import PageMargins
 import pandas as pd 
 
 from copy import copy, deepcopy
-import sys
-import os
+import sys, os
+from datetime import datetime
+
 
 exp_file_name = 'export.csv'
 excel_file_name = 'export.xlsx'
@@ -15,11 +17,11 @@ column_dimension_table = {
     'B' : 8.0,
     'C' : 8.0,
     'D' : 21.0,
-    'E' : 30.0,
+    'E' : 40.0,
     'F' : 42.0,
     'G' : 7.0,
     'H' : 8.0,
-    'I' : 10.0
+    'I' : 8.0
 }
 
 column_name_table = {
@@ -55,13 +57,14 @@ def set_page_properties (sheet):
     sheet.page_setup.paperSize = sheet.PAPERSIZE_A4
 
     #narrow_margin 설정
-    sheet.page_setup.fitToWidth = 1
-    sheet.page_setup.fitToHeight = 0
+    sheet.page_margins = PageMargins (left=0.25, right=0.25, top=0.75, bottom=0.75)
+
 
 def set_page_area (sheet, row_count):
     # # flexible setting of print area based on real captured data.
-    print_area = "C1:J{}".format(row_count)
+    print_area = "B1:I{}".format(row_count)
     sheet.print_area = print_area
+
 
 def set_cells_properties(sheet, minrow, mincol, maxcol):
     #set column demension with predefined one.
@@ -74,6 +77,7 @@ def set_cells_properties(sheet, minrow, mincol, maxcol):
             # Center the content both horizontally and vertically
             # long text will wrap to the next line
             cell.alignment = Alignment(horizontal="left", vertical="top", wrap_text=True)
+
 
 def csv2excel(filename):
     csv_file_path = filename
@@ -102,6 +106,39 @@ def csv2excel(filename):
     return wb_report
 
 
+def creat_blank_column(column_to_insert=1, number_to_insert=2):
+    report_sheet.insert_cols(column_to_insert,number_to_insert)
+    
+
+def move_columns (start_column_char, end_column_char, max_row, shift_number):
+    cell_range = "{0}1:{1}{2}".format(start_column_char,end_column_char, max_row)
+    # print("cell_range", cell_range)
+    report_sheet.move_range(cell_range, rows=0, cols=shift_number)
+
+
+def rearrange_columns(sheet):
+    column_to_insert = 1  # "A"
+    number_to_insert = 2  # "A" and "B" 
+    char_Expedite_column = "E" # if two columns are inserted original 'E' has Expedite 
+    char_Tags_column = "F"  # # if two columns are inserted original 'E' has Expedite
+    shift_number = -4 # shfit back -4
+    delete_column = 5 # "E" 
+    delete_num = 2 # "E" and "F"
+    # 빈 열 추가 in order to move Tags and Expertide column, .
+    creat_blank_column(column_to_insert, number_to_insert)
+    move_columns (char_Expedite_column, char_Tags_column, row_count, shift_number)
+    sheet.delete_cols(delete_column, delete_num)
+    
+
+def simple_datatime(date_string):
+    # 입력된 날짜를 FWXX.X format 으로 변경
+    date_object = datetime.strptime(date_string, "%m/%d/%Y")
+
+    formatted_date = date_object.strftime("FW%W.%w") 
+
+    return formatted_date
+
+
 if len(sys.argv) != 2:
     print("Usage: python xl_weekly_ioi.py <filename>")
     sys.exit()
@@ -117,62 +154,45 @@ try:
     column_to_insert = 1
     number_to_insert = 2 
 
-    def creat_blank_column(column_to_insert=1, number_to_insert=2):
-        report_sheet.insert_cols(column_to_insert,number_to_insert)
-        
-    def move_columns (start_column_char, end_column_char, max_row, shift_number):
-        cell_range = "{0}1:{1}{2}".format(start_column_char,end_column_char, max_row)
-        # print("jinha cell_range", cell_range)
-        report_sheet.move_range(cell_range, rows=0, cols=shift_number)
-
     print(f"The number of rows in the sheet is: {row_count}")
     print(f"max_column: {max_column}")
 
     set_page_properties (report_sheet)
-
-    # if not created before, create blank column "A" and "B" to move Experdite Tags "Columne"
-    cell_value1 = report_sheet['A1'].value  # for Expertite
-    cell_value2 = report_sheet['B1'].value  # for Tags
-
-    if ((cell_value1 != "Expedite") and (cell_value2 != "Tags")):
-        column_to_insert = 1  # "A"
-        number_to_insert = 2  # "A" and "B" 
-        char_Expedite_column = "E"
-        char_Tags_column = "F"
-        shift_number = -4 # shfit back -2
-        delete_column = 5 # "E" 
-        delete_num = 2 # "E" and "F"
-        # 빈 열 추가 in order to move Tags and Expertide column, .
-        creat_blank_column(column_to_insert, number_to_insert)
-        move_columns (char_Expedite_column, char_Tags_column, row_count, shift_number)
-        report_sheet.delete_cols(delete_column, delete_num)
+    rearrange_columns(report_sheet)
 
     # if not merged with "Delivery Date" and "Target Data", 
     # merge them with "Due"
     cell_value1 = report_sheet['I1'].value  # for Target Date
     cell_value2 = report_sheet['J1'].value  # for Delivery Date
-    
-    # combine "I" and "J" into one column
-    if ((cell_value1 == "Target Date") and (cell_value2 == "Delivery Date")):
-        for row in report_sheet.iter_rows(min_row=2, max_row=row_count, min_col=9, max_col=9):
-            for cell in row:
-                copy_val = report_sheet["J"+str(cell.row)].value
-                target_val = report_sheet[cell.coordinate].value 
-                # print("due", copy_val, target_val)
-                if ((copy_val is not None) and (target_val is None)) :
-                    report_sheet[cell.coordinate].value = copy_val
 
-        del_column = 10  # "J" column
-        report_sheet.delete_cols(del_column, 1)
+    if ((cell_value1 != "Target Date") and (cell_value2 != "Delivery Date")):
+        print("excel file has wrong format. Can't process it")
+        sys.exit() 
+
+    # combine "I" and "J" into one column
+    for row in report_sheet.iter_rows(min_row=2, max_row=row_count, min_col=9, max_col=9):
+        for cell in row:
+            copy_val = report_sheet["J"+str(cell.row)].value
+            target_val = report_sheet[cell.coordinate].value 
+            if ((copy_val is not None) and (target_val is None)) :
+                report_sheet[cell.coordinate].value = copy_val
+    
+    del_column = 10  # "J" column
+    report_sheet.delete_cols(del_column, 1)
+
+    # change due data format into simpler one
+    for row in report_sheet.iter_rows(min_row=2, max_row=row_count, min_col=9, max_col=9):
+        for cell in row:
+            target_date = report_sheet[cell.coordinate].value
+            if ((target_date is not None)):
+                report_sheet[cell.coordinate].value = simple_datatime(target_date)
+
 
     # update row_count, max_column 
     row_count = report_sheet.max_row
     max_column = report_sheet.max_column
 
     set_page_area (report_sheet, row_count)
-
-    print(f"2nd The number of rows in the sheet is: {row_count}")
-    print(f"2nd max_column: {max_column}")
 
     # change title name to simplified one
     for row in report_sheet.iter_rows(min_row=1, max_row=1, min_col=1, max_col=9):

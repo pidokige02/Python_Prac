@@ -118,13 +118,14 @@ sw_members = [
         "\"=taeyang.an\"",
         "\"=han il.lee\"",
         "\"=ho.lee\"",
-        "\"=youjin.jung\"",
+        "\"=youjin.jung\"",        
         "\"=doo je.sung\"",
         "\"=jin ha.hwang\"",
         "\"=youngdug.kim\"",
-        "\"=youjin.na\"",
+        "\"=yujin.na\"",
         "\"=kyudong.kim\"",
-        "\"=heejin.na\""
+        "\"=heejin.na\"",
+        "\"=Suncheol.Heo\"",
 ]
 
 system_members = [
@@ -206,6 +207,7 @@ for ws_src in reversed(ws_srcs):
     new_position = get_position (total_spr_table['Open'], index)
     txt = "=COUNTIFS('{0}'!M2:M3000,\"=Submitted\")\
     +COUNTIFS('{0}'!M2:M3000,\"=Accepted\")\
+    +COUNTIFS('{0}'!M2:M3000,\"=Failed\")\
     +COUNTIFS('{0}'!M2:M3000,\"=In Progress\")\
     +COUNTIFS('{0}'!M2:M3000,\"=In Review\")\
     +COUNTIFS('{0}'!M2:M3000,\"=Postponed\")".format(ws_src.title)
@@ -217,6 +219,7 @@ for ws_src in reversed(ws_srcs):
     new_position = get_position (total_spr_table['Open_NC'], index)
     txt = "=COUNTIFS('{0}'!M2:M3000,\"=Submitted\",'{0}'!J2:J3000,\"=NC - Design Non-Conformance\")\
     +COUNTIFS('{0}'!M2:M3000,\"=Accepted\",'{0}'!J2:J3000,\"=NC - Design Non-Conformance\")\
+    +COUNTIFS('{0}'!M2:M3000,\"=Failed\",'{0}'!J2:J3000,\"=NC - Design Non-Conformance\")\
     +COUNTIFS('{0}'!M2:M3000,\"=In Progress\",'{0}'!J2:J3000,\"=NC - Design Non-Conformance\")\
     +COUNTIFS('{0}'!M2:M3000,\"=In Review\",'{0}'!J2:J3000,\"=NC - Design Non-Conformance\")\
     +COUNTIFS('{0}'!M2:M3000,\"=Postponed\",'{0}'!J2:J3000,\"=NC - Design Non-Conformance\")".format(ws_src.title)
@@ -229,6 +232,7 @@ for ws_src in reversed(ws_srcs):
     new_position = get_position (total_spr_table['Open_IO'], index)
     txt = "=COUNTIFS('{0}'!M2:M3000,\"=Submitted\",'{0}'!J2:J3000,\"=IO - Improvement Opportunity\")\
     +COUNTIFS('{0}'!M2:M3000,\"=Accepted\",'{0}'!J2:J3000,\"=IO - Improvement Opportunity\")\
+    +COUNTIFS('{0}'!M2:M3000,\"=Failed\",'{0}'!J2:J3000,\"=IO - Improvement Opportunity\")\
     +COUNTIFS('{0}'!M2:M3000,\"=In Progress\",'{0}'!J2:J3000,\"=IO - Improvement Opportunity\")\
     +COUNTIFS('{0}'!M2:M3000,\"=In Review\",'{0}'!J2:J3000,\"=IO - Improvement Opportunity\")\
     +COUNTIFS('{0}'!M2:M3000,\"=Postponed\",'{0}'!J2:J3000,\"=IO - Improvement Opportunity\")".format(ws_src.title)
@@ -298,13 +302,15 @@ for ws_src in reversed(ws_srcs):
     temp_txt3=""
     temp_txt4=""
     temp_txt5=""
+    temp_txt6=""
     for sw_member in sw_members:
         temp_txt1 = "COUNTIFS({0}!N2:N3000,".format(ws_src.title) + sw_member + ",{0}!M2:M3000,\"=Submitted\")".format(ws_src.title) + "+" 
         temp_txt2 = "COUNTIFS({0}!N2:N3000,".format(ws_src.title) + sw_member + ",{0}!M2:M3000,\"=Accepted\")".format(ws_src.title) + "+"
-        temp_txt3 = "COUNTIFS({0}!N2:N3000,".format(ws_src.title) + sw_member + ",{0}!M2:M3000,\"=In Review\")".format(ws_src.title) + "+"
-        temp_txt4 = "COUNTIFS({0}!N2:N3000,".format(ws_src.title) + sw_member + ",{0}!M2:M3000,\"=Postponed\")".format(ws_src.title) + "+"
-        temp_txt5 = "COUNTIFS({0}!N2:N3000,".format(ws_src.title) + sw_member + ",{0}!M2:M3000,\"=In Progress\")".format(ws_src.title) + "+"
-        temp_txt += temp_txt1 + temp_txt2 + temp_txt3 + temp_txt4 + temp_txt5
+        temp_txt3 = "COUNTIFS({0}!N2:N3000,".format(ws_src.title) + sw_member + ",{0}!M2:M3000,\"=Failed\")".format(ws_src.title) + "+"
+        temp_txt4 = "COUNTIFS({0}!N2:N3000,".format(ws_src.title) + sw_member + ",{0}!M2:M3000,\"=In Review\")".format(ws_src.title) + "+"
+        temp_txt5 = "COUNTIFS({0}!N2:N3000,".format(ws_src.title) + sw_member + ",{0}!M2:M3000,\"=Postponed\")".format(ws_src.title) + "+"
+        temp_txt6 = "COUNTIFS({0}!N2:N3000,".format(ws_src.title) + sw_member + ",{0}!M2:M3000,\"=In Progress\")".format(ws_src.title) + "+"
+        temp_txt += temp_txt1 + temp_txt2 + temp_txt3 + temp_txt4 + temp_txt5 + temp_txt6
     txt = temp_txt[0:len(temp_txt)-1]  # truncate last "+"
     new_position = get_position (sw_spr_table['SW_Open'], index)
     ws_summary[new_position] = txt
@@ -320,13 +326,15 @@ for ws_src in reversed(ws_srcs):
     temp_txt3=""
     temp_txt4=""
     temp_txt5=""
+    temp_txt6=""
     for sw_member in sw_members:
         temp_txt1 = "COUNTIFS({0}!N2:N3000,".format(ws_src.title) + sw_member + ",{0}!M2:M3000,\"=Submitted\"".format(ws_src.title) + ",{0}!J2:J3000,\"=NC - Design Non-Conformance\")".format(ws_src.title) + "+" 
         temp_txt2 = "COUNTIFS({0}!N2:N3000,".format(ws_src.title) + sw_member + ",{0}!M2:M3000,\"=Accepted\"".format(ws_src.title) + ",{0}!J2:J3000,\"=NC - Design Non-Conformance\")".format(ws_src.title) + "+"
-        temp_txt3 = "COUNTIFS({0}!N2:N3000,".format(ws_src.title) + sw_member + ",{0}!M2:M3000,\"=In Review\"".format(ws_src.title) + ",{0}!J2:J3000,\"=NC - Design Non-Conformance\")".format(ws_src.title) + "+"
-        temp_txt4 = "COUNTIFS({0}!N2:N3000,".format(ws_src.title) + sw_member + ",{0}!M2:M3000,\"=Postponed\"".format(ws_src.title) + ",{0}!J2:J3000,\"=NC - Design Non-Conformance\")".format(ws_src.title) + "+"
-        temp_txt5 = "COUNTIFS({0}!N2:N3000,".format(ws_src.title) + sw_member + ",{0}!M2:M3000,\"=In Progress\"".format(ws_src.title) + ",{0}!J2:J3000,\"=NC - Design Non-Conformance\")".format(ws_src.title) + "+"
-        temp_txt += temp_txt1 + temp_txt2 + temp_txt3 + temp_txt4 + temp_txt5
+        temp_txt3 = "COUNTIFS({0}!N2:N3000,".format(ws_src.title) + sw_member + ",{0}!M2:M3000,\"=Failed\"".format(ws_src.title) + ",{0}!J2:J3000,\"=NC - Design Non-Conformance\")".format(ws_src.title) + "+"
+        temp_txt4 = "COUNTIFS({0}!N2:N3000,".format(ws_src.title) + sw_member + ",{0}!M2:M3000,\"=In Review\"".format(ws_src.title) + ",{0}!J2:J3000,\"=NC - Design Non-Conformance\")".format(ws_src.title) + "+"
+        temp_txt5 = "COUNTIFS({0}!N2:N3000,".format(ws_src.title) + sw_member + ",{0}!M2:M3000,\"=Postponed\"".format(ws_src.title) + ",{0}!J2:J3000,\"=NC - Design Non-Conformance\")".format(ws_src.title) + "+"
+        temp_txt6 = "COUNTIFS({0}!N2:N3000,".format(ws_src.title) + sw_member + ",{0}!M2:M3000,\"=In Progress\"".format(ws_src.title) + ",{0}!J2:J3000,\"=NC - Design Non-Conformance\")".format(ws_src.title) + "+"
+        temp_txt += temp_txt1 + temp_txt2 + temp_txt3 + temp_txt4 + temp_txt5 + temp_txt6
     txt = temp_txt[0:len(temp_txt)-1]  # truncate last "+"
     new_position = get_position (sw_spr_table['SW_Open_NC'], index)
     ws_summary[new_position] = txt
@@ -340,13 +348,15 @@ for ws_src in reversed(ws_srcs):
     temp_txt3=""
     temp_txt4=""
     temp_txt5=""
+    temp_txt6=""
     for sw_member in sw_members:
         temp_txt1 = "COUNTIFS({0}!N2:N3000,".format(ws_src.title) + sw_member + ",{0}!M2:M3000,\"=Submitted\"".format(ws_src.title) + ",{0}!J2:J3000,\"=IO - Improvement Opportunity\")".format(ws_src.title) + "+" 
         temp_txt2 = "COUNTIFS({0}!N2:N3000,".format(ws_src.title) + sw_member + ",{0}!M2:M3000,\"=Accepted\"".format(ws_src.title) + ",{0}!J2:J3000,\"=IO - Improvement Opportunity\")".format(ws_src.title) + "+"
-        temp_txt3 = "COUNTIFS({0}!N2:N3000,".format(ws_src.title) + sw_member + ",{0}!M2:M3000,\"=In Review\"".format(ws_src.title) + ",{0}!J2:J3000,\"=IO - Improvement Opportunity\")".format(ws_src.title) + "+"
-        temp_txt4 = "COUNTIFS({0}!N2:N3000,".format(ws_src.title) + sw_member + ",{0}!M2:M3000,\"=Postponed\"".format(ws_src.title) + ",{0}!J2:J3000,\"=IO - Improvement Opportunity\")".format(ws_src.title) + "+"
-        temp_txt5 = "COUNTIFS({0}!N2:N3000,".format(ws_src.title) + sw_member + ",{0}!M2:M3000,\"=In Progress\"".format(ws_src.title) + ",{0}!J2:J3000,\"=IO - Improvement Opportunity\")".format(ws_src.title) + "+"
-        temp_txt += temp_txt1 + temp_txt2 + temp_txt3 + temp_txt4 + temp_txt5
+        temp_txt3 = "COUNTIFS({0}!N2:N3000,".format(ws_src.title) + sw_member + ",{0}!M2:M3000,\"=Failed\"".format(ws_src.title) + ",{0}!J2:J3000,\"=IO - Improvement Opportunity\")".format(ws_src.title) + "+"
+        temp_txt4 = "COUNTIFS({0}!N2:N3000,".format(ws_src.title) + sw_member + ",{0}!M2:M3000,\"=In Review\"".format(ws_src.title) + ",{0}!J2:J3000,\"=IO - Improvement Opportunity\")".format(ws_src.title) + "+"
+        temp_txt5 = "COUNTIFS({0}!N2:N3000,".format(ws_src.title) + sw_member + ",{0}!M2:M3000,\"=Postponed\"".format(ws_src.title) + ",{0}!J2:J3000,\"=IO - Improvement Opportunity\")".format(ws_src.title) + "+"
+        temp_txt6 = "COUNTIFS({0}!N2:N3000,".format(ws_src.title) + sw_member + ",{0}!M2:M3000,\"=In Progress\"".format(ws_src.title) + ",{0}!J2:J3000,\"=IO - Improvement Opportunity\")".format(ws_src.title) + "+"
+        temp_txt += temp_txt1 + temp_txt2 + temp_txt3 + temp_txt4 + temp_txt5 + temp_txt6
     txt = temp_txt[0:len(temp_txt)-1]  # truncate last "+"
     new_position = get_position (sw_spr_table['SW_Open_IO'], index)
     ws_summary[new_position] = txt
@@ -423,13 +433,15 @@ for ws_src in reversed(ws_srcs):
     temp_txt3=""
     temp_txt4=""
     temp_txt5=""
+    temp_txt6=""
     for system_member in system_members:
         temp_txt1 = "COUNTIFS({0}!N2:N3000,".format(ws_src.title) + system_member + ",{0}!M2:M3000,\"=Submitted\")".format(ws_src.title) + "+" 
         temp_txt2 = "COUNTIFS({0}!N2:N3000,".format(ws_src.title) + system_member + ",{0}!M2:M3000,\"=Accepted\")".format(ws_src.title) + "+"
-        temp_txt3 = "COUNTIFS({0}!N2:N3000,".format(ws_src.title) + system_member + ",{0}!M2:M3000,\"=In Review\")".format(ws_src.title) + "+"
-        temp_txt4 = "COUNTIFS({0}!N2:N3000,".format(ws_src.title) + system_member + ",{0}!M2:M3000,\"=Postponed\")".format(ws_src.title) + "+"
-        temp_txt5 = "COUNTIFS({0}!N2:N3000,".format(ws_src.title) + system_member + ",{0}!M2:M3000,\"=In Progress\")".format(ws_src.title) + "+"
-        temp_txt += temp_txt1 + temp_txt2 + temp_txt3 + temp_txt4 + temp_txt5
+        temp_txt3 = "COUNTIFS({0}!N2:N3000,".format(ws_src.title) + system_member + ",{0}!M2:M3000,\"=Failed\")".format(ws_src.title) + "+"
+        temp_txt4 = "COUNTIFS({0}!N2:N3000,".format(ws_src.title) + system_member + ",{0}!M2:M3000,\"=In Review\")".format(ws_src.title) + "+"
+        temp_txt5 = "COUNTIFS({0}!N2:N3000,".format(ws_src.title) + system_member + ",{0}!M2:M3000,\"=Postponed\")".format(ws_src.title) + "+"
+        temp_txt6 = "COUNTIFS({0}!N2:N3000,".format(ws_src.title) + system_member + ",{0}!M2:M3000,\"=In Progress\")".format(ws_src.title) + "+"
+        temp_txt += temp_txt1 + temp_txt2 + temp_txt3 + temp_txt4 + temp_txt5 + temp_txt6
     txt = temp_txt[0:len(temp_txt)-1]  # truncate last "+"
     new_position = get_position (system_spr_table['system_Open'], index)
     ws_summary[new_position] = txt
@@ -445,13 +457,15 @@ for ws_src in reversed(ws_srcs):
     temp_txt3=""
     temp_txt4=""
     temp_txt5=""
+    temp_txt6=""
     for system_member in system_members:
         temp_txt1 = "COUNTIFS({0}!N2:N3000,".format(ws_src.title) + system_member + ",{0}!M2:M3000,\"=Submitted\"".format(ws_src.title) + ",{0}!J2:J3000,\"=NC - Design Non-Conformance\")".format(ws_src.title) + "+" 
         temp_txt2 = "COUNTIFS({0}!N2:N3000,".format(ws_src.title) + system_member + ",{0}!M2:M3000,\"=Accepted\"".format(ws_src.title) + ",{0}!J2:J3000,\"=NC - Design Non-Conformance\")".format(ws_src.title) + "+"
-        temp_txt3 = "COUNTIFS({0}!N2:N3000,".format(ws_src.title) + system_member + ",{0}!M2:M3000,\"=In Review\"".format(ws_src.title) + ",{0}!J2:J3000,\"=NC - Design Non-Conformance\")".format(ws_src.title) + "+"
-        temp_txt4 = "COUNTIFS({0}!N2:N3000,".format(ws_src.title) + system_member + ",{0}!M2:M3000,\"=Postponed\"".format(ws_src.title) + ",{0}!J2:J3000,\"=NC - Design Non-Conformance\")".format(ws_src.title) + "+"
-        temp_txt5 = "COUNTIFS({0}!N2:N3000,".format(ws_src.title) + system_member + ",{0}!M2:M3000,\"=In Progress\"".format(ws_src.title) + ",{0}!J2:J3000,\"=NC - Design Non-Conformance\")".format(ws_src.title) + "+"
-        temp_txt += temp_txt1 + temp_txt2 + temp_txt3 + temp_txt4 + temp_txt5
+        temp_txt3 = "COUNTIFS({0}!N2:N3000,".format(ws_src.title) + system_member + ",{0}!M2:M3000,\"=Failed\"".format(ws_src.title) + ",{0}!J2:J3000,\"=NC - Design Non-Conformance\")".format(ws_src.title) + "+"
+        temp_txt4 = "COUNTIFS({0}!N2:N3000,".format(ws_src.title) + system_member + ",{0}!M2:M3000,\"=In Review\"".format(ws_src.title) + ",{0}!J2:J3000,\"=NC - Design Non-Conformance\")".format(ws_src.title) + "+"
+        temp_txt5 = "COUNTIFS({0}!N2:N3000,".format(ws_src.title) + system_member + ",{0}!M2:M3000,\"=Postponed\"".format(ws_src.title) + ",{0}!J2:J3000,\"=NC - Design Non-Conformance\")".format(ws_src.title) + "+"
+        temp_txt6 = "COUNTIFS({0}!N2:N3000,".format(ws_src.title) + system_member + ",{0}!M2:M3000,\"=In Progress\"".format(ws_src.title) + ",{0}!J2:J3000,\"=NC - Design Non-Conformance\")".format(ws_src.title) + "+"
+        temp_txt += temp_txt1 + temp_txt2 + temp_txt3 + temp_txt4 + temp_txt5 + temp_txt6
     txt = temp_txt[0:len(temp_txt)-1]  # truncate last "+"
     new_position = get_position (system_spr_table['system_Open_NC'], index)
     ws_summary[new_position] = txt
@@ -466,13 +480,15 @@ for ws_src in reversed(ws_srcs):
     temp_txt3=""
     temp_txt4=""
     temp_txt5=""
+    temp_txt6=""
     for system_member in system_members:
         temp_txt1 = "COUNTIFS({0}!N2:N3000,".format(ws_src.title) + system_member + ",{0}!M2:M3000,\"=Submitted\"".format(ws_src.title) + ",{0}!J2:J3000,\"=IO - Improvement Opportunity\")".format(ws_src.title) + "+" 
         temp_txt2 = "COUNTIFS({0}!N2:N3000,".format(ws_src.title) + system_member + ",{0}!M2:M3000,\"=Accepted\"".format(ws_src.title) + ",{0}!J2:J3000,\"=IO - Improvement Opportunity\")".format(ws_src.title) + "+"
-        temp_txt3 = "COUNTIFS({0}!N2:N3000,".format(ws_src.title) + system_member + ",{0}!M2:M3000,\"=In Review\"".format(ws_src.title) + ",{0}!J2:J3000,\"=IO - Improvement Opportunity\")".format(ws_src.title) + "+"
-        temp_txt4 = "COUNTIFS({0}!N2:N3000,".format(ws_src.title) + system_member + ",{0}!M2:M3000,\"=Postponed\"".format(ws_src.title) + ",{0}!J2:J3000,\"=IO - Improvement Opportunity\")".format(ws_src.title) + "+"
-        temp_txt5 = "COUNTIFS({0}!N2:N3000,".format(ws_src.title) + system_member + ",{0}!M2:M3000,\"=In Progress\"".format(ws_src.title) + ",{0}!J2:J3000,\"=IO - Improvement Opportunity\")".format(ws_src.title) + "+"
-        temp_txt += temp_txt1 + temp_txt2 + temp_txt3 + temp_txt4 + temp_txt5
+        temp_txt3 = "COUNTIFS({0}!N2:N3000,".format(ws_src.title) + system_member + ",{0}!M2:M3000,\"=Failed\"".format(ws_src.title) + ",{0}!J2:J3000,\"=IO - Improvement Opportunity\")".format(ws_src.title) + "+"
+        temp_txt4 = "COUNTIFS({0}!N2:N3000,".format(ws_src.title) + system_member + ",{0}!M2:M3000,\"=In Review\"".format(ws_src.title) + ",{0}!J2:J3000,\"=IO - Improvement Opportunity\")".format(ws_src.title) + "+"
+        temp_txt5 = "COUNTIFS({0}!N2:N3000,".format(ws_src.title) + system_member + ",{0}!M2:M3000,\"=Postponed\"".format(ws_src.title) + ",{0}!J2:J3000,\"=IO - Improvement Opportunity\")".format(ws_src.title) + "+"
+        temp_txt6 = "COUNTIFS({0}!N2:N3000,".format(ws_src.title) + system_member + ",{0}!M2:M3000,\"=In Progress\"".format(ws_src.title) + ",{0}!J2:J3000,\"=IO - Improvement Opportunity\")".format(ws_src.title) + "+"
+        temp_txt += temp_txt1 + temp_txt2 + temp_txt3 + temp_txt4 + temp_txt5 + temp_txt6
     txt = temp_txt[0:len(temp_txt)-1]  # truncate last "+"
     new_position = get_position (system_spr_table['system_Open_IO'], index)
     ws_summary[new_position] = txt

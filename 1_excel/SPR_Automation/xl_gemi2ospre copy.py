@@ -433,37 +433,26 @@ def search_matched_cell (value):
   for row in ws_previous.iter_rows(min_row=1, min_col=2, max_col=2):
       for cell in row:
         if(ws_previous[cell.coordinate].value == value): 
-          return cell.row  # return matched cell from prev_work_sheet.
+          return cell.row  
 
   return 99999
 
-# mark green mark for newly resolve/verified/closed cell in in prev worksheet 
-def mark_newly_closed_cell (newcellrow, precellrow, new_value):
-  for row in ws_new.iter_rows(min_row=newcellrow, max_row=newcellrow, min_col=13, max_col=13):  # status column
+def mark_newly_closed_cell (newcellrow, cellrow, new_value):
+  for row in ws_previous.iter_rows(min_row=cellrow, max_row=cellrow, min_col=13, max_col=13):  # status column
     for cell in row:
-        pre_val = ws_previous["M"+str(precellrow)].value
-        ws_new["M"+str(newcellrow)].fill = copy(ws_previous["M"+str(precellrow)].fill)
+        pre_val = ws_previous["M"+str(cellrow)].value
+        ws_new["M"+str(newcellrow)].fill = copy(ws_previous["M"+str(cellrow)].fill)
         if ((pre_val != new_value) and (pre_val != "Verified") and (pre_val != "Resolved") and (pre_val != "Closed")):
           if((new_value == "Verified") or (new_value == "Resolved") or (new_value == "Closed")):
             ws_new["M"+str(newcellrow)].fill = PatternFill(fgColor="00FF00", fill_type = "solid")
             # ws_new["M"+str(newcellrow)].fill = PatternFill(fgColor="237F2E", fill_type = "solid")
 
-# mark green mark for resolve/verified/closed cell in new entries out of new worksheet 
-def mark_new_entry_closed_cell (newcellrow, new_value):
-  for row in ws_new.iter_rows(min_row=newcellrow, max_row=newcellrow, min_col=13, max_col=13):  # status column
-    for cell in row:
-      if((new_value == "Verified") or (new_value == "Resolved") or (new_value == "Closed")):
-        ws_new["M"+str(newcellrow)].fill = PatternFill(fgColor="00FF00", fill_type = "solid")
-
-
-for row in ws_new.iter_rows(min_row=1,min_col=2, max_col=2):
+for row in ws_previous.iter_rows(min_row=1,min_col=2, max_col=2):
   for cell in row:
     cell_row = search_matched_cell (ws_new["B"+str(cell.row)].value)
     if(cell_row == 99999):
       print("cell not found for", ws_new["B"+str(cell.row)].value )
-      mark_new_entry_closed_cell (cell.row, ws_new["M"+str(cell.row)].value)   # Status column
     else:
-      # cell.row is each traversed cell from new_ws. cell_row is matched cell in prev_ws.   
       mark_newly_closed_cell (cell.row, cell_row, ws_new["M"+str(cell.row)].value)   # Status column
       ws_new["AB"+str(cell.row)].value = ws_previous["AB"+str(cell_row)].value
       ws_new["AB"+str(cell.row)].font = copy(ws_previous["AB"+str(cell_row)].font)

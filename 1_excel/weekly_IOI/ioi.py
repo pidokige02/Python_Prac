@@ -1,6 +1,8 @@
 from openpyxl import load_workbook, Workbook
 from openpyxl.styles import Alignment, Font
-from openpyxl.worksheet.page import PageMargins
+from openpyxl.worksheet.page import PageMargins, PrintOptions 
+from openpyxl.worksheet.header_footer import HeaderFooter
+
 import pandas as pd 
 
 from copy import copy, deepcopy
@@ -40,13 +42,14 @@ product_search_table = {
     "Osprey R4" : 1,
     "Osprey R5" : 2,
     "Osprey2mainline" : 3,
-    "Gemini R4" : 4,
-    "Gemini R5" : 5,
-    "Maru R4.5" : 6,
-    "Maru R4" : 7,
-    "Maru R3" : 8,
-    "Others" : 9,
-    "Advantech" : 10
+    "#PLATFORM-HAWK" : 4,
+    "Gemini R4" : 5,
+    "Gemini R5" : 6,
+    "Maru R4.5" : 7,
+    "Maru R4" : 8,
+    "Maru R3" : 9,
+    "Others" : 10,
+    "Advantech" : 11
 }
 
 
@@ -58,6 +61,15 @@ def set_page_properties (sheet):
 
     #narrow_margin 설정
     sheet.page_margins = PageMargins (left=0.25, right=0.25, top=0.75, bottom=0.75)
+    
+    footer = HeaderFooter()
+    footer.evenFooter.left.text = "Page &P of &N"
+    footer.oddFooter.left.text = "Page &P of &N"
+
+    sheet.footer = footer
+    
+    # Set print options to include footer
+    sheet.page_setup.header_footer = footer
 
 
 def set_page_area (sheet, row_count):

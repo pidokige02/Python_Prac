@@ -23,6 +23,14 @@ def get_current_date():
 
     return current_date
 
+def get_current_year():
+    # 현재 날짜와 시간 얻기
+    current_date_time = datetime.now()    
+    
+    # 현재 날짜만 얻기
+    current_year = current_date_time.year()
+
+    return current_year
 
 def date_to_fw_format(input_date):
     # 입력된 날짜를 파싱
@@ -76,15 +84,14 @@ sheet_name = 'Sheet'             # Replace with the desired sheet name
 excel_file_path = get_absolate_path(excel_file)
 pdf_file_path = get_absolate_path(pdf_file_path)
 
-excel_to_pdf(excel_file_path, pdf_file_path, sheet_name)
-
-today = get_current_date()
-fw_format = date_to_fw_format (today)
+date = get_current_date()
+fw_format = date_to_fw_format (date)
 
 new_file_name = f"{fw_format}_IOI_GI_SW_Engineering.xlsx"
-file_name_change(excel_file, new_file_name)
+new_pdf_file_name = f"{fw_format}_IOI_GI_SW_Engineering.pdf"
 
-new_file_name = f"{fw_format}_IOI_GI_SW_Engineering.pdf"
-file_name_change(pdf_file_path, new_file_name)
+excel_to_pdf(excel_file_path, pdf_file_path, sheet_name)
+file_name_change(excel_file, new_file_name)
+file_name_change(pdf_file_path, new_pdf_file_name)
 
 

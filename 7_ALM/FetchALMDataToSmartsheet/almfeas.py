@@ -51,8 +51,8 @@ print(r'Logged in succesfully and QC session initialized')
 ##################################################################
 ## fetch the whole defect entities for Osprey R4 Oprey for feasibility testing.
 fields = list(alm_table_map.keys())
-# filter = r"{user-01['Osprey R4' or 'Osprey']}"
-filter = r"{user-01['Gemini R4']}"
+filter = r"{user-01['Osprey R4' or 'Osprey']}"
+# filter = r"{user-01['Gemini R4']}"
 sprs = alm.get_defects_Osprey_R4(filter, fields, 25)
 spr2excel(sprs,alm_table_header)
 ##################################################################

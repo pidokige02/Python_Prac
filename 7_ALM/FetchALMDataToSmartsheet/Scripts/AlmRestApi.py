@@ -88,7 +88,8 @@ class AlmRestApi:
 		qcallEndoint = AlmRestApi.almURL + AlmRestApi.midPoint + r"defects/"
 
 		sprs = []
-
+		print("start Fetching ALM entries!!")
+		
 		while True:
 			qcallEndoint = AlmRestApi.almURL + AlmRestApi.midPoint + r"defects?" + sufx + str(len(sprs) + 1)
 			response = self.sess.get(qcallEndoint, headers=AlmRestApi.__headers, cookies=self.cookies, verify=False).json()

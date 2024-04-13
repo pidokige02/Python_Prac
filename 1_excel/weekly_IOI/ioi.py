@@ -49,7 +49,8 @@ product_search_table = {
     "Maru R4" : 8,
     "Maru R3" : 9,
     "Others" : 10,
-    "Advantech" : 11
+    "Advantech" : 11,
+    "ATD" : 12
 }
 
 

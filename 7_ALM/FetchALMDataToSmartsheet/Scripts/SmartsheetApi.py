@@ -13,7 +13,9 @@ import getpass
 from .Utils import *
 from .smarttable import *
 from .export2excel import *
+from dotenv import load_dotenv
 
+load_dotenv()
 
 columnNames={}
 deletRowBatch=350
@@ -550,10 +552,8 @@ def addUserToSmartsheet():
 
 
 def loginToAlm():
-	# almUsername = configData.get("AlmUserName")
-	# almPassword = configData.get("AlmPassword")
-	almUsername="jin ha.hwang"
-	almPassword="oct1006minja"
+	almUsername=os.getenv('ALMUSERNAME')
+	almPassword=os.getenv('ALMPASSWORD')
 
 	if almPassword is None:
 		almPassword = userInput(r"Enter ALM password: ")

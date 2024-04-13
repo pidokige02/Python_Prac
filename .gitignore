@@ -3,3 +3,8 @@ env
 **/__pycache__
 
 account.py
+**/*.bat
+**/*.xlsx
+**/*.ini
+**/*.log
+**/*.json

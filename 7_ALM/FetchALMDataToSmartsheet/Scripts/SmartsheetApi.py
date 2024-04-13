@@ -480,25 +480,25 @@ def startProcess():
 	spr2excel(sprs,alm_table_header)
 	##################################################################
 	
-	# Smartsheet operations
-	setProxy("Proxy")
-	smartsheet_client,sheet = connectToSmartsheet(sheetID)
-	if smartsheet_client is None:
-		printError("Connection to smartsheet failed")
-		sys.exit()
+	# # Smartsheet operations
+	# setProxy("Proxy")
+	# smartsheet_client,sheet = connectToSmartsheet(sheetID)
+	# if smartsheet_client is None:
+	# 	printError("Connection to smartsheet failed")
+	# 	sys.exit()
 		
-	sprs = exportFromSheet()
-	sheetspr2excel(sprs, smart_table_header)
+	# sprs = exportFromSheet()
+	# sheetspr2excel(sprs, smart_table_header)
 
-	subprocess.run(["python", "./Scripts/xl_smart.py", "./Data/sheetexport.xlsx", "./Data/export.xlsx"])
+	# subprocess.run(["python", "./Scripts/xl_smart.py", "./Data/sheetexport.xlsx", "./Data/export.xlsx"])
 
-	issue_file_name = excel2sheet(smartsheet_client, configData)
+	# issue_file_name = excel2sheet(smartsheet_client, configData)
 
-	osprey_issue_path = "./" + issue_file_name
+	# osprey_issue_path = "./" + issue_file_name
 
-	subprocess.run(["python", "./Scripts/xl_master.py", osprey_issue_path])
+	# subprocess.run(["python", "./Scripts/xl_master.py", osprey_issue_path])
 
-	subprocess.run(["python", "./Scripts/xl_analysis.py", "./Data/osprey_issues_master.xlsx"])
+	# subprocess.run(["python", "./Scripts/xl_analysis.py", "./Data/osprey_issues_master.xlsx"])
 	
 	# deleteSheet()
 

@@ -1,21 +1,18 @@
 import sys
 import getpass
 import warnings
+import os
 
 from  Scripts.AlmRestApi import AlmRestApi
 from  Scripts.almtable import *
 from  Scripts.export2excel import *
+from dotenv import load_dotenv
 
+load_dotenv()
 
-# -------------------------------------------------------------------
-# make following as a user input:
-# almUsername = input(r"Enter ALM username: ")
-# almPassword =  getpass.getpass(r"Enter ALM password: ")
-almUsername="jin ha.hwang"
-almPassword="oct1006minja"
-# almBgn = input(r"Enter first date of the period date (yyyy-mm-dd): ")
-# almEnd = input(r"Enter date of next day after the period (yyyy-mm-dd): ")
-
+# .env 파일에서 환경변수 로드
+almUsername=os.getenv('ALMUSERNAME')
+almPassword=os.getenv('ALMPASSWORD')
 # -------------------------------------------------------------------
 
 warnings.simplefilter("ignore")
@@ -36,7 +33,6 @@ print(r'Logged in succesfully and QC session initialized')
 # print("jinha",returndict)
 ##################################################################
 
-
 ##################################################################
 ## fetch the whole defect entities for Osprey R4 Oprey for feasibility testing.
 # fields = list(alm_table_map.keys())
@@ -46,7 +42,6 @@ print(r'Logged in succesfully and QC session initialized')
 # # print("jinha", sprs)
 # spr2excel(sprs,alm_table_header)
 ##################################################################
-
 
 ##################################################################
 ## fetch the whole defect entities for Osprey R4 Oprey for feasibility testing.

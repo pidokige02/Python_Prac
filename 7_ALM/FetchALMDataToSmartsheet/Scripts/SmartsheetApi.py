@@ -478,6 +478,7 @@ def startProcess():
 	sheetspr2excel(sprs, smart_table_header)
 
 	subprocess.run(["python", "./Scripts/xl_smart.py", "./Data/sheetexport.xlsx", "./Data/export.xlsx"])
+	# old data 는 smartsheet 에서 manaul 로 update 한 부부분이 있다, new data 는 ALM 에서 capture 한 것으로 최신 status 를 가지고 있다.
 
 	issue_file_name, createdID = excel2sheet(smartsheet_client, configData, "Osprey R4")
 
@@ -548,3 +549,5 @@ def hide_Sheetcolumn(sheet_id, smart_table_header):
 				smartsheet_client.Sheets.update_column(sheet_id, column.id, update_column)
 				break
 
+
+	print("Hiding unnecessary columns!")

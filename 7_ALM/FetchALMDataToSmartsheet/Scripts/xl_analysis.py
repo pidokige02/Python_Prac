@@ -7,11 +7,11 @@ import re
 
 def get_header_position(index,  position):
     if(index == 0 ):
-        replaced_string = re.sub(r'\d+', '1', position)  # 숫자를 1로 대체
+        replaced_string = re.sub(r'\d+', '1', position)  # 숫자를 1로 대체 all SPR DATA
     elif (index == 1):
-        replaced_string = re.sub(r'\d+', '14', position)  # 숫자를 14로 대체
+        replaced_string = re.sub(r'\d+', '14', position)  # 숫자를 14로 대체  all sw SPR data
     else:
-        replaced_string = re.sub(r'\d+', '28', position)  # 숫자를 28로 대체
+        replaced_string = re.sub(r'\d+', '28', position)  # 숫자를 28로 대체   all other team SPR data
             
     return replaced_string 
     
@@ -63,12 +63,12 @@ def get_delta_position (base_position):
     prev_ascii_code =  ascii_code  - 2   #  pre position is the two column back
     
 
-    if((len(character[0]) > 1) and (prev_ascii_code < 0x41) ):  # 0x41 은 대문자 A 임
+    if((len(character[0]) > 1) and (prev_ascii_code < 0x41) ):  # 0x41 은 대문자 A 임   AZ BA 와 같이 경계를 넘어가는 경우 
         delta_character = chr(delta_ascii_code)
-        prev_character = chr(prev_ascii_code + 0x1A)        #  0x1A meads total# of capital
+        prev_character = chr(prev_ascii_code + 0x1A)        #  0x1A means total# of capital
         delta_position = appendedchar + delta_character[0] + digit[0]
-        prev_position =  chr(appendedchar_ascii_code-1) + prev_character[0] + digit[0]  # appendchar 가 C 인경우 B 를 만들어 둠
-    elif((len(character[0]) > 1) and (prev_ascii_code >= 0x41) ):
+        prev_position =  chr(appendedchar_ascii_code-1) + prev_character[0] + digit[0]  # appendchar 가 C 인경우 B 를 만들기 위해 C 의 ascii code 를 만들어 둠
+    elif((len(character[0]) > 1) and (prev_ascii_code >= 0x41) ):    # AA, AB, AC BB BC 와 같은 경우 
         delta_character = chr(delta_ascii_code)
         prev_character = chr(prev_ascii_code)
         delta_position = appendedchar + delta_character[0] + digit[0]

@@ -2,6 +2,8 @@ from openpyxl import load_workbook
 from openpyxl.utils import get_column_letter, column_index_from_string
 from openpyxl.styles import PatternFill
 
+import re
+
 from copy import copy, deepcopy
 import sys
 from datetime import datetime
@@ -40,6 +42,26 @@ def date_to_fw_format(input_date):
     fw_format = f'FW{str_week_number.zfill(2)}'
 
     return fw_format
+
+def analysis_drb(text, pattern):
+   
+   matches = re.findall(pattern, text, re.IGNORECASE)
+   
+   return matches
+
+   
+def put_issue_triage():  # based on DRB, isseu will be categorized as minor major, IO
+  for row in ws_new.iter_rows(min_row=2,min_col=27, max_col=27):  # 27 은 DRB column 을 의미함. 
+    for cell in row:
+      if ws_new["J"+str(cell.row)].value == "IO - Improvement Opportunity" and  ws_new["AD"+str(cell.row)].value is None:
+        ws_new["AD"+str(cell.row)].value = "IO"
+      elif ws_new["J"+str(cell.row)].value == "NC - Design Non-Conformance" and  ws_new["AD"+str(cell.row)].value is None:
+        if (ws_new["AA"+str(cell.row)].value):
+          match = analysis_drb(str(ws_new["AA"+str(cell.row)].value), r"#Minor#")
+          if(match):
+              ws_new["AD"+str(cell.row)].value = "Minor"    
+      else:
+        pass           
 
 
 new_file_name = "osprey_issues_new.xlsx"
@@ -157,9 +179,11 @@ for row in ws_previous.iter_rows(min_row=2,min_col=2, max_col=2):
 #             mark_newly_closed_cell(cell.row, ws_new["M"+str(cell.row)].value)
 
 # Critical	Triage	Comments column
-ws_new.column_dimensions[get_column_letter(28)].width = ws_previous.column_dimensions[get_column_letter(27)].width    
-ws_new.column_dimensions[get_column_letter(29)].width = ws_previous.column_dimensions[get_column_letter(28)].width    
-ws_new.column_dimensions[get_column_letter(30)].width = ws_previous.column_dimensions[get_column_letter(29)].width    
+ws_new.column_dimensions[get_column_letter(28)].width = ws_previous.column_dimensions[get_column_letter(28)].width    
+ws_new.column_dimensions[get_column_letter(29)].width = ws_previous.column_dimensions[get_column_letter(29)].width    
+ws_new.column_dimensions[get_column_letter(30)].width = ws_previous.column_dimensions[get_column_letter(30)].width    
+
+put_issue_triage()
 
 # change sheet name of new comsolidated file
 date = get_current_date()

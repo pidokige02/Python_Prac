@@ -43,8 +43,8 @@ def deleteSheet():
 
 
 
-def exportFromSheet():
-	global smartsheet_client, sheetID
+def exportFromSheet(sheetID):
+	global smartsheet_client
 
 	sprs = []
 	
@@ -390,23 +390,6 @@ def fetchColumnsDetails():
 	return smartsheetColumns
 	#print(smartsheetColumns)
 
-# def deleteAllRows():
-# 	print("Deleting all rows from smartsheet")
-# 	logger.info("Deleting all rows ...")
-# 	all_rows=smartsheet_client.Sheets.get_sheet(sheetID)
-# 	rowsArray =[]
-# 	for row in list(all_rows.rows):
-# 		rowsArray.append(row.id)
-# 		if (len(rowsArray)>deletRowBatch):
-# 			smartsheet_client.Sheets.delete_rows(sheetID,rowsArray)
-# 			rowsArray=[]
-# 	if len(rowsArray)>0 :
-# 		smartsheet_client.Sheets.delete_rows(sheetID,rowsArray)
-# 	print("All Rows Deleted\n")
-# 	logger.info("All Rows Deleted")
-	
-		
-
 configData = getConfigData()
 if configData is None:
 	printError("{} file configured incorrectly. Please check".format(configFileName))
@@ -415,6 +398,8 @@ if configData is None:
 smartsheet_client,sheet = "",""
 sheetID = configData.get("SmartsheetID")
 sheetID = int(str(sheetID))
+sheetID2 = configData.get("SmartsheetID2")
+sheetID2 = int(str(sheetID2))
 
 def startLog():
 	#logger = logging.getLogger(__name__)  
@@ -478,78 +463,56 @@ def startProcess():
 	fields = list(alm_table_map.keys())
 	filter = r"{user-01['Osprey R4' or 'Osprey']}"
 	# filter = r"{user-01['Gemini R4']}"
-	sprs = alm.get_defects_Osprey_R4(filter, fields, 25)
+	sprs = alm.get_defects_product(filter, fields, 25)
 	spr2excel(sprs,alm_table_header)
 	##################################################################
 	
-	# # Smartsheet operations
-	# setProxy("Proxy")
-	# smartsheet_client,sheet = connectToSmartsheet(sheetID)
-	# if smartsheet_client is None:
-	# 	printError("Connection to smartsheet failed")
-	# 	sys.exit()
-		
-	# sprs = exportFromSheet()
-	# sheetspr2excel(sprs, smart_table_header)
-
-	# subprocess.run(["python", "./Scripts/xl_smart.py", "./Data/sheetexport.xlsx", "./Data/export.xlsx"])
-
-	# issue_file_name = excel2sheet(smartsheet_client, configData)
-
-	# osprey_issue_path = "./" + issue_file_name
-
-	# subprocess.run(["python", "./Scripts/xl_master.py", osprey_issue_path])
-
-	# subprocess.run(["python", "./Scripts/xl_analysis.py", "./Data/osprey_issues_master.xlsx"])
-	
-	# deleteSheet()
-
-	# importtoSheet(sprs)
-	# importtoSheet()
-
-	# getAllColumnsProperties()
-	# createALMColumns()
-	# deleteAllColumns()
-
-
-	# deleteAllCloumns(reqColumns)
-	# deleteAllRows()
-	# addColumns()
-	# smartsheetColumns = fetchColumnsDetails()
-	# addValues(sprList,userDetails)
-	# datetime2 = datetime.now()
-	# difference = datetime2.replace(microsecond=0) - datetime1.replace(microsecond=0)
-	
-	# printSuccess(f"\nAll rows are added to smartsheet '{sheet.name}'\nUrl : {sheet.permalink}")
-	# logger.info(f"All rows are added to smartsheet '{sheet.name}'\nUrl : {sheet.permalink}")
-	# print("Total time taken: {}".format(difference))
-	# logger.info("Total time taken: {}".format(difference))
-	return True
-
-
-
-def exportUserDetails():
-	userDetails = alm.get_user_details()
-	with open(exportUserFileName, "w") as file:
-		file.writelines(userDetails.get(u) + '\n' for u in userDetails)
-	printSuccess(f'Alm User details exported to file {exportUserFileName}')
-
-def addUserToSmartsheet():
-	global smartsheetColumns
-	global logger
-	global smartsheet_client,sheet,sheetID
-	sheetID = configData.get("UserDetailsSmartsheetID")
-	logger  = startLog()
+	# Smartsheet access
 	setProxy("Proxy")
 	smartsheet_client,sheet = connectToSmartsheet(sheetID)
 	if smartsheet_client is None:
 		printError("Connection to smartsheet failed")
 		sys.exit()
-	deleteAllRows()
-	smartsheetColumns = fetchColumnsDetails()
-	addUserDetails()
-	printSuccess(f"User and Manager mapping added to smartsheet '{sheet.name}' \nUrl : {sheet.permalink}")
+		
+	sprs = exportFromSheet(sheetID)
+	sheetspr2excel(sprs, smart_table_header)
 
+	subprocess.run(["python", "./Scripts/xl_smart.py", "./Data/sheetexport.xlsx", "./Data/export.xlsx"])
+
+	issue_file_name, createdID = excel2sheet(smartsheet_client, configData, "Osprey R4")
+
+	hide_Sheetcolumn(createdID, smart_table_header)
+
+	osprey_issue_path = "./" + issue_file_name
+
+	subprocess.run(["python", "./Scripts/xl_master.py", osprey_issue_path])
+
+	subprocess.run(["python", "./Scripts/xl_analysis.py", "./Data/osprey_issues_master.xlsx"])
+
+	##################################################################
+	## fetch the whole defect entities for Gemini R5 for feasibility testing.
+	fields = list(alm_table_map.keys())
+	filter = r"{user-01['Gemini R5' or 'Gemini R5 Future' or 'Osprey R5' or 'Peregrine R5' or 'Swallow R5']}"
+	sprs = alm.get_defects_product(filter, fields, 25)
+	spr2excel(sprs,alm_table_header)
+	##################################################################
+
+	setProxy("Proxy")
+	smartsheet_client,sheet = connectToSmartsheet(sheetID2)
+	if smartsheet_client is None:
+		printError("Connection to smartsheet failed")
+		sys.exit()
+
+	sprs = exportFromSheet(sheetID2)
+	sheetspr2excel(sprs, smart_table_header)
+
+	subprocess.run(["python", "./Scripts/xl_smart.py", "./Data/sheetexport.xlsx", "./Data/export.xlsx"])
+
+	issue_file_name , createdID = excel2sheet(smartsheet_client, configData, "Gemini R5")
+	
+	hide_Sheetcolumn(createdID, smart_table_header)
+
+	return True
 
 def loginToAlm():
 	almUsername=os.getenv('ALMUSERNAME')
@@ -569,4 +532,19 @@ def loginToAlm():
 		sys.exit()
 	printSuccess(r'Logged in succesfully and ALM session initialized')
 
+
+def hide_Sheetcolumn(sheet_id, smart_table_header):
+     # 시트 조회
+	sheet = smartsheet_client.Sheets.get_sheet(sheet_id)
+
+    # 시트의 열 정보 가져오기
+	columns = sheet.columns
+	update_column = smartsheet_client.models.Column()
+
+	for column in columns:
+		for col, value in smart_table_header.items():
+			if column.title == value[0]:
+				update_column.hidden = value[1]
+				smartsheet_client.Sheets.update_column(sheet_id, column.id, update_column)
+				break
 

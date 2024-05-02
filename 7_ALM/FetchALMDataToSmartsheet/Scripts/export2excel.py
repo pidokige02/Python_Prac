@@ -49,7 +49,7 @@ def spr2excel(sprs, alm_table_header):
         for col, value in alm_table_header.items():
             new_sheet[col+'1'] = value[0]
 
-        # add data ito below row    
+        # add data into below row    
         for spr in sprs:
             headers = list(spr.keys())
             sorted_columns = sorted(headers, key=lambda x: list(alm_table_map.keys()).index(x))  # sort it for exported excel
@@ -154,47 +154,6 @@ def sheetspr2excel(sprs, smart_table_header):
         for spr in sprs:
             new_sheet.append(spr)
 
-        # # get dimension based on template excel file
-        # for column in template_sheet.iter_cols(min_row=1, max_row=1, min_col=1, max_col=maxcolumn):
-        #     column_letter = column[0].column_letter
-        #     column_width_table[column_letter] = template_sheet.column_dimensions[column_letter].width 
-
-        # # set dimension based on template excel file
-        # for column in new_sheet.iter_cols(min_row=1, max_row=1, min_col=1, max_col=maxcolumn):
-        #     column_letter = column[0].column_letter
-        #     new_sheet.column_dimensions[column_letter].width = column_width_table[column_letter]
-
-        # # # set html element removed content for DRB session
-        # # for row in new_sheet.iter_rows(min_row=2,min_col=maxcolumn):
-        # #     for cell in row:
-        # #         html_content = new_sheet[cell.coordinate].value
-        # #         soup = BeautifulSoup(html_content, 'html.parser')
-        # #         visible_text = soup.get_text(separator=' ', strip=True)
-        # #         new_sheet[cell.coordinate].value = visible_text
-
-        # # set the property of title
-        # for row in new_sheet.iter_rows(min_row=1,max_row=1, min_col=1, max_col=maxcolumn):
-        #     for cell in row:
-        #         cell.alignment = Alignment(horizontal="left", vertical="top", wrap_text=False)
-        #         new_sheet[cell.coordinate].fill = copy(template_sheet[cell.coordinate].fill)
-        #         new_sheet[cell.coordinate].font = copy(template_sheet[cell.coordinate].font)
-        #         new_sheet[cell.coordinate].border = copy(template_sheet[cell.coordinate].border)
-
-        # # # set the property of spr contents
-        # for row in new_sheet.iter_rows(min_row=2,min_col=1, max_col=maxcolumn):
-        #     for cell in row:
-        #         cell.alignment = Alignment(horizontal="left", vertical="top", wrap_text=False)
-        #         new_sheet[cell.coordinate].font = copy(template_sheet[get_column_letter(cell.column)+"2"].font)
-        #         new_sheet[cell.coordinate].border = copy(template_sheet[get_column_letter(cell.column)+"2"].border)
-        #         if(cell.row % 2 == 0 ):
-        #             new_sheet[cell.coordinate].fill = copy(template_sheet[get_column_letter(cell.column)+"2"].fill)
-        #         else:
-        #             new_sheet[cell.coordinate].fill = copy(template_sheet[get_column_letter(cell.column)+"3"].fill)
-
-        # # 열(column) 숨기기
-        # for column, data in alm_table_header.items():
-        #     new_sheet.column_dimensions[column].hidden = data[1]  # data[2] has hide flag
-
         # # Save the modified workbook
         new_wb.save(report_file_name)
         template_wb.save(template_excel_file_name)
@@ -214,12 +173,17 @@ def sheetspr2excel(sprs, smart_table_header):
             template_wb.close()
 
 
-def excel2sheet(smartsheet_client, configData):
+def excel2sheet(smartsheet_client, configData, product):
 
     date = get_current_date()
     fw_format = date_to_fw_format (date)
 
-    new_file_name = f"Data/osprey_issues_2024_{fw_format}.xlsx"
+    if(product == "Osprey R4"):
+        new_file_name = f"Data/osprey_issues_2024_{fw_format}.xlsx"
+    elif(product == "Gemini R5"):
+        new_file_name = f"Data/gemini_r5_issues_2024_{fw_format}.xlsx"
+    else:
+        new_file_name = f"Data/osprey_issues_2024_{fw_format}.xlsx"
 
     report_file_name = new_file_name
 
@@ -270,10 +234,15 @@ def excel2sheet(smartsheet_client, configData):
                     # print("smartsheetID : " + str(sheet.id))
                     print("Loaded " + str(len(sheet.rows)) + " rows from sheet: " + sheet.name)
 
-                    configData.update({"SmartsheetID": str(sheet.id)})  # newly save sheetID
-                    
+                    if(product == "Osprey R4"):
+                        configData.update({"SmartsheetID": str(sheet.id)})  # newly save sheetID
+                    elif(product == "Gemini R5"):
+                        configData.update({"SmartsheetID2": str(sheet.id)})  # newly save sheetID
+                    else:
+                        configData.update({"SmartsheetID": str(sheet.id)})  # newly save sheetID
+
                     writeConfigData(configData)
 
                     print("Done")
 
-    return report_file_name
+    return report_file_name, sheet.id

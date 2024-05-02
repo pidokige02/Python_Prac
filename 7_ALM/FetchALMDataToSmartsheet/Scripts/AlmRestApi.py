@@ -83,7 +83,7 @@ class AlmRestApi:
 			print("Response Content:", response.text)
 
 
-	def get_defects_Osprey_R4(self, the_filter, the_fields, the_page_size):
+	def get_defects_product(self, the_filter, the_fields, the_page_size):
 		sufx = r"query=" + requests.utils.quote(the_filter) + r"&fields=" + requests.utils.quote(",".join(the_fields)) + "&page-size=" + str(the_page_size) + "&start-index="
 		qcallEndoint = AlmRestApi.almURL + AlmRestApi.midPoint + r"defects/"
 

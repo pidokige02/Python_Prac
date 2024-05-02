@@ -214,7 +214,7 @@ smart_table_header = {
     'Y' : ['Category', False],
     'Z' : ['Status Update', False],
     'AA' : ['DRB Comments', True],
-    'AB' : ['Comments', True],
-    'AC' : ['T2/Common?', True],
-    'AD' : ['Triage', True],
+    'AB' : ['Comments', False],
+    'AC' : ['T2/Common?', False],
+    'AD' : ['Triage', False],
 }

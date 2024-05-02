@@ -21,10 +21,10 @@ def get_position (base_position, index):
 
     ascii_code = ord(character[0])
 
-    new_ascii_code = ascii_code + 2 * index
+    new_ascii_code = ascii_code + 2 * index  # 2 conside delta and each FWxx
 
     # 0x41 means "A" in ascii code.
-    dividen = int((new_ascii_code - 0X41) / 0X1A)  # 0x1B meadn total# of capital
+    dividen = int((new_ascii_code - 0X41) / 0X1A)  # 0x1A meads total# of capital
     modulus = (new_ascii_code - 0X41) % 0X1A
 
     new_ascii_code = 0x41 + modulus
@@ -35,6 +35,7 @@ def get_position (base_position, index):
     if (dividen): 
         addedcharcode = 0x41 + (dividen - 1)   #make AA. AC if index is beyond Z  
         appended_character = chr(addedcharcode)
+        # print("jinha", appended_character)
         new_position = appended_character[0] + new_character[0] + digit[0]
     else:
         new_position = new_character[0] + digit[0]
@@ -47,23 +48,26 @@ def get_delta_position (base_position):
     digit =  re.findall("[0-9]+", base_position)
     character = re.findall("[A-Z]+", base_position)
 
-    # print ("jinha5", character[0], digit )
+    # print ("jinha5", character, digit )
 
-    if(len(character[0]) > 1 ):
-        ascii_code = ord(character[0][1:])
-        appendedchar = character[0][:1]  # In case AA, AB, A 
-        # print ("jinha7", appendedchar, ascii_code )
+    if(len(character[0]) > 1 ):   # AA AB column 과 같이 2 char 이상의으로 위치를 표시하는 column
+        ascii_code = ord(character[0][1:])  # In case AA, AB, BB  와 같은 경우는 후마의 A, B 를 뽑아내는 것임   
+        appendedchar = character[0][:1]  # In case AA, AB, BB  와 같은 경우는 선두의 A, B 를 뽑아내는 것임  
+        appendedchar_ascii_code = ord(appendedchar)   
+        # BZ 와 CB 의 delta 를 구할 경우 CB - BZ 에서 appendchar 가 C 인경우 B 를 만들기 위해 C 의 ascii code 를 만들어 둠.  
     else:
         ascii_code = ord(character[0])
-
+    
+    # 현재 위치를 기준으로 delta 는 이전 pre 는 delta 이전의 cell 을 의미한다.
     delta_ascii_code =  ascii_code - 1  #  delta position is the previous one 
     prev_ascii_code =  ascii_code  - 2   #  pre position is the two column back
+    
 
-    if((len(character[0]) > 1) and (prev_ascii_code < 0x41) ):
+    if((len(character[0]) > 1) and (prev_ascii_code < 0x41) ):  # 0x41 은 대문자 A 임
         delta_character = chr(delta_ascii_code)
-        prev_character = chr(prev_ascii_code + 0x1A)
+        prev_character = chr(prev_ascii_code + 0x1A)        #  0x1A meads total# of capital
         delta_position = appendedchar + delta_character[0] + digit[0]
-        prev_position =  prev_character[0] + digit[0]
+        prev_position =  chr(appendedchar_ascii_code-1) + prev_character[0] + digit[0]  # appendchar 가 C 인경우 B 를 만들어 둠
     elif((len(character[0]) > 1) and (prev_ascii_code >= 0x41) ):
         delta_character = chr(delta_ascii_code)
         prev_character = chr(prev_ascii_code)
@@ -74,6 +78,8 @@ def get_delta_position (base_position):
         prev_character = chr(prev_ascii_code)
         delta_position = delta_character[0] + digit[0]
         prev_position =  prev_character[0] + digit[0]
+
+    # print ("jinha8", [delta_position, prev_position] )
 
     return [delta_position, prev_position] 
 
@@ -212,7 +218,7 @@ for ws_src in reversed(ws_srcs):
     apply_cell_property(ws_summary[header_position])
     ws_summary[header_position]= ws_src.title
 
-    # print("jinha4", new_position)
+    # print("jinha", new_position)
     txt = "=COUNTA('{}'!A2:A3000)".format(ws_src.title)
     ws_summary[new_position] = txt
     if (index != 0):

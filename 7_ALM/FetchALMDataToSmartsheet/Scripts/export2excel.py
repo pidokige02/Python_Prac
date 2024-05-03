@@ -181,7 +181,9 @@ def excel2sheet(smartsheet_client, configData, product):
     if(product == "Osprey R4"):
         new_file_name = f"Data/osprey_issues_2024_{fw_format}.xlsx"
     elif(product == "Gemini R5"):
-        new_file_name = f"Data/gemini_r5_issues_2024_{fw_format}.xlsx"
+        new_file_name = f"Data/Gemini_R5_issues_2024_{fw_format}.xlsx"
+    elif(product == "Gemini R4"):
+        new_file_name = f"Data/Gemini_R4_issues_2024_{fw_format}.xlsx"
     else:
         new_file_name = f"Data/osprey_issues_2024_{fw_format}.xlsx"
 
@@ -238,6 +240,8 @@ def excel2sheet(smartsheet_client, configData, product):
                         configData.update({"SmartsheetID": str(sheet.id)})  # newly save sheetID
                     elif(product == "Gemini R5"):
                         configData.update({"SmartsheetID2": str(sheet.id)})  # newly save sheetID
+                    elif(product == "Gemini R4"):
+                        configData.update({"SmartsheetID3": str(sheet.id)})  # newly save sheetID
                     else:
                         configData.update({"SmartsheetID": str(sheet.id)})  # newly save sheetID
 

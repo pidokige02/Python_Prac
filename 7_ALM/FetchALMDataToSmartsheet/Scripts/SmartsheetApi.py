@@ -398,8 +398,13 @@ if configData is None:
 smartsheet_client,sheet = "",""
 sheetID = configData.get("SmartsheetID")
 sheetID = int(str(sheetID))
+
 sheetID2 = configData.get("SmartsheetID2")
 sheetID2 = int(str(sheetID2))
+
+sheetID3 = configData.get("SmartsheetID3")
+sheetID3 = int(str(sheetID3))
+
 
 def startLog():
 	#logger = logging.getLogger(__name__)  
@@ -478,7 +483,7 @@ def startProcess():
 	sheetspr2excel(sprs, smart_table_header)
 
 	subprocess.run(["python", "./Scripts/xl_smart.py", "./Data/sheetexport.xlsx", "./Data/export.xlsx"])
-	# old data 는 smartsheet 에서 manaul 로 update 한 부부분이 있다, new data 는 ALM 에서 capture 한 것으로 최신 status 를 가지고 있다.
+	# old data 는 smartsheet 에서 manaul 로 update 한 부분이 있다, new data 는 ALM 에서 capture 한 것으로 최신 status 를 가지고 있다.
 
 	issue_file_name, createdID = excel2sheet(smartsheet_client, configData, "Osprey R4")
 
@@ -513,6 +518,30 @@ def startProcess():
 	
 	hide_Sheetcolumn(createdID, smart_table_header)
 
+
+	##################################################################
+	## fetch the whole defect entities for Gemini R4 for feasibility testing.
+	fields = list(alm_table_map.keys())
+	filter = r"{user-01['Gemini R4' or 'Eagle R4' or 'Eagle R4 Upgrade' or 'Falcon R4' or 'Gemini R4 Dev' or 'Gemini R4 Post Release' or 'Peregrine R4' or 'Swallow R4']}"
+	sprs = alm.get_defects_product(filter, fields, 25)
+	spr2excel(sprs,alm_table_header)
+	##################################################################
+
+	setProxy("Proxy")
+	smartsheet_client,sheet = connectToSmartsheet(sheetID3)
+	if smartsheet_client is None:
+		printError("Connection to smartsheet failed")
+		sys.exit()
+
+	sprs = exportFromSheet(sheetID3)
+	sheetspr2excel(sprs, smart_table_header)
+
+	subprocess.run(["python", "./Scripts/xl_gemi2ospre.py", "./Data/sheetexport.xlsx", "./Data/export.xlsx"])
+
+	issue_file_name , createdID = excel2sheet(smartsheet_client, configData, "Gemini R4")
+	
+	hide_Sheetcolumn(createdID, smart_table_header)
+
 	return True
 
 def loginToAlm():
@@ -535,6 +564,7 @@ def loginToAlm():
 
 
 def hide_Sheetcolumn(sheet_id, smart_table_header):
+	print("Hiding unnecessary columns!")
      # 시트 조회
 	sheet = smartsheet_client.Sheets.get_sheet(sheet_id)
 
@@ -550,4 +580,4 @@ def hide_Sheetcolumn(sheet_id, smart_table_header):
 				break
 
 
-	print("Hiding unnecessary columns!")
+	print("Hiding complete!")

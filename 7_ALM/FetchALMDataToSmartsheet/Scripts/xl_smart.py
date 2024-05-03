@@ -53,13 +53,19 @@ def analysis_drb(text, pattern):
 def put_issue_triage():  # based on DRB, isseu will be categorized as minor major, IO
   for row in ws_new.iter_rows(min_row=2,min_col=27, max_col=27):  # 27 은 DRB column 을 의미함. 
     for cell in row:
+      if ws_new["J"+str(cell.row)].value == "NC - Design Non-Conformance" and  ws_new["AD"+str(cell.row)].value == "IO":   # wrong setting
+        ws_new["AD"+str(cell.row)].value = None
+
       if ws_new["J"+str(cell.row)].value == "IO - Improvement Opportunity" and  ws_new["AD"+str(cell.row)].value is None:
         ws_new["AD"+str(cell.row)].value = "IO"
       elif ws_new["J"+str(cell.row)].value == "NC - Design Non-Conformance" and  ws_new["AD"+str(cell.row)].value is None:
         if (ws_new["AA"+str(cell.row)].value):
           match = analysis_drb(str(ws_new["AA"+str(cell.row)].value), r"#Minor#")
           if(match):
-              ws_new["AD"+str(cell.row)].value = "Minor"    
+              ws_new["AD"+str(cell.row)].value = "Minor"
+          match = analysis_drb(str(ws_new["AA"+str(cell.row)].value), r"#Major#")
+          if(match):
+              ws_new["AD"+str(cell.row)].value = "Major"         
       else:
         pass           
 

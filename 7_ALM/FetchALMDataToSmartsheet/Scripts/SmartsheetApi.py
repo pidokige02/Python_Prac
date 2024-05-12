@@ -10,9 +10,12 @@ import time
 from .AlmRestApi import AlmRestApi
 import warnings
 import getpass
+from .almtable import *
 from .Utils import *
 from .smarttable import *
 from .export2excel import *
+from .xl_utils import *
+
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -405,6 +408,8 @@ sheetID2 = int(str(sheetID2))
 sheetID3 = configData.get("SmartsheetID3")
 sheetID3 = int(str(sheetID3))
 
+sheetID4 = configData.get("SmartsheetID4")
+sheetID4 = int(str(sheetID4))
 
 def startLog():
 	#logger = logging.getLogger(__name__)  
@@ -463,13 +468,91 @@ def startProcess():
 	datetime1 = datetime.now()
 	logger  = startLog()
 
+
+	##################################################################
+	## fetch the whole defect entities for Gemini R4 for feasibility testing.
+	fields = list(alm_table_map.keys())
+	filter = r"{user-01['Gemini R4' or 'Eagle R4' or 'Eagle R4 Upgrade' or 'Falcon R4' or 'Gemini R4 Dev' or 'Gemini R4 Post Release' or 'Peregrine R4' or 'Swallow R4']}"
+	sprs = alm.get_defects_product(filter, fields, 25)
+	spr2excel(sprs,alm_table_header, alm_table_map)
+	##################################################################
+
+	setProxy("Proxy")
+	smartsheet_client,sheet = connectToSmartsheet(sheetID3)
+	if smartsheet_client is None:
+		printError("Connection to smartsheet failed")
+		sys.exit()
+
+	sprs = exportFromSheet(sheetID3)
+	sheetspr2excel(sprs, smart_table_header)
+
+	subprocess.run(["python", "./Scripts/xl_gemi2ospre.py", "./Data/sheetexport.xlsx", "./Data/export.xlsx"])
+
+	report_file_name_for_gemini_r4 = create_product_file("Gemini R4")
+
+	createdID = excel2sheet(smartsheet_client, configData, report_file_name_for_gemini_r4, "Gemini R4")
+	
+	hide_Sheetcolumn(createdID, smart_table_header)
+
+
+	##################################################################
+	## fetch the whole defect entities for Gemini R5 for feasibility testing.
+	fields = list(alm_table_map.keys())
+	filter = r"{user-01['Gemini R5' or 'Gemini R5 Future' or 'Osprey R5' or 'Peregrine R5' or 'Swallow R5']}"
+	sprs = alm.get_defects_product(filter, fields, 25)
+	spr2excel(sprs,alm_table_header, alm_table_map)
+	##################################################################
+
+	setProxy("Proxy")
+	smartsheet_client,sheet = connectToSmartsheet(sheetID2)
+	if smartsheet_client is None:
+		printError("Connection to smartsheet failed")
+		sys.exit()
+
+	sprs = exportFromSheet(sheetID2)
+	sheetspr2excel(sprs, smart_table_header)
+
+	subprocess.run(["python", "./Scripts/xl_smart.py", "./Data/sheetexport.xlsx", "./Data/export.xlsx"])
+
+	report_file_name_for_gemini_r5 = create_product_file("Gemini R5")
+
+	createdID = excel2sheet(smartsheet_client, configData, report_file_name_for_gemini_r5, "Gemini R5")
+	
+	hide_Sheetcolumn(createdID, smart_table_header)
+
 	#################################################################
-	## fetch the whole defect entities for Osprey R4 Oprey for feasibility testing.
+	## fetch the whole defect entities for Gemini R3 .
+	fields = list(alm_table_map.keys())
+	filter = r"{user-01['Gemini R3' or 'Eagle R3' or 'Falcon R3' or 'Gemini R3 - Dev' or 'Gemini R3 Future' or 'Gemini R3 Post Release']}"
+	sprs = alm.get_defects_product(filter, fields, 25)
+	spr2excel(sprs,alm_table_header, alm_table_map)
+	##################################################################
+
+	# Smartsheet access
+	setProxy("Proxy")
+	smartsheet_client,sheet = connectToSmartsheet(sheetID4)
+	if smartsheet_client is None:
+		printError("Connection to smartsheet failed")
+		sys.exit()
+
+	sprs = exportFromSheet(sheetID4)
+	sheetspr2excel(sprs, smart_table_header)
+
+	subprocess.run(["python", "./Scripts/xl_smart.py", "./Data/sheetexport.xlsx", "./Data/export.xlsx"])
+
+	report_file_name_for_gemini_r3 = create_product_file("Gemini R3")
+
+	createdID = excel2sheet(smartsheet_client, configData, report_file_name_for_gemini_r3, "Gemini R3")
+	
+	hide_Sheetcolumn(createdID, smart_table_header)
+
+	#################################################################
+	## fetch the whole defect entities for Osprey R4 Oprey .
 	fields = list(alm_table_map.keys())
 	filter = r"{user-01['Osprey R4' or 'Osprey']}"
 	# filter = r"{user-01['Gemini R4']}"
 	sprs = alm.get_defects_product(filter, fields, 25)
-	spr2excel(sprs,alm_table_header)
+	spr2excel(sprs,alm_table_header, alm_table_map)
 	##################################################################
 	
 	# Smartsheet access
@@ -485,64 +568,40 @@ def startProcess():
 	subprocess.run(["python", "./Scripts/xl_smart.py", "./Data/sheetexport.xlsx", "./Data/export.xlsx"])
 	# old data 는 smartsheet 에서 manaul 로 update 한 부분이 있다, new data 는 ALM 에서 capture 한 것으로 최신 status 를 가지고 있다.
 
-	issue_file_name, createdID = excel2sheet(smartsheet_client, configData, "Osprey R4")
+	report_file_name_osprey_r4 = create_product_file("Osprey R4")
+
+	#################################################################
+	## fetch the link-purpose defect entities for Osprey R4 Oprey.
+	fields = list(alm_table_map_for_link.keys())
+	filter = r"{user-01['Osprey R4' or 'Osprey']}"
+	sprs = alm.get_defects_product(filter, fields, 25)
+	spr2excel(sprs,alm_link_table_header, alm_table_map_for_link )
+	##################################################################
+
+	link_file_name = create_product_file("Osprey R4 clone")
+	# link_file_name = "Data/osprey_link_2024_FW20.xlsx"
+	# report_file_name_osprey_r4 = "Data/osprey_issues_2024_FW20.xlsx"
+	# report_file_name_for_gemini_r3 = "Data/Gemini_R3_issues_2024_FW20.xlsx"	
+	# report_file_name_for_gemini_r4 = "Data/Gemini_R4_issues_2024_FW20.xlsx"
+	# report_file_name_for_gemini_r5 = "Data/Gemini_R5_issues_2024_FW20.xlsx"	
+
+
+	print (link_file_name, report_file_name_osprey_r4, report_file_name_for_gemini_r3, report_file_name_for_gemini_r4, report_file_name_for_gemini_r5)
+
+	xl_clone_analysis (link_file_name, report_file_name_osprey_r4, report_file_name_for_gemini_r3, report_file_name_for_gemini_r4, report_file_name_for_gemini_r5)
+
+	createdID = excel2sheet(smartsheet_client, configData, report_file_name_osprey_r4, "Osprey R4")
 
 	hide_Sheetcolumn(createdID, smart_table_header)
 
-	osprey_issue_path = "./" + issue_file_name
+	osprey_issue_path = "./" + report_file_name_osprey_r4
 
 	subprocess.run(["python", "./Scripts/xl_master.py", osprey_issue_path])
 
 	subprocess.run(["python", "./Scripts/xl_analysis.py", "./Data/osprey_issues_master.xlsx"])
 
-	##################################################################
-	## fetch the whole defect entities for Gemini R5 for feasibility testing.
-	fields = list(alm_table_map.keys())
-	filter = r"{user-01['Gemini R5' or 'Gemini R5 Future' or 'Osprey R5' or 'Peregrine R5' or 'Swallow R5']}"
-	sprs = alm.get_defects_product(filter, fields, 25)
-	spr2excel(sprs,alm_table_header)
-	##################################################################
-
-	setProxy("Proxy")
-	smartsheet_client,sheet = connectToSmartsheet(sheetID2)
-	if smartsheet_client is None:
-		printError("Connection to smartsheet failed")
-		sys.exit()
-
-	sprs = exportFromSheet(sheetID2)
-	sheetspr2excel(sprs, smart_table_header)
-
-	subprocess.run(["python", "./Scripts/xl_smart.py", "./Data/sheetexport.xlsx", "./Data/export.xlsx"])
-
-	issue_file_name , createdID = excel2sheet(smartsheet_client, configData, "Gemini R5")
-	
-	hide_Sheetcolumn(createdID, smart_table_header)
-
-
-	##################################################################
-	## fetch the whole defect entities for Gemini R4 for feasibility testing.
-	fields = list(alm_table_map.keys())
-	filter = r"{user-01['Gemini R4' or 'Eagle R4' or 'Eagle R4 Upgrade' or 'Falcon R4' or 'Gemini R4 Dev' or 'Gemini R4 Post Release' or 'Peregrine R4' or 'Swallow R4']}"
-	sprs = alm.get_defects_product(filter, fields, 25)
-	spr2excel(sprs,alm_table_header)
-	##################################################################
-
-	setProxy("Proxy")
-	smartsheet_client,sheet = connectToSmartsheet(sheetID3)
-	if smartsheet_client is None:
-		printError("Connection to smartsheet failed")
-		sys.exit()
-
-	sprs = exportFromSheet(sheetID3)
-	sheetspr2excel(sprs, smart_table_header)
-
-	subprocess.run(["python", "./Scripts/xl_gemi2ospre.py", "./Data/sheetexport.xlsx", "./Data/export.xlsx"])
-
-	issue_file_name , createdID = excel2sheet(smartsheet_client, configData, "Gemini R4")
-	
-	hide_Sheetcolumn(createdID, smart_table_header)
-
 	return True
+
 
 def loginToAlm():
 	almUsername=os.getenv('ALMUSERNAME')

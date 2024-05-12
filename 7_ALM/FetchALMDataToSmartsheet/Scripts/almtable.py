@@ -28,6 +28,13 @@ alm_table_map = {
     'user-27' : 'DRB Comments',                        
 }
 
+alm_table_map_for_link = {
+    'user-01' : 'Project',
+    'id' : 'Defect ID',
+    'name' : 'Summary',
+    'user-template-19' : "Cloned ID"
+}
+
 # display name, field name, hide flag  
 alm_table_header = {
     'A' : ['Project', 'user-01', False],
@@ -57,4 +64,13 @@ alm_table_header = {
     'Y' : ['Category','user-02', False],
     'Z' : ['Status Update','user-16', False],
     'AA' : ['DRB Comments','user-27', True],                        
+}
+
+
+# display name, field name, hide flag  
+alm_link_table_header = {
+    'A' : ['Project', 'user-01', False],
+    'B' : ['Defect ID', 'id', False],
+    'C' : ['Summary', 'name', False],
+    'D' : ['Detected on Date','user-template-19', False],
 }

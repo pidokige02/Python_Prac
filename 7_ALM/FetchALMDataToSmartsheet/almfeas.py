@@ -27,11 +27,11 @@ if rc == 'err_002':
 
 print(r'Logged in succesfully and QC session initialized')
 
-##################################################################
-## fetch one defect entity for feasibility testing.
-# returndict = alm.get_defects_single()
-# print("jinha",returndict)
-##################################################################
+#################################################################
+# fetch one defect entity for feasibility testing.
+returndict = alm.get_defects_single()
+print("jinha",returndict)
+#################################################################
 
 ##################################################################
 ## fetch the whole defect entities for Osprey R4 Oprey for feasibility testing.
@@ -40,7 +40,7 @@ print(r'Logged in succesfully and QC session initialized')
 # # filter = r"{user-01['Osprey R4' or 'Osprey'];id['94173']}"
 # sprs = alm.get_defects_product(filter, fields, 25)
 # # print("jinha", sprs)
-# spr2excel(sprs,alm_table_header)
+# spr2excel(sprs,alm_table_header, alm_table_map)
 ##################################################################
 
 # ##################################################################
@@ -48,17 +48,17 @@ print(r'Logged in succesfully and QC session initialized')
 # fields = list(alm_table_map.keys())
 # filter = r"{user-01['Gemini R5' or 'Gemini R5 Future' or 'Osprey R5' or 'Peregrine R5' or 'Swallow R5']}"
 # sprs = alm.get_defects_product(filter, fields, 25)
-# spr2excel(sprs,alm_table_header)
+# spr2excel(sprs,alm_table_header, alm_table_map)
 # ##################################################################
 
-##################################################################
-## fetch the whole defect entities for Osprey R4 Oprey for feasibility testing.
-fields = list(alm_table_map.keys())
-filter = r"{user-01['Osprey R4' or 'Osprey']}"
-# filter = r"{user-01['Gemini R4']}"
-sprs = alm.get_defects_product(filter, fields, 25)
-spr2excel(sprs,alm_table_header)
-##################################################################
+# ##################################################################
+# ## fetch the whole defect entities for Osprey R4 Oprey for feasibility testing.
+# fields = list(alm_table_map.keys())
+# filter = r"{user-01['Osprey R4' or 'Osprey']}"
+# # filter = r"{user-01['Gemini R4']}"
+# sprs = alm.get_defects_product(filter, fields, 25)
+# spr2excel(sprs,alm_table_header, alm_table_map)
+# ##################################################################
 alm.logout()
 
 

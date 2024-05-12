@@ -11,16 +11,15 @@ from openpyxl.utils import get_column_letter
 from copy import copy, deepcopy
 import sys, os
 from datetime import datetime
-from .almtable import *
 from .Utils import *
-# from .SmartsheetApi import writeConfigData
+
 
 excel_file_name = 'Data/export.xlsx'
 template_excel_file_name = 'Data/template.xlsx'
 sheet_excel_file_name = 'Data/sheetexport.xlsx'
 
-
-def spr2excel(sprs, alm_table_header):
+# 들어오는 SPR DATA 를 excel file 로 변경하는 험수 
+def spr2excel(sprs, arg_alm_table_header, arg_alm_table_map):
 
     report_file_name = excel_file_name
 
@@ -43,16 +42,16 @@ def spr2excel(sprs, alm_table_header):
         template_sheet = template_wb.active
 
         # get maxcolumn 
-        maxcolumn = len(alm_table_header) 
+        maxcolumn = len(arg_alm_table_header) 
 
         # append title rowl
-        for col, value in alm_table_header.items():
+        for col, value in arg_alm_table_header.items():
             new_sheet[col+'1'] = value[0]
 
         # add data into below row    
         for spr in sprs:
             headers = list(spr.keys())
-            sorted_columns = sorted(headers, key=lambda x: list(alm_table_map.keys()).index(x))  # sort it for exported excel
+            sorted_columns = sorted(headers, key=lambda x: list(arg_alm_table_map.keys()).index(x))  # sort it for exported excel
             row_data = [spr[header] for header in sorted_columns]
             new_sheet.append(row_data)
 
@@ -99,7 +98,7 @@ def spr2excel(sprs, alm_table_header):
                 new_sheet[cell.coordinate].number_format = '@'
 
         # 열(column) 숨기기
-        for column, data in alm_table_header.items():
+        for column, data in arg_alm_table_header.items():
             new_sheet.column_dimensions[column].hidden = data[2]  # data[2] has hide flag
 
         # # Save the modified workbook
@@ -121,6 +120,7 @@ def spr2excel(sprs, alm_table_header):
             template_wb.close()
 
 
+#smartsheet 에 있는 SPR data 를 excel 로 만들어 내는 함수.
 def sheetspr2excel(sprs, smart_table_header):
 
     report_file_name = sheet_excel_file_name
@@ -172,24 +172,9 @@ def sheetspr2excel(sprs, smart_table_header):
         if 'template_wb' in locals():
             template_wb.close()
 
-
-def excel2sheet(smartsheet_client, configData, product):
-
-    date = get_current_date()
-    fw_format = date_to_fw_format (date)
-
-    if(product == "Osprey R4"):
-        new_file_name = f"Data/osprey_issues_2024_{fw_format}.xlsx"
-    elif(product == "Gemini R5"):
-        new_file_name = f"Data/Gemini_R5_issues_2024_{fw_format}.xlsx"
-    elif(product == "Gemini R4"):
-        new_file_name = f"Data/Gemini_R4_issues_2024_{fw_format}.xlsx"
-    else:
-        new_file_name = f"Data/osprey_issues_2024_{fw_format}.xlsx"
-
-    report_file_name = new_file_name
-
-    file_name_change(excel_file_name, report_file_name)
+ 
+# excel 로 있는  SPR 을 smartsheet 로 올리는 함수
+def excel2sheet(smartsheet_client, configData, report_file_name, product):
 
     print("Start uploading...")
 
@@ -242,6 +227,8 @@ def excel2sheet(smartsheet_client, configData, product):
                         configData.update({"SmartsheetID2": str(sheet.id)})  # newly save sheetID
                     elif(product == "Gemini R4"):
                         configData.update({"SmartsheetID3": str(sheet.id)})  # newly save sheetID
+                    elif(product == "Gemini R3"):
+                        configData.update({"SmartsheetID4": str(sheet.id)})  # newly save sheetID
                     else:
                         configData.update({"SmartsheetID": str(sheet.id)})  # newly save sheetID
 
@@ -249,4 +236,27 @@ def excel2sheet(smartsheet_client, configData, product):
 
                     print("Done")
 
-    return report_file_name, sheet.id
+    return  sheet.id
+
+
+def create_product_file(product):
+
+    date = get_current_date()
+    fw_format = date_to_fw_format (date)
+
+    if(product == "Osprey R4"):
+        new_file_name = f"Data/osprey_issues_2024_{fw_format}.xlsx"
+    elif(product == "Gemini R5"):
+        new_file_name = f"Data/Gemini_R5_issues_2024_{fw_format}.xlsx"
+    elif(product == "Gemini R4"):
+        new_file_name = f"Data/Gemini_R4_issues_2024_{fw_format}.xlsx"
+    elif(product == "Osprey R4 clone"):
+        new_file_name = f"Data/osprey_link_2024_{fw_format}.xlsx"
+    elif(product == "Gemini R3"):
+        new_file_name = f"Data/Gemini_R3_issues_2024_{fw_format}.xlsx"
+    else:
+        new_file_name = f"Data/osprey_issues_2024_{fw_format}.xlsx"
+
+    file_name_change(excel_file_name, new_file_name)
+
+    return new_file_name

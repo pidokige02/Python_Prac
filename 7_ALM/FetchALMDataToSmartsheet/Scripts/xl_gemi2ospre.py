@@ -489,25 +489,26 @@ for row in ws_new.iter_rows(min_row=1,min_col=2, max_col=2):
       ws_new["AD"+str(cell.row)].protection = copy(ws_previous["AD"+str(cell_row)].protection)
       ws_new["AD"+str(cell.row)].alignment = copy(ws_previous["AD"+str(cell_row)].alignment)
 
-      ws_new["AE"+str(cell.row)].value = ws_previous["AE"+str(cell_row)].value
-      ws_new["AE"+str(cell.row)].font = copy(ws_previous["AE"+str(cell_row)].font)
-      ws_new["AE"+str(cell.row)].border = copy(ws_previous["AE"+str(cell_row)].border)
-      ws_new["AE"+str(cell.row)].fill = copy(ws_previous["AE"+str(cell_row)].fill)
-      ws_new["AE"+str(cell.row)].number_format = copy(ws_previous["AE"+str(cell_row)].number_format)
-      ws_new["AE"+str(cell.row)].protection = copy(ws_previous["AE"+str(cell_row)].protection)
-      ws_new["AE"+str(cell.row)].alignment = copy(ws_previous["AE"+str(cell_row)].alignment)
+      # ws_new["AE"+str(cell.row)].value = ws_previous["AE"+str(cell_row)].value
+      # ws_new["AE"+str(cell.row)].font = copy(ws_previous["AE"+str(cell_row)].font)
+      # ws_new["AE"+str(cell.row)].border = copy(ws_previous["AE"+str(cell_row)].border)
+      # ws_new["AE"+str(cell.row)].fill = copy(ws_previous["AE"+str(cell_row)].fill)
+      # ws_new["AE"+str(cell.row)].number_format = copy(ws_previous["AE"+str(cell_row)].number_format)
+      # ws_new["AE"+str(cell.row)].protection = copy(ws_previous["AE"+str(cell_row)].protection)
+      # ws_new["AE"+str(cell.row)].alignment = copy(ws_previous["AE"+str(cell_row)].alignment)
 
-      ws_new["AF"+str(cell.row)].value = ws_previous["AF"+str(cell_row)].value
-      ws_new["AF"+str(cell.row)].font = copy(ws_previous["AF"+str(cell_row)].font)
-      ws_new["AF"+str(cell.row)].border = copy(ws_previous["AF"+str(cell_row)].border)
-      ws_new["AF"+str(cell.row)].fill = copy(ws_previous["AF"+str(cell_row)].fill)
-      ws_new["AF"+str(cell.row)].number_format = copy(ws_previous["AF"+str(cell_row)].number_format)
-      ws_new["AF"+str(cell.row)].protection = copy(ws_previous["AF"+str(cell_row)].protection)
-      ws_new["AF"+str(cell.row)].alignment = copy(ws_previous["AF"+str(cell_row)].alignment)
+      # ws_new["AF"+str(cell.row)].value = ws_previous["AF"+str(cell_row)].value
+      # ws_new["AF"+str(cell.row)].font = copy(ws_previous["AF"+str(cell_row)].font)
+      # ws_new["AF"+str(cell.row)].border = copy(ws_previous["AF"+str(cell_row)].border)
+      # ws_new["AF"+str(cell.row)].fill = copy(ws_previous["AF"+str(cell_row)].fill)
+      # ws_new["AF"+str(cell.row)].number_format = copy(ws_previous["AF"+str(cell_row)].number_format)
+      # ws_new["AF"+str(cell.row)].protection = copy(ws_previous["AF"+str(cell_row)].protection)
+      # ws_new["AF"+str(cell.row)].alignment = copy(ws_previous["AF"+str(cell_row)].alignment)
 
-# Reviewer in GEUK	Status
-ws_new.column_dimensions[get_column_letter(28)].width = ws_previous.column_dimensions[get_column_letter(27)].width    
-ws_new.column_dimensions[get_column_letter(29)].width = ws_previous.column_dimensions[get_column_letter(28)].width    
+# Reviewer in GEUK/Comments/Triage
+ws_new.column_dimensions[get_column_letter(28)].width = ws_previous.column_dimensions[get_column_letter(28)].width    
+ws_new.column_dimensions[get_column_letter(29)].width = ws_previous.column_dimensions[get_column_letter(29)].width    
+ws_new.column_dimensions[get_column_letter(30)].width = ws_previous.column_dimensions[get_column_letter(30)].width    
 
 
 for row in ws_new.iter_rows(min_row=1, min_col=28, max_col=29):

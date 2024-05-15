@@ -29,7 +29,7 @@ print(r'Logged in succesfully and QC session initialized')
 
 #################################################################
 # fetch one defect entity for feasibility testing.
-returndict = alm.get_defects_single()
+returndict = alm.get_defects_single("91389")
 print("jinha",returndict)
 #################################################################
 

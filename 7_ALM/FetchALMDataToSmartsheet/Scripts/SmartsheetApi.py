@@ -495,9 +495,9 @@ def process_Gemini_R4():
 
 	report_file_name_for_gemini_r4 = create_product_file("Gemini R4")
 
-	# createdID = excel2sheet(smartsheet_client, configData, report_file_name_for_gemini_r4, "Gemini R4")
+	createdID = excel2sheet(smartsheet_client, configData, report_file_name_for_gemini_r4, "Gemini R4")
 	
-	# hide_Sheetcolumn(createdID, smart_table_header_gemini)
+	hide_Sheetcolumn(createdID, smart_table_header_gemini)
 
 def process_Gemini_R5():
 	global smartsheet_client,sheet
@@ -527,9 +527,9 @@ def process_Gemini_R5():
 
 	report_file_name_for_gemini_r5 = create_product_file("Gemini R5")
 
-	# createdID = excel2sheet(smartsheet_client, configData, report_file_name_for_gemini_r5, "Gemini R5")
+	createdID = excel2sheet(smartsheet_client, configData, report_file_name_for_gemini_r5, "Gemini R5")
 	
-	# hide_Sheetcolumn(createdID, smart_table_header_gemini)
+	hide_Sheetcolumn(createdID, smart_table_header_gemini)
 
 
 def process_Gemini_R3():
@@ -561,9 +561,9 @@ def process_Gemini_R3():
 
 	report_file_name_for_gemini_r3 = create_product_file("Gemini R3")
 
-	# createdID = excel2sheet(smartsheet_client, configData, report_file_name_for_gemini_r3, "Gemini R3")
+	createdID = excel2sheet(smartsheet_client, configData, report_file_name_for_gemini_r3, "Gemini R3")
 	
-	# hide_Sheetcolumn(createdID, smart_table_header_gemini)
+	hide_Sheetcolumn(createdID, smart_table_header_gemini)
 
 
 def process_Osprey_R4():
@@ -611,13 +611,15 @@ def process_Osprey_R4():
 
 	link_file_name = create_product_file("Osprey R4 clone")
 
-	print (link_file_name, report_file_name_osprey_r4, report_file_name_for_gemini_r3, report_file_name_for_gemini_r4, report_file_name_for_gemini_r5)
-
+	# excel file 을 모두 만들어 두고 분석하는 함수  아래를 사용하므로 remark 함
 	# xl_clone_analysis (link_file_name, report_file_name_osprey_r4, report_file_name_for_gemini_r3, report_file_name_for_gemini_r4, report_file_name_for_gemini_r5)
 
-	# createdID = excel2sheet(smartsheet_client, configData, report_file_name_osprey_r4, "Osprey R4")
+	# alm 에서 필요한 data 를 조화하면서 분석하는 함수
+	xl_clone_analysis_in_alm (alm, link_file_name, report_file_name_osprey_r4)
 
-	# hide_Sheetcolumn(createdID, smart_table_header)
+	createdID = excel2sheet(smartsheet_client, configData, report_file_name_osprey_r4, "Osprey R4")
+
+	hide_Sheetcolumn(createdID, smart_table_header)
 
 	osprey_issue_path = "./" + report_file_name_osprey_r4
 
@@ -632,11 +634,12 @@ def startProcess():
 	datetime1 = datetime.now()
 	logger  = startLog()
 
-	for i in range(1, 11):
-		process_Gemini_R3()
-		process_Gemini_R4()
-		process_Gemini_R5()
-		process_Osprey_R4()
+	# comment below two line due to acceing cloned SPR status directly
+	# process_Gemini_R3()
+	# process_Gemini_R4()
+	process_Gemini_R5()
+	process_Osprey_R4()
+	
 	return True
 
 

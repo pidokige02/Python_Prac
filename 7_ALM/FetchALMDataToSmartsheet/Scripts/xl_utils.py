@@ -2,6 +2,7 @@ from openpyxl import load_workbook
 from openpyxl.utils import get_column_letter, column_index_from_string
 from openpyxl.styles import PatternFill
 
+
 # gemini R3/R4/R5 의 cell 을 확인하여 match 된 cell 이 resolved, verified, closed되 었으면 true 와 같이 status 를 return 함 
 def check_cloned_spr_completed(sheet, value):
     for row in sheet.iter_rows(min_row=2,min_col=2, max_col=2): # check coloned ID in osprey_link_2024FWxx..xlsx
@@ -13,6 +14,20 @@ def check_cloned_spr_completed(sheet, value):
                 else:
                     return False
     return False
+
+
+# gemini R3/R4/R5 의 cell 을 alm 에 직접접속하여 확인하여  match 된 cell 이 resolved, verified, closed되 었으면 true 와 같이 status 를 return 함 
+def check_cloned_spr_completed_in_alm (alm, value):
+
+    result_dict = alm.get_defects_single(value)
+    
+    status = result_dict['user-template-01']
+
+    if((status[0]['value'] == "Verified") or (status[0]['value'] == "Resolved") or (status[0]['value'] == "Closed")):
+        return True
+    else:
+        return False
+
 
 # Osprey r4 가 still open 되어 있으면서 genimi 가 close 되어 있으면 색으로 표시를 함
 def mark_closed_spr (sheet, value):  # mark closed spr skyblue in ospret_r4
@@ -71,3 +86,26 @@ def  xl_clone_analysis (link_file_name, report_file_name_osprey_r4, report_file_
     wb_gemini_r5.close()
                        
 
+
+def  xl_clone_analysis_in_alm (alm, link_file_name, report_file_name_osprey_r4):
+
+
+    wb_link = load_workbook(link_file_name)
+    wb_osprey_r4 = load_workbook(report_file_name_osprey_r4)
+
+    ws_link = wb_link[wb_link.sheetnames[0]]  
+    ws_osprey_r4 = wb_osprey_r4[wb_osprey_r4.sheetnames[0]] 
+
+    for row in ws_link.iter_rows(min_row=2,min_col=4, max_col=4): # check coloned ID in osprey_link_2024FWxx..xlsx
+          for cell in row:
+            if(ws_link[cell.coordinate].value):
+                ret = check_cloned_spr_completed_in_alm (alm, ws_link[cell.coordinate].value)
+                if ret == True:
+                    mark_closed_spr (ws_osprey_r4, ws_link["B"+str(cell.row)].value)
+
+
+    wb_link.save(link_file_name)
+    wb_osprey_r4.save(report_file_name_osprey_r4)
+
+    wb_link.close()
+    wb_osprey_r4.close()

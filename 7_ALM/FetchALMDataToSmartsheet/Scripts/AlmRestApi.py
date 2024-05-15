@@ -56,23 +56,22 @@ class AlmRestApi:
 		response = self.sess.post(AlmRestApi.qcLogoutEndPoint, headers=self.__headers, cookies=self.cookies)
 		return response.headers.get('Expires')
     
-	def get_defects_single(self):
-		qcallEndoint = AlmRestApi.almURL + AlmRestApi.midPoint + r"defects/" + r"91389"
-        # print ("jinha",qcallEndoint)
+	def get_defects_single(self, spr_num):
+		qcallEndoint = AlmRestApi.almURL + AlmRestApi.midPoint + r"defects/" + spr_num
 		result_dict = {}
 
 		response = self.sess.get(qcallEndoint, headers=AlmRestApi.__headers, cookies=self.cookies, verify=False)        
 		if response.status_code == 200:
 			alm_entry_data = response.json()
-            # print(type(alm_entry_data))
+
 			for field in alm_entry_data['Fields']:
 				field_name = field['Name']
 				field_values = field['values']
 				result_dict[field_name] = field_values
 
-			print("ALM Entry Data:", alm_entry_data)
-			with open("output.json", "w") as json_file:
-				json.dump(alm_entry_data, json_file)      
+			# print("ALM Entry Data:", alm_entry_data)
+			# with open("output.json", "w") as json_file:
+			# 	json.dump(alm_entry_data, json_file)      
             
             # parsed_data = json.loads(alm_entry_data)
             # entry_name = parsed_data['Project']

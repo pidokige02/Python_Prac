@@ -30,6 +30,11 @@ alm = AlmRestApi()
 exportUserFileName = "Data\\AlmUserList.txt"
 userManagerFileName = "Data\\UserManagerList.txt"
 
+link_file_name = "Data/osprey_link_2024_FW20.xlsx"
+report_file_name_osprey_r4 = "Data/osprey_issues_2024_FW20.xlsx"
+report_file_name_for_gemini_r3 = "Data/Gemini_R3_issues_2024_FW20.xlsx"	
+report_file_name_for_gemini_r4 = "Data/Gemini_R4_issues_2024_FW20.xlsx"
+report_file_name_for_gemini_r5 = "Data/Gemini_R5_issues_2024_FW20.xlsx"	
 
 def deleteSheet():
 	global smartsheet_client, sheetID
@@ -83,8 +88,8 @@ def renameALMColumn(column_id, new_column_title):
 
 
 
-def getAllColumnsProperties():
-	global smartsheet_client,sheet,sheetID
+def getAllColumnsProperties(sheetID):
+	global smartsheet_client,sheet
 
 	try:
 		# 시트 정보 가져오기
@@ -399,8 +404,8 @@ if configData is None:
 	sys.exit()
 
 smartsheet_client,sheet = "",""
-sheetID = configData.get("SmartsheetID")
-sheetID = int(str(sheetID))
+sheetID1 = configData.get("SmartsheetID1")
+sheetID1 = int(str(sheetID1))
 
 sheetID2 = configData.get("SmartsheetID2")
 sheetID2 = int(str(sheetID2))
@@ -461,20 +466,20 @@ def printException(exception,logger):
 	print("Error in line {}, {} \n{} \n{}".format(sys.exc_info()[-1].tb_lineno, sys.exc_info()[2].tb_frame.f_code.co_filename, type(exception).__name__, exception))
 	logger.error("Error in line {}, {} \n{} \n{}".format(sys.exc_info()[-1].tb_lineno, sys.exc_info()[2].tb_frame.f_code.co_filename, type(exception).__name__, exception))		
 
-def startProcess():
-	global smartsheetColumns
-	global logger
-	global smartsheet_client,sheet
-	datetime1 = datetime.now()
-	logger  = startLog()
 
+def process_Gemini_R4():
+	global smartsheet_client,sheet
 
 	##################################################################
 	## fetch the whole defect entities for Gemini R4 for feasibility testing.
 	fields = list(alm_table_map.keys())
 	filter = r"{user-01['Gemini R4' or 'Eagle R4' or 'Eagle R4 Upgrade' or 'Falcon R4' or 'Gemini R4 Dev' or 'Gemini R4 Post Release' or 'Peregrine R4' or 'Swallow R4']}"
 	sprs = alm.get_defects_product(filter, fields, 25)
-	spr2excel(sprs,alm_table_header, alm_table_map)
+	if (len(sprs)):
+		spr2excel(sprs,alm_table_header, alm_table_map)
+	else:
+		printError("Gemini_R4 ALM data fetch failure")
+		return		
 	##################################################################
 
 	setProxy("Proxy")
@@ -484,23 +489,29 @@ def startProcess():
 		sys.exit()
 
 	sprs = exportFromSheet(sheetID3)
-	sheetspr2excel(sprs, smart_table_header)
+	sheetspr2excel(sprs, smart_table_header_gemini)
 
 	subprocess.run(["python", "./Scripts/xl_gemi2ospre.py", "./Data/sheetexport.xlsx", "./Data/export.xlsx"])
 
 	report_file_name_for_gemini_r4 = create_product_file("Gemini R4")
 
-	createdID = excel2sheet(smartsheet_client, configData, report_file_name_for_gemini_r4, "Gemini R4")
+	# createdID = excel2sheet(smartsheet_client, configData, report_file_name_for_gemini_r4, "Gemini R4")
 	
-	hide_Sheetcolumn(createdID, smart_table_header)
+	# hide_Sheetcolumn(createdID, smart_table_header_gemini)
 
+def process_Gemini_R5():
+	global smartsheet_client,sheet
 
 	##################################################################
 	## fetch the whole defect entities for Gemini R5 for feasibility testing.
 	fields = list(alm_table_map.keys())
 	filter = r"{user-01['Gemini R5' or 'Gemini R5 Future' or 'Osprey R5' or 'Peregrine R5' or 'Swallow R5']}"
 	sprs = alm.get_defects_product(filter, fields, 25)
-	spr2excel(sprs,alm_table_header, alm_table_map)
+	if (len(sprs)):
+		spr2excel(sprs,alm_table_header, alm_table_map)
+	else:
+		printError("Gemini_R5 ALM data fetch failure")
+		return		
 	##################################################################
 
 	setProxy("Proxy")
@@ -510,22 +521,30 @@ def startProcess():
 		sys.exit()
 
 	sprs = exportFromSheet(sheetID2)
-	sheetspr2excel(sprs, smart_table_header)
+	sheetspr2excel(sprs, smart_table_header_gemini)
 
 	subprocess.run(["python", "./Scripts/xl_smart.py", "./Data/sheetexport.xlsx", "./Data/export.xlsx"])
 
 	report_file_name_for_gemini_r5 = create_product_file("Gemini R5")
 
-	createdID = excel2sheet(smartsheet_client, configData, report_file_name_for_gemini_r5, "Gemini R5")
+	# createdID = excel2sheet(smartsheet_client, configData, report_file_name_for_gemini_r5, "Gemini R5")
 	
-	hide_Sheetcolumn(createdID, smart_table_header)
+	# hide_Sheetcolumn(createdID, smart_table_header_gemini)
+
+
+def process_Gemini_R3():
+	global smartsheet_client,sheet
 
 	#################################################################
 	## fetch the whole defect entities for Gemini R3 .
 	fields = list(alm_table_map.keys())
 	filter = r"{user-01['Gemini R3' or 'Eagle R3' or 'Falcon R3' or 'Gemini R3 - Dev' or 'Gemini R3 Future' or 'Gemini R3 Post Release']}"
 	sprs = alm.get_defects_product(filter, fields, 25)
-	spr2excel(sprs,alm_table_header, alm_table_map)
+	if (len(sprs)):
+		spr2excel(sprs,alm_table_header, alm_table_map)
+	else:
+		printError("Gemini_R3  ALM data fetch failure")
+		return		
 	##################################################################
 
 	# Smartsheet access
@@ -536,33 +555,40 @@ def startProcess():
 		sys.exit()
 
 	sprs = exportFromSheet(sheetID4)
-	sheetspr2excel(sprs, smart_table_header)
+	sheetspr2excel(sprs, smart_table_header_gemini)
 
 	subprocess.run(["python", "./Scripts/xl_smart.py", "./Data/sheetexport.xlsx", "./Data/export.xlsx"])
 
 	report_file_name_for_gemini_r3 = create_product_file("Gemini R3")
 
-	createdID = excel2sheet(smartsheet_client, configData, report_file_name_for_gemini_r3, "Gemini R3")
+	# createdID = excel2sheet(smartsheet_client, configData, report_file_name_for_gemini_r3, "Gemini R3")
 	
-	hide_Sheetcolumn(createdID, smart_table_header)
+	# hide_Sheetcolumn(createdID, smart_table_header_gemini)
 
+
+def process_Osprey_R4():
+	
+	global smartsheet_client,sheet
 	#################################################################
 	## fetch the whole defect entities for Osprey R4 Oprey .
 	fields = list(alm_table_map.keys())
 	filter = r"{user-01['Osprey R4' or 'Osprey']}"
-	# filter = r"{user-01['Gemini R4']}"
 	sprs = alm.get_defects_product(filter, fields, 25)
-	spr2excel(sprs,alm_table_header, alm_table_map)
+	if (len(sprs)):
+		spr2excel(sprs,alm_table_header, alm_table_map)
+	else:
+		printError("Osprey_R4 ALM data fetch failure")
+		return		
 	##################################################################
 	
 	# Smartsheet access
 	setProxy("Proxy")
-	smartsheet_client,sheet = connectToSmartsheet(sheetID)
+	smartsheet_client,sheet = connectToSmartsheet(sheetID1)
 	if smartsheet_client is None:
 		printError("Connection to smartsheet failed")
 		sys.exit()
 		
-	sprs = exportFromSheet(sheetID)
+	sprs = exportFromSheet(sheetID1)
 	sheetspr2excel(sprs, smart_table_header)
 
 	subprocess.run(["python", "./Scripts/xl_smart.py", "./Data/sheetexport.xlsx", "./Data/export.xlsx"])
@@ -575,24 +601,23 @@ def startProcess():
 	fields = list(alm_table_map_for_link.keys())
 	filter = r"{user-01['Osprey R4' or 'Osprey']}"
 	sprs = alm.get_defects_product(filter, fields, 25)
-	spr2excel(sprs,alm_link_table_header, alm_table_map_for_link )
+	if (len(sprs)):
+		spr2excel(sprs,alm_link_table_header, alm_table_map_for_link )
+	else:
+		printError("Osprey_R4_link ALM data fetch failure")
+		return		
+
 	##################################################################
 
 	link_file_name = create_product_file("Osprey R4 clone")
-	# link_file_name = "Data/osprey_link_2024_FW20.xlsx"
-	# report_file_name_osprey_r4 = "Data/osprey_issues_2024_FW20.xlsx"
-	# report_file_name_for_gemini_r3 = "Data/Gemini_R3_issues_2024_FW20.xlsx"	
-	# report_file_name_for_gemini_r4 = "Data/Gemini_R4_issues_2024_FW20.xlsx"
-	# report_file_name_for_gemini_r5 = "Data/Gemini_R5_issues_2024_FW20.xlsx"	
-
 
 	print (link_file_name, report_file_name_osprey_r4, report_file_name_for_gemini_r3, report_file_name_for_gemini_r4, report_file_name_for_gemini_r5)
 
-	xl_clone_analysis (link_file_name, report_file_name_osprey_r4, report_file_name_for_gemini_r3, report_file_name_for_gemini_r4, report_file_name_for_gemini_r5)
+	# xl_clone_analysis (link_file_name, report_file_name_osprey_r4, report_file_name_for_gemini_r3, report_file_name_for_gemini_r4, report_file_name_for_gemini_r5)
 
-	createdID = excel2sheet(smartsheet_client, configData, report_file_name_osprey_r4, "Osprey R4")
+	# createdID = excel2sheet(smartsheet_client, configData, report_file_name_osprey_r4, "Osprey R4")
 
-	hide_Sheetcolumn(createdID, smart_table_header)
+	# hide_Sheetcolumn(createdID, smart_table_header)
 
 	osprey_issue_path = "./" + report_file_name_osprey_r4
 
@@ -600,6 +625,18 @@ def startProcess():
 
 	subprocess.run(["python", "./Scripts/xl_analysis.py", "./Data/osprey_issues_master.xlsx"])
 
+
+def startProcess():
+	global smartsheetColumns
+	global logger
+	datetime1 = datetime.now()
+	logger  = startLog()
+
+	for i in range(1, 11):
+		process_Gemini_R3()
+		process_Gemini_R4()
+		process_Gemini_R5()
+		process_Osprey_R4()
 	return True
 
 
@@ -622,7 +659,7 @@ def loginToAlm():
 	printSuccess(r'Logged in succesfully and ALM session initialized')
 
 
-def hide_Sheetcolumn(sheet_id, smart_table_header):
+def hide_Sheetcolumn(sheet_id, arg_smart_table_header):
 	print("Hiding unnecessary columns!")
      # 시트 조회
 	sheet = smartsheet_client.Sheets.get_sheet(sheet_id)
@@ -632,7 +669,7 @@ def hide_Sheetcolumn(sheet_id, smart_table_header):
 	update_column = smartsheet_client.models.Column()
 
 	for column in columns:
-		for col, value in smart_table_header.items():
+		for col, value in arg_smart_table_header.items():
 			if column.title == value[0]:
 				update_column.hidden = value[1]
 				smartsheet_client.Sheets.update_column(sheet_id, column.id, update_column)

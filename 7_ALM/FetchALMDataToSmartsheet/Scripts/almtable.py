@@ -32,7 +32,7 @@ alm_table_map_for_link = {
     'user-01' : 'Project',
     'id' : 'Defect ID',
     'name' : 'Summary',
-    'user-template-19' : "Cloned ID"
+    'user-template-19' : 'Cloned ID'
 }
 
 # display name, field name, hide flag  

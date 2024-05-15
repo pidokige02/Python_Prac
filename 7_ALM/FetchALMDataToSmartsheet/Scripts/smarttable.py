@@ -185,7 +185,7 @@ alm_table_map_ss = [
 ]
 
 
-# display name, field name, hide flag  
+# display name, field name, hide flag  for Osprey Product
 smart_table_header = {
     'A' : ['Project', False],
     'B' : ['Defect ID', False],
@@ -216,5 +216,39 @@ smart_table_header = {
     'AA' : ['DRB Comments', True],
     'AB' : ['Comments', False],
     'AC' : ['T2/Common?', False],
+    'AD' : ['Triage', False],
+}
+
+
+smart_table_header_gemini = {
+    'A' : ['Project', False],
+    'B' : ['Defect ID', False],
+    'C' : ['Summary', False],
+    'D' : ['Detected on Date', True],
+    'E' : ['Detected By', True],
+    'F' : ['SW Revision & Build', True],
+    'G' : ['GI Development', True],
+    'H' : ['Issue Type', True],
+    'I' : ['Priority', True],
+    'J' : ['Classification', False],
+    'K' : ['DRB Reviewed', True],
+    'L' : ['Reproducible', True],
+    'M' : ['Status', False],
+    'N' : ['Assigned To', False],
+    'O' : ['Target Cycle', True],
+    'P' : ['External Defect ID', True],
+    'Q' : ['Verifier', True],
+    'R' : ['Disposition', True],
+    'S' : ['Root Cause', False],
+    'T' : ['Duplicate ID', True],
+    'U' : ['Resolved By', True],
+    'V' : ['Resolved in Branch or Version', True],
+    'W' : ['Resolve Date', True],
+    'X' : ['Verify Date', True],
+    'Y' : ['Category', False],
+    'Z' : ['Status Update', False],
+    'AA' : ['DRB Comments', True],
+    'AB' : ['Reviewer in GEUK', False],
+    'AC' : ['Comments', False],
     'AD' : ['Triage', False],
 }

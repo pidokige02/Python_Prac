@@ -184,7 +184,7 @@ for row in ws_previous.iter_rows(min_row=2,min_col=2, max_col=2):
     
 #             mark_newly_closed_cell(cell.row, ws_new["M"+str(cell.row)].value)
 
-# Critical	Triage	Comments column
+# Comments/T2/Common?/Triage
 ws_new.column_dimensions[get_column_letter(28)].width = ws_previous.column_dimensions[get_column_letter(28)].width    
 ws_new.column_dimensions[get_column_letter(29)].width = ws_previous.column_dimensions[get_column_letter(29)].width    
 ws_new.column_dimensions[get_column_letter(30)].width = ws_previous.column_dimensions[get_column_letter(30)].width    

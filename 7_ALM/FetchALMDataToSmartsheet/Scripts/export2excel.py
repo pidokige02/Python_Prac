@@ -222,15 +222,15 @@ def excel2sheet(smartsheet_client, configData, report_file_name, product):
                     print("Loaded " + str(len(sheet.rows)) + " rows from sheet: " + sheet.name)
 
                     if(product == "Osprey R4"):
-                        configData.update({"SmartsheetID": str(sheet.id)})  # newly save sheetID
+                        configData.update({"SmartsheetID1": str(sheet.id)})  # newly save sheetID1
                     elif(product == "Gemini R5"):
-                        configData.update({"SmartsheetID2": str(sheet.id)})  # newly save sheetID
+                        configData.update({"SmartsheetID2": str(sheet.id)})  # newly save sheetID2
                     elif(product == "Gemini R4"):
-                        configData.update({"SmartsheetID3": str(sheet.id)})  # newly save sheetID
+                        configData.update({"SmartsheetID3": str(sheet.id)})  # newly save sheetID3
                     elif(product == "Gemini R3"):
-                        configData.update({"SmartsheetID4": str(sheet.id)})  # newly save sheetID
+                        configData.update({"SmartsheetID4": str(sheet.id)})  # newly save sheetID4
                     else:
-                        configData.update({"SmartsheetID": str(sheet.id)})  # newly save sheetID
+                        configData.update({"SmartsheetID1": str(sheet.id)})  # newly save sheetID1
 
                     writeConfigData(configData)
 

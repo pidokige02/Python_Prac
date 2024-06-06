@@ -8,12 +8,15 @@ class Log:
         self.df = None
         self.filtered_df = None 
 
-    def load_log (self, file_path, use_columns):
+        self.df_device = None
+
+
+    def load_log (self, file_path, use_columns_log):
         # 탭으로 구분된 텍스트 파일을 인코딩을 지정하여 데이터 프레임으로 읽기
         try:
-            self.df = pd.read_csv(file_path, sep='\t', usecols=use_columns, encoding='utf-8')
+            self.df = pd.read_csv(file_path, sep='\t', usecols=use_columns_log, encoding='utf-8')
         except UnicodeDecodeError:
-            self.df = pd.read_csv(file_path, sep='\t', usecols=use_columns, encoding='latin1')
+            self.df = pd.read_csv(file_path, sep='\t', usecols=use_columns_log, encoding='latin1')
 
     # 새로운 열 추가 - 예: 새로운 열 'NewColumn'에 기본값 0 할당
     def add_columns (self):
@@ -47,4 +50,11 @@ class Log:
 
         return self.filtered_df
 
+
+    def load_device (self, file_path, use_columns_device):
+        # 탭으로 구분된 텍스트 파일을 인코딩을 지정하여 데이터 프레임으로 읽기
+        try:
+            self.df_device = pd.read_csv(file_path, sep='\t', usecols=use_columns_device, encoding='utf-8')
+        except UnicodeDecodeError:
+            self.df_device = pd.read_csv(file_path, sep='\t', usecols=use_columns_device, encoding='latin1')
 

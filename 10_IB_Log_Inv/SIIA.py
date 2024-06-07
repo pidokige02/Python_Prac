@@ -36,8 +36,14 @@ class App:
         self.notebook = ttk.Notebook(root)
         self.notebook.grid(row=1, column=0, sticky="nsew")
 
+        #log window creation
+        self.logwin = LogWindow() 
+
+        # keyevent window creation
+        self.keyeventwin =  KeyEventWindow ()
+
         # # 첫 번째 Pane EventWindow 생성
-        self.eventWin = EventWindow()
+        self.eventWin = EventWindow(self.logwin)
         self.eventWin.layout_EventWindow(self.notebook)
 
         # 두 번째 Pane InfoWindow 생성
@@ -59,12 +65,6 @@ class App:
         # 버튼 추가
         button = ttk.Button(right_frame, text="Button2")
         button.pack(padx=10, pady=10, anchor="ne")
-
-        #log window creation
-        self.logwin = LogWindow() 
-
-        # keyevent window creation
-        self.keyeventwin =  KeyEventWindow ()
 
         # log object creation for log analysis 
         self.log = Log()
@@ -91,8 +91,10 @@ class App:
                     self.log.load_log(file_path, use_columns_log)
                     self.log.add_columns()
                     self.log.analyze_log ()
-                    self.log.filter_log()
-                    self.eventWin.update_EventWindow(self.log.filtered_df)
+                    filtered_df = self.log.filter_event()
+                    self.eventWin.update_EventWindow(filtered_df)
+                    filtered_df = self.log.filter_event("S/W version")
+                    self.infoWin.update_InfoWindow(filtered_df)
 
             except Exception as e:
                 self.logwin.log_text.insert(tk.END, f"Failed to read file:\n{e}")

@@ -42,11 +42,14 @@ class Log:
                         self.df.at[index, 'line#'] = index + 1
                         break
 
-    #                         
-    def filter_log(self):
 
-        # 'Event' 열이 빈 문자열이 아닌 행만 선택
-        self.filtered_df = self.df[self.df['Event'] != ""]
+    def filter_event(self, event=None):
+        if event:
+            # 특정 이벤트를 필터링 중복되는 것은 drop 시킴
+            self.filtered_df = self.df[self.df['Event'] == event].drop_duplicates(subset='Info')
+        else:
+            # 'Event' 열이 빈 문자열이 아닌 행만 선택
+            self.filtered_df = self.df[(self.df['Event'] != "") & (self.df['Event'] != "S/W version")]
 
         return self.filtered_df
 

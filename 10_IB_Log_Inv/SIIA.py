@@ -1,9 +1,7 @@
 import tkinter as tk
 from tkinter import ttk
-from tkinter import filedialog
 
 from Utils import *
-from log import *
 from event_win import *
 from info_win import *
 from peripheral_win import *
@@ -11,6 +9,7 @@ from log_win import *
 from keyevent_win import *
 from log import *
 from configure_data import *
+from control_pad import *
 
 
 class App:
@@ -54,17 +53,9 @@ class App:
         self.periWin  = PeripheralWindow()
         self.periWin.layout_PeripheralWindow(self.notebook)
 
-        # 오른쪽 프레임 생성
-        right_frame = ttk.Frame(root)
-        right_frame.grid(row=1, column=1, sticky="ns")
-
-        # 버튼 추가
-        button = ttk.Button(right_frame, text="Open Log", command=self.open_log)
-        button.pack(padx=10, pady=10, anchor="ne")
-
-        # 버튼 추가
-        button = ttk.Button(right_frame, text="Button2")
-        button.pack(padx=10, pady=10, anchor="ne")
+        # control pad 생성
+        self.controlpad = ControlPad(self)
+        self.controlpad.layout_ControlPad()
 
         # log object creation for log analysis 
         self.log = Log()
@@ -73,55 +64,7 @@ class App:
     def on_vertical_scroll(self, *args):
         print(f"Scrolled to: {args}")
 
-
-    def open_log(self):
-        # 파일 선택 대화 상자 열기
-        file_path = filedialog.askopenfilename()
-
-        if file_path:
-
-            self.logwin.layout_LogWindow(self.root, LOGWIN_DIMENSION)
-
-            try:
-                with open(file_path, 'r') as file:
-                    content = file.read()
-                    
-                    self.logwin.log_text.insert(tk.END, content)
-
-                    self.log.load_log(file_path, use_columns_log)
-                    self.log.add_columns()
-                    self.log.analyze_log ()
-                    filtered_df = self.log.filter_event()
-                    self.eventWin.update_EventWindow(filtered_df)
-                    filtered_df = self.log.filter_event("S/W version")
-                    self.infoWin.update_InfoWindow(filtered_df)
-
-            except Exception as e:
-                self.logwin.log_text.insert(tk.END, f"Failed to read file:\n{e}")
-
-
-            file_path_keyevent = replace_filename(file_path, 'KeyBoardShadow_1.txt')
-            self.keyeventwin.layout_KeyEventWindow(self.root, KEYEVENTWIN_DIMENSION)
-            try:
-                with open(file_path_keyevent, 'r') as file:
-                    content = file.read()
-                    self.keyeventwin.keyevent_text.insert(tk.END, content)
-            except Exception as e:
-                self.keyeventwin.keyevent_text.insert(tk.END, f"Failed to read file:\n{e}")
-
-
-            file_path_device = replace_filename(file_path, 'Devices_1.txt')
-            try:
-                with open(file_path_device, 'r') as file:
-                    self.log.load_device(file_path_device, use_columns_device)
-                    self.periWin.update_PeripheralWindow(self.log.df_device)
-            except Exception as e:
-                print(f"Failed to read file:\n{e}")
-
-
-        # 포커스 및 이벤트 관리
-        self.root.bind_all("<FocusIn>", self.on_focus_in)
-        
+     
     def on_focus_in(self, event):
         # 포커스 변경 시 처리할 로직
         if self.logwin.log_text == self.root.focus_get():

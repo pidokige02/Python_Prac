@@ -32,14 +32,13 @@ class Log:
             text = row['Text']
             if not isinstance(text, str):
                 continue  # 문자열이 아닌 경우 건너뛰기    
-            for event, patterns in evant_table_map.items():
-                for pattern in patterns:
+            for event, (pattern, isEvent, info_idx) in evant_table_map.items():
                     match = re.search(pattern, row['Text'])
                     if match:
-                        event_info = match.group(1) if match.lastindex else match.group(0)
+                        event_info = match.group(info_idx) if match.lastindex else match.group(0)
                         self.df.at[index, 'Event'] = event
                         self.df.at[index, 'Info'] = event_info
-                        self.df.at[index, 'line#'] = index + 1
+                        self.df.at[index, 'line#'] = index + 2 # 2 is offset
                         break
 
 

@@ -1,34 +1,43 @@
 import tkinter as tk
 from tkinter import ttk
+from tkinter import font
 from configure_data import *
 
 #pane 에 remarkable event만 표시하는 window 임 
 class EventWindow:
-    def __init__(self):
+    def __init__(self, logwin):
         self.pane1 = None
         self.tree = None 
+        self.logwin = logwin
 
 
     def layout_EventWindow(self, root):
-        # 첫 번째 Pane 생성
-        self.pane1 = ttk.Frame(root)
-        root.add(self.pane1, text='Event')
+        # root 에는 notebook 이 실랴오고, 
+        self.pane1 = ttk.Frame(root) # root 를 parent 로 panel 을 만들음.
+        root.add(self.pane1, text='Event')  # panel 을 notebook 에 추가함
 
         # Treeview 생성
-        self.tree = ttk.Treeview(root, columns=treeview_index, show='headings')
+        self.tree = ttk.Treeview(self.pane1, columns=treeview_index, show='headings')  # panel 을 parent 로 하여 TreeView 를 만든다.
 
         for col_name, col_text in event_columns:
             self.tree.heading(col_name, text=col_text) # 각 열의 제목 설정
             self.tree.column(col_name, width=100)  # 열의 너비를 설정 (옵션)
 
-        # Treeview 패킹
-        self.tree.pack(expand=True, fill=tk.BOTH)
-
         # 스크롤바 추가
-        scrollbar = ttk.Scrollbar(root, orient="vertical", command=self.tree.yview)
+        scrollbar = ttk.Scrollbar(self.pane1, orient="vertical", command=self.tree.yview) # scroll bar 도 panel 을 parent 로 만든다.
         self.tree.configure(yscroll=scrollbar.set)
-        scrollbar.pack(side="right", fill="y")
-      
+
+        # Treeview와 스크롤바를 grid로 배치
+        self.tree.grid(row=0, column=0, sticky='nsew')
+        scrollbar.grid(row=0, column=1, sticky='ns')
+
+        # grid 레이아웃을 사용하여 크기 조정
+        self.pane1.grid_rowconfigure(0, weight=1)
+        self.pane1.grid_columnconfigure(0, weight=1)
+        
+        # TreeviewSelect 이벤트 바인딩
+        self.tree.bind("<<TreeviewSelect>>", self.on_tree_select)
+
 
     def update_EventWindow (self, filtered_df):
 
@@ -41,3 +50,11 @@ class EventWindow:
             self.tree.insert("", tk.END, values=(row['Timestamp'], row['Event'], row['Info'], row['line#']))
 
 
+    def on_tree_select(self, event):
+        # 선택된 항목들 가져오기
+        selected_items = self.tree.selection()
+        for item in selected_items:
+            item_text = self.tree.item(item, "values")
+            line_number = item_text[3]  # line# is the 4th column
+            print(f"Selected item: {item_text}")
+            self.logwin.scroll_to_line(line_number)

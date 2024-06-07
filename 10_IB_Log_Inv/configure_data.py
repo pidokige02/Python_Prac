@@ -1,15 +1,19 @@
+# True, faLSE 는 event tracking 을 할지 말지를 정하는 indicator
+# 3번째 1, 2 는 원하는  event info 가 있는  
 evant_table_map = {
-    'S/W version' : [r'Overall SW version (\S+)'],
-    'Probe connection' : [r'conn (\d+) name (\S+)'],
-    'Probe change' : [r'PRH::SetActiveProbe\(probeId=(\d+)\)'],
-    'Application change' : [r'SetApplication\(ES:(\w+)\)'],
-    'Normal shutdown message' : [r'EchoRootPck::PowerOffRack'],
+    'S/W version' : [r'Overall SW version (\S+)', False, 1],
+    'Probe connection' : [r'conn (\d+) name (\S+)', True, 2],
+    'Probe change' : [r'PRH::SetActiveProbe\(probeId=(\d+)\)',True, 1],
+    'Application change' : [r'SetApplication\(ES:(.*?)->',True, 1],
+    'shutdown' : [r'(rack power)', True, 0],
 }
+
+
 
 #각 windows 의 dimension
 MAINWIN_DIMENSION="1536x300+0+0"
-LOGWIN_DIMENSION = "768x564+0+350"
-KEYEVENTWIN_DIMENSION = "768x564+768+350"
+LOGWIN_DIMENSION = "968x564+0+350"
+KEYEVENTWIN_DIMENSION = "568x564+968+350"
 
 # raw log file 에서 특정 열만 읽기
 use_columns_log = ['Timestamp', 'Text']

@@ -42,7 +42,7 @@ class App:
         self.keyeventwin =  KeyEventWindow ()
 
         # # 첫 번째 Pane EventWindow 생성
-        self.eventWin = EventWindow(self.logwin)
+        self.eventWin = EventWindow(self.logwin, self.keyeventwin)
         self.eventWin.layout_EventWindow(self.notebook)
 
         # 두 번째 Pane InfoWindow 생성

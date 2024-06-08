@@ -17,8 +17,11 @@ KEYEVENTWIN_DIMENSION = "568x564+968+350"
 
 # raw log file 에서 특정 열만 읽기
 use_columns_log = ['Timestamp', 'Text']
-# analysis 후 아래 columne 을 추가하여 필요한 정보를 추가함
-custom_column = ['Event','Info', 'line#']
+# # analysis 후 아래 columne 을 추가하여 필요한 정보를 추가함
+# custom_column = ['Event','Info', 'line#']
+
+# raw keyevent file 에서 특정 열만 읽기
+use_columns_keyevent = ['Timestamp', 'EventName']
 
 
 # raw  Devices_1 에서 특정 열만 읽기
@@ -26,8 +29,8 @@ use_columns_device = ['Name', 'ProductName', 'MfgName', 'Status']
 
 
 #event window 에서 보여줄 column 정보
-event_columns = [('col1','Timestamp'),('col2','Event'),('col3','Info'),('col4','line#')]
+event_columns = [('col1','Timestamp'),('col2','Event'),('col3','Info'),('col4','line#'),('col5','keyeventline#')]
 
 peripheral_columns = [('col1','Name'),('col2','ProductName'),('col3','MfgName'),('col4','Status')]
 
-treeview_index = ("col1", "col2", "col3", "col4")
+treeview_index = ("col1", "col2", "col3", "col4", "col5")

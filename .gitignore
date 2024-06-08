@@ -2,6 +2,8 @@ env
 **/*.pyc
 **/__pycache__
 **/log_repo
+**/build
+**/dist
 
 account.py
 **/*.bat
@@ -10,3 +12,5 @@ account.py
 **/*.log
 **/*.json
 **/.env
+**/*.spec
+

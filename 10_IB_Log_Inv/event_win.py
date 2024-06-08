@@ -5,10 +5,12 @@ from configure_data import *
 
 #pane 에 remarkable event만 표시하는 window 임 
 class EventWindow:
-    def __init__(self, logwin):
+    def __init__(self, logwin, keycodewin):
         self.pane1 = None
         self.tree = None 
         self.logwin = logwin
+        self.keycodewin = keycodewin
+        
 
 
     def layout_EventWindow(self, root):
@@ -47,7 +49,7 @@ class EventWindow:
 
         # DataFrame의 각 행을 Treeview에 삽입
         for index, row in filtered_df.iterrows():
-            self.tree.insert("", tk.END, values=(row['Timestamp'], row['Event'], row['Info'], row['line#']))
+            self.tree.insert("", tk.END, values=(row['Timestamp'], row['Event'], row['Info'], row['line#'], row['keyeventline#']))
 
 
     def on_tree_select(self, event):
@@ -56,5 +58,8 @@ class EventWindow:
         for item in selected_items:
             item_text = self.tree.item(item, "values")
             line_number = item_text[3]  # line# is the 4th column
+            keyevent_line_number = item_text[4]  # keyeventline# is the 5th column 
             print(f"Selected item: {item_text}")
             self.logwin.scroll_to_line(line_number)
+            self.keycodewin.scroll_to_line(keyevent_line_number)
+            

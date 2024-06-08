@@ -56,6 +56,17 @@ class KeyEventWindow:
         self.keyevent_text.configure(font=self.text_font)
 
 
+    def scroll_to_line(self, line_number):
+        # Clear previous highlights
+        self.keyevent_text.tag_remove("highlight", "1.0", "end")
+        
+        # Scroll to the specified line number
+        self.keyevent_text.see(f"{line_number}.0")
+        
+        # Highlight the specified line
+        self.keyevent_text.tag_add("highlight", f"{line_number}.0", f"{line_number}.0 lineend")
+        self.keyevent_text.tag_configure("highlight", background="yellow")
+
     def on_vertical_scroll(self, *args):
         self.keyevent_text.yview(*args)
     

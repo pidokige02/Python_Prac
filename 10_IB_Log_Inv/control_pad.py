@@ -58,7 +58,7 @@ class ControlPad:
                     self.app.logwin.log_text.insert(tk.END, content)
 
                     self.app.log.load_log(file_path, use_columns_log)
-                    self.app.log.add_columns()
+                    self.app.log.add_columns_log()
                     self.app.log.analyze_log ()
                     filtered_df = self.app.log.filter_event()
                     self.app.eventWin.update_EventWindow(filtered_df)
@@ -75,6 +75,15 @@ class ControlPad:
                 with open(file_path_keyevent, 'r') as file:
                     content = file.read()
                     self.app.keyeventwin.keyevent_text.insert(tk.END, content)
+
+                    self.app.log.load_keyevent_log(file_path_keyevent, use_columns_keyevent)
+                    self.app.log.add_columns_keyevent()
+                    filtered_df = self.app.log.filter_event()  # filter out normal event table
+                    
+                    filtered_df = self.app.log.analyze_keyevent(filtered_df)
+                    print(filtered_df)
+                    self.app.eventWin.update_EventWindow(filtered_df)
+
             except Exception as e:
                 self.app.keyeventwin.keyevent_text.insert(tk.END, f"Failed to read file:\n{e}")
 

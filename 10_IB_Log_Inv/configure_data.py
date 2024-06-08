@@ -29,8 +29,8 @@ use_columns_device = ['Name', 'ProductName', 'MfgName', 'Status']
 
 
 #event window 에서 보여줄 column 정보
-event_columns = [('col1','Timestamp'),('col2','Event'),('col3','Info'),('col4','line#'),('col5','keyeventline#')]
+event_columns = [('col1','Timestamp', 100),('col2','Event', 50),('col3','Info', 50),('col4','line#', 50),('col5','keyeventline#', 50)]
 
-peripheral_columns = [('col1','Name'),('col2','ProductName'),('col3','MfgName'),('col4','Status')]
+peripheral_columns = [('col1','Name', 100),('col2','ProductName', 100),('col3','MfgName',100),('col4','Status',100)]
 
 treeview_index = ("col1", "col2", "col3", "col4", "col5")

@@ -96,4 +96,9 @@ class Log:
             filtered_df.at[index, 'keyeventline#'] = self.df_keyevent.at[closest_index, 'keyeventline#']
         
         return filtered_df
-        
+
+    def clear_data(self):
+        self.df = pd.DataFrame()
+        self.filtered_df = pd.DataFrame()
+        self.df_device = pd.DataFrame()
+        self.df_keyevent = pd.DataFrame()

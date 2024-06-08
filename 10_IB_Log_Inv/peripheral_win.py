@@ -17,9 +17,9 @@ class PeripheralWindow:
         # Treeview 생성
         self.tree = ttk.Treeview(self.pane1, columns=treeview_index, show='headings')  # panel 을 parent 로 하여 TreeView 를 만든다.
 
-        for col_name, col_text in peripheral_columns:
+        for col_name, col_text, col_width in peripheral_columns:
             self.tree.heading(col_name, text=col_text) # 각 열의 제목 설정
-            self.tree.column(col_name, width=100)  # 열의 너비를 설정 (옵션)
+            self.tree.column(col_name, width=col_width)  # 열의 너비를 설정 (옵션)
 
         # 스크롤바 추가
         scrollbar = ttk.Scrollbar(self.pane1, orient="vertical", command=self.tree.yview) # scroll bar 도 panel 을 parent 로 만든다.

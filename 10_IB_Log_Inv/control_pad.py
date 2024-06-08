@@ -15,8 +15,6 @@ class ControlPad:
         self.right_frame = None
         self.openlog_button = None 
         self.button = None
-        # self.checkbuttons = []
-        # self.checkbox_vars = []
 
 
     def layout_ControlPad(self):
@@ -29,18 +27,12 @@ class ControlPad:
         self.openlog_button = ttk.Button(self.right_frame, text="Open Log", command=self.open_log)
         self.openlog_button.pack(padx=10, pady=10, anchor="ne")
 
-        # 버튼 추가
-        self.button = ttk.Button(self.right_frame, text="Filter", command=self.open_log)
+        # Save Key Event 버튼 추가
+        self.button = ttk.Button(self.right_frame, text="Save Key Event", command=self.save_keyevent)
         self.button.pack(padx=10, pady=10, anchor="ne")
 
-        # # Checkbuttons 추가
-        # for option, (pattern, is_active, info_idx) in evant_table_map.items():
-        #     if is_active:  # is_active가 True인 항목만 추가
-        #         var = tk.BooleanVar(value=is_active)
-        #         chk = ttk.Checkbutton(self.right_frame, text=option, variable=var)
-        #         chk.pack(padx=10, pady=2, anchor="ne")
-        #         self.checkbuttons.append(chk)
-        #         self.checkbox_vars.append(var)
+        self.app.logwin.layout_LogWindow(self.app.root, LOGWIN_DIMENSION)
+        self.app.keyeventwin.layout_KeyEventWindow(self.app.root, KEYEVENTWIN_DIMENSION)
 
 
     def open_log(self):
@@ -48,8 +40,9 @@ class ControlPad:
         file_path = filedialog.askopenfilename()
 
         if file_path:
-
-            self.app.logwin.layout_LogWindow(self.app.root, LOGWIN_DIMENSION)
+            self.app.log.clear_data()
+            self.app.logwin.log_text.delete('1.0', tk.END)
+            self.app.keyeventwin.keyevent_text.delete('1.0', tk.END)
 
             try:
                 with open(file_path, 'r') as file:
@@ -70,7 +63,6 @@ class ControlPad:
 
 
             file_path_keyevent = replace_filename(file_path, 'KeyBoardShadow_1.txt')
-            self.app.keyeventwin.layout_KeyEventWindow(self.app.root, KEYEVENTWIN_DIMENSION)
             try:
                 with open(file_path_keyevent, 'r') as file:
                     content = file.read()
@@ -101,8 +93,5 @@ class ControlPad:
         self.app.root.bind_all("<FocusIn>", self.app.on_focus_in)
 
 
-    def filter_log(self):
-        # Checkbutton의 상태를 읽어 evant_table_map의 활성 상태 업데이트
-        # for option, var in zip(evant_table_map.keys(), self.checkbox_vars):
-        #     evant_table_map[option][1] = var.get()
+    def save_keyevent(self):
         print("JINHA")

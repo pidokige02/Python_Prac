@@ -1,6 +1,7 @@
 import tkinter as tk
 from tkinter import ttk
 from tkinter import filedialog
+from datetime import datetime
 
 from configure_data import *
 from Utils import *
@@ -14,7 +15,11 @@ class ControlPad:
         self.app = app
         self.right_frame = None
         self.openlog_button = None 
-        self.button = None
+        self.savekeyevent_button = None
+        self.reset_timestamp_button = None        
+        self.timestamp_from = None
+        self.timestamp_to = None
+        self.file_path_keyevent = None 
 
 
     def layout_ControlPad(self):
@@ -25,11 +30,23 @@ class ControlPad:
 
         # openlog 버튼 추가
         self.openlog_button = ttk.Button(self.right_frame, text="Open Log", command=self.open_log)
-        self.openlog_button.pack(padx=10, pady=10, anchor="ne")
+        self.openlog_button.grid(row=0, column=0, padx=1, pady=1, sticky="w")
 
         # Save Key Event 버튼 추가
-        self.button = ttk.Button(self.right_frame, text="Save Key Event", command=self.save_keyevent)
-        self.button.pack(padx=10, pady=10, anchor="ne")
+        self.savekeyevent_button = ttk.Button(self.right_frame, text="Save Key Event", command=self.save_keyevent_log)
+        self.savekeyevent_button.grid(row=1, column=0, padx=1, pady=1, sticky="w")
+
+        # Save Key Event 버튼 추가
+        self.reset_timestamp_button = ttk.Button(self.right_frame, text="Reset TimeS", command=self.reset_timestamp)
+        self.reset_timestamp_button.grid(row=1, column=1, padx=1, pady=1, sticky="w")
+
+        ttk.Label(self.right_frame, text="From (YYYY-MM-DD HH:MM:SS.ssssss)").grid(row=2, column=0, padx=1, pady=1, sticky="w")
+        self.timestamp_from = ttk.Entry(self.right_frame)
+        self.timestamp_from.grid(row=3, column=0, padx=1, pady=1, sticky="w")
+
+        ttk.Label(self.right_frame, text="To (YYYY-MM-DD HH:MM:SS.ssssss)").grid(row=4, column=0, padx=1, pady=1, sticky="w")
+        self.timestamp_to = ttk.Entry(self.right_frame)
+        self.timestamp_to.grid(row=5, column=0, padx=1, pady=1, sticky="w")
 
         self.app.logwin.layout_LogWindow(self.app.root, LOGWIN_DIMENSION)
         self.app.keyeventwin.layout_KeyEventWindow(self.app.root, KEYEVENTWIN_DIMENSION)
@@ -62,18 +79,17 @@ class ControlPad:
                 self.app.logwin.log_text.insert(tk.END, f"Failed to read file:\n{e}")
 
 
-            file_path_keyevent = replace_filename(file_path, 'KeyBoardShadow_1.txt')
+            self.file_path_keyevent = replace_filename(file_path, 'KeyBoardShadow_1.txt')
             try:
-                with open(file_path_keyevent, 'r') as file:
+                with open(self.file_path_keyevent, 'r') as file:
                     content = file.read()
                     self.app.keyeventwin.keyevent_text.insert(tk.END, content)
 
-                    self.app.log.load_keyevent_log(file_path_keyevent, use_columns_keyevent)
+                    self.app.log.load_keyevent_log(self.file_path_keyevent, use_columns_keyevent)
                     self.app.log.add_columns_keyevent()
                     filtered_df = self.app.log.filter_event()  # filter out normal event table
                     
                     filtered_df = self.app.log.analyze_keyevent(filtered_df)
-                    print(filtered_df)
                     self.app.eventWin.update_EventWindow(filtered_df)
 
             except Exception as e:
@@ -93,5 +109,49 @@ class ControlPad:
         self.app.root.bind_all("<FocusIn>", self.app.on_focus_in)
 
 
-    def save_keyevent(self):
-        print("JINHA")
+    def save_keyevent_log(self):
+
+        try:
+            print("save_keyevent_log is initiated!!!")
+
+            timestamp_from_value = self.timestamp_from.get()
+            timestamp_to_value = self.timestamp_to.get()
+
+            # 문자열을 datetime 객체로 변환
+            timestamp_from_dt = extract_timestamp(timestamp_from_value)
+            timestamp_to_dt = extract_timestamp(timestamp_to_value)
+
+            # CSV 파일 읽기
+            df = pd.read_csv(self.file_path_keyevent, sep='\t', dtype=str, low_memory=False)
+
+            # 타임스탬프 열의 값을 datetime 객체로 변환하여 새로운 열에 저장
+            df['Timestamp_dt'] = df['Timestamp'].apply(extract_timestamp)
+
+            # 주어진 타임스탬프 범위에 있는 행들만 필터링
+            filtered_df = df[(df['Timestamp_dt'] >= timestamp_from_dt) & (df['Timestamp_dt'] <= timestamp_to_dt)]
+
+            # 처음 두 줄을 가져오기
+            with open(self.file_path_keyevent, 'r') as source_file:
+                lines = source_file.readlines()
+            header_lines = lines[:2]
+
+            # 새로운 CSV 파일에 처음 두 줄을 쓰기
+            file_path_keyevent_dest = replace_filename(self.file_path_keyevent, 'KeyBoardShadow_1_captured.txt')
+            with open(file_path_keyevent_dest, 'w') as dest_file:
+                dest_file.writelines(header_lines)
+
+                # 필터링된 행들을 추가 모드로 쓰기
+                filtered_df.to_csv(dest_file, sep='\t', index=False, header=False, mode='a', columns=df.columns.drop('Timestamp_dt'), lineterminator='\n')
+
+        except ValueError as e:
+            print("Invalid timestamp format:", e)
+
+        print("save_keyevent_log is completed!!!")
+
+
+
+    def reset_timestamp(self):
+        self.timestamp_from.delete(0, tk.END)
+        self.timestamp_to.delete(0, tk.END)        
+
+

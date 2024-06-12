@@ -1,12 +1,16 @@
 # True, faLSE 는 event tracking 을 할지 말지를 정하는 indicator
 # 3번째 1, 2 는 원하는  event info 가 있는  
 evant_table_map = {
-    'S/W version' : [r'Overall SW version (\S+)', False, 1],
-    'Probe connection' : [r'conn (\d+) name (\S+)', True, 2],
-    'Probe change' : [r'PRH::SetActiveProbe\(probeId=(\d+)\)',True, 1],
-    'Application change' : [r'SetApplication\(ES:(.*?)->',True, 1],
-    'shutdown' : [r'(rack power)', True, 0],
+    'S/W version' : [r'Overall SW version (\S+)', False, 1, None],
+    'Probe connection' : [r'conn (\d+) name (\S+)', True, 2, None],
+    'Probe change' : [r'PRH::SetActiveProbe\(probeId=(\d+)\)',True, 1, None], 
+    'Application change' : [r'SetApplication\(ES:(.*?)->',True, 1, None],
+    'fatal error' : [r'(fatal)', True, 0, None],
+    'shutdown' : [r'(rack power)', True, 0, None],
+    'Product' : [r'Initialized for product:\s*(\w+)', False, 1, None],
+    'RunState' : [r'RunState\("([^"]+)"\)\s+Modes\("([^"]+)"\)\s+Probe\("([^"]+)"\)\s+Appl\("([^"]+)"\)', True, 2, '<none>']
 }
+
 
 
 

@@ -6,6 +6,8 @@ from datetime import datetime
 from configure_data import *
 from Utils import *
 from configure_data import *
+from tkinter import messagebox
+
 
 
 
@@ -48,9 +50,6 @@ class ControlPad:
         self.timestamp_to = ttk.Entry(self.right_frame)
         self.timestamp_to.grid(row=5, column=0, padx=1, pady=1, sticky="w")
 
-        self.app.logwin.layout_LogWindow(self.app.root, LOGWIN_DIMENSION)
-        self.app.keyeventwin.layout_KeyEventWindow(self.app.root, KEYEVENTWIN_DIMENSION)
-
 
     def open_log(self):
         # 파일 선택 대화 상자 열기
@@ -64,7 +63,6 @@ class ControlPad:
             try:
                 with open(file_path, 'r') as file:
                     content = file.read()
-                    
                     self.app.logwin.log_text.insert(tk.END, content)
 
                     self.app.log.load_log(file_path, use_columns_log)
@@ -72,7 +70,7 @@ class ControlPad:
                     self.app.log.analyze_log ()
                     filtered_df = self.app.log.filter_event()
                     self.app.eventWin.update_EventWindow(filtered_df)
-                    filtered_df = self.app.log.filter_event("S/W version")
+                    filtered_df = self.app.log.filter_event(events=['S/W version', 'Product'])
                     self.app.infoWin.update_InfoWindow(filtered_df)
 
             except Exception as e:
@@ -105,15 +103,10 @@ class ControlPad:
                 print(f"Failed to read file:\n{e}")
 
 
-        # 포커스 및 이벤트 관리
-        self.app.root.bind_all("<FocusIn>", self.app.on_focus_in)
-
 
     def save_keyevent_log(self):
 
         try:
-            print("save_keyevent_log is initiated!!!")
-
             timestamp_from_value = self.timestamp_from.get()
             timestamp_to_value = self.timestamp_to.get()
 
@@ -121,6 +114,11 @@ class ControlPad:
             timestamp_from_dt = extract_timestamp(timestamp_from_value)
             timestamp_to_dt = extract_timestamp(timestamp_to_value)
 
+            # 타임스탬프 유효성 검사
+            if pd.isna(timestamp_from_dt) or pd.isna(timestamp_to_dt):
+                raise ValueError("One or both timestamps are invalid")
+            
+            print("save_keyevent_log is initiated!!!")
             # CSV 파일 읽기
             df = pd.read_csv(self.file_path_keyevent, sep='\t', dtype=str, low_memory=False)
 
@@ -142,11 +140,15 @@ class ControlPad:
 
                 # 필터링된 행들을 추가 모드로 쓰기
                 filtered_df.to_csv(dest_file, sep='\t', index=False, header=False, mode='a', columns=df.columns.drop('Timestamp_dt'), lineterminator='\n')
+            
+            print("save_keyevent_log is completed!!!")
 
         except ValueError as e:
-            print("Invalid timestamp format:", e)
+            print("Invalid timestamp format:", e) 
+            messagebox.showerror("Error", f"Invalid timestamp format: {e}")
 
-        print("save_keyevent_log is completed!!!")
+
+        
 
 
 

@@ -37,26 +37,38 @@ class Log:
             text = row['Text']
             if not isinstance(text, str):
                 continue  # 문자열이 아닌 경우 건너뛰기    
-            for event, (pattern, isEvent, info_idx) in evant_table_map.items():
+            for event, (pattern, isEvent, info_idx, skip) in evant_table_map.items():
                     match = re.search(pattern, row['Text'])
                     if match:
-                        event_info = match.group(info_idx) if match.lastindex else match.group(0)
-                        self.df.at[index, 'Event'] = event
-                        self.df.at[index, 'Info'] = event_info
-                        self.df.at[index, 'line#'] = index + 2 # 2 is offset
+                        if(skip != None ):
+                            event_info = match.group(info_idx) if match.lastindex else match.group(0)
+                            if (event_info !='<none>'): 
+                                self.df.at[index, 'Event'] = event
+                                self.df.at[index, 'Info'] = event_info
+                                self.df.at[index, 'line#'] = index + 2 # 2 is offset
+                        else: 
+                            event_info = match.group(info_idx) if match.lastindex else match.group(0)
+                            self.df.at[index, 'Event'] = event
+                            self.df.at[index, 'Info'] = event_info
+                            self.df.at[index, 'line#'] = index + 2 # 2 is offset
                         break
 
 
-    def filter_event(self, event=None):
-        if event:
-            # 특정 이벤트를 필터링 중복되는 것은 drop 시킴
-            self.filtered_df = self.df[self.df['Event'] == event].drop_duplicates(subset='Info')
+    def filter_event(self, events=None):
+        if events:
+            if isinstance(events, str):
+                events = [events]  # events가 문자열이면 리스트로 변환
+            # 특정 이벤트들을 필터링 중복되는 것은 drop 시킴
+            self.filtered_df = self.df[self.df['Event'].isin(events)].drop_duplicates(subset='Info')
         else:
             # 'Event' 열이 빈 문자열이 아닌 행만 선택
-            self.filtered_df = self.df[(self.df['Event'] != "") & (self.df['Event'] != "S/W version")]
+            self.filtered_df = self.df[(
+                self.df['Event'] != "") & 
+                (self.df['Event'] != "S/W version") &
+                (self.df['Event'] != "Product") 
+                ]
 
         return self.filtered_df
-
 
     def load_device (self, file_path, use_columns_device):
         # 탭으로 구분된 텍스트 파일을 인코딩을 지정하여 데이터 프레임으로 읽기

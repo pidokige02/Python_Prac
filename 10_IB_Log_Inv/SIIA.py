@@ -37,9 +37,11 @@ class App:
 
         #log window creation
         self.logwin = LogWindow() 
+        self.logwin.layout_LogWindow(root, LOGWIN_DIMENSION)
 
         # keyevent window creation
         self.keyeventwin =  KeyEventWindow ()
+        self.keyeventwin.layout_KeyEventWindow(root, KEYEVENTWIN_DIMENSION)
 
         # # 첫 번째 Pane EventWindow 생성
         self.eventWin = EventWindow(self.logwin, self.keyeventwin)
@@ -60,27 +62,34 @@ class App:
         # log object creation for log analysis 
         self.log = Log()
 
+        # # 포커스 및 이벤트 관리
+        self.root.bind_all("<FocusIn>", self.on_focus_in)
+
+
 
     def on_vertical_scroll(self, *args):
         print(f"Scrolled to: {args}")
 
-     
-    def on_focus_in(self, event):
+
+    def on_focus_in(self, event):  
         # 포커스 변경 시 처리할 로직
-        if self.logwin.log_text == self.root.focus_get():
-            print("Log window is focused")
-        elif self.keyeventwin.keyevent_text == self.root.focus_get():
-            print("KeyEvent window is focused")
-        elif self.eventWin.tree == self.root.focus_get():
-            print("Event window is focused")
-        elif self.infoWin.text == self.root.focus_get():
-            print("infoWin window is focused")
-        elif self.periWin.tree == self.root.focus_get():
-            print("periWin window is focused")
+        widget = self.root.focus_get()
+
+        if self.logwin.log_text == widget:
+            print("Log window is focused", self.logwin.log_text)
+        elif self.keyeventwin.keyevent_text == widget:
+            print("KeyEvent window is focused", self.keyeventwin.keyevent_text)
+        elif self.eventWin.tree == widget:
+            print("Event window is focused", self.eventWin.tree)
+        elif self.infoWin.text == widget:
+            print("infoWin window is focused", self.infoWin.text)
+        elif self.periWin.tree == widget:
+            print("periWin window is focused", self.periWin.tree)
         else: 
-            print("other window is focused")
+            print("Other window is focused", widget, widget.winfo_name(), widget.winfo_class())
+
 
 if __name__ == "__main__":
     root = tk.Tk()
-    app = App(root)
+    app = App(root)    
     root.mainloop()

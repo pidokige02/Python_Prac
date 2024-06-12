@@ -13,9 +13,13 @@ def replace_filename(file_path, new_filename):
 
 #타임스탬프 문자열에서 날짜와 시간을 추출하여 pandas의 datetime 형식으로 변환
 def extract_timestamp(timestamp_str):
-    match = re.match(r'(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}\.\d{6})', timestamp_str)
-    if match:
-        return pd.to_datetime(match.group(1), format='%Y-%m-%d %H:%M:%S.%f')
-    else:
+    try:
+        match = re.match(r'(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}\.\d{6})', timestamp_str)
+        if match:
+            return pd.to_datetime(match.group(1), format='%Y-%m-%d %H:%M:%S.%f')
+        else:
+            print(f"Invalid timestamp format: {timestamp_str}")
+            return pd.NaT
+    except Exception as e:
+        print(f"Error parsing timestamp: {timestamp_str}. Error: {e}")
         return pd.NaT
-

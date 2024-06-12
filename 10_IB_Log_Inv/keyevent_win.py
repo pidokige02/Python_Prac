@@ -5,7 +5,7 @@ from tkinter import font
 class KeyEventWindow:
     def __init__(self):
         self.keyevent_window = None
-        self.log_text = None 
+        self.keyevent_text = None 
         self.current_font_size = 10  # 기본 폰트 크기
         self.text_font = None        
 
@@ -16,6 +16,8 @@ class KeyEventWindow:
         self.keyevent_window.title("Key Log")
         self.keyevent_window.geometry(dimension)
 
+        # 메뉴 추가
+        self.create_menu()
 
         # 프레임
         frame_keyevent = tk.Frame(self.keyevent_window)
@@ -70,3 +72,58 @@ class KeyEventWindow:
     def on_vertical_scroll(self, *args):
         self.keyevent_text.yview(*args)
     
+
+    def create_menu(self):
+        menubar = tk.Menu(self.keyevent_window)
+
+        # 편집 메뉴
+        edit_menu = tk.Menu(menubar, tearoff=0)
+        edit_menu.add_command(label="Find", command=self.find)
+        menubar.add_cascade(label="Search", menu=edit_menu)
+
+        self.keyevent_window.config(menu=menubar)
+
+    def find(self):
+        # 찾기 대화 상자를 생성하는 코드
+        find_dialog = tk.Toplevel(self.keyevent_window)
+        find_dialog.title("Find")
+
+        tk.Label(find_dialog, text="Find:").grid(row=0, column=0, padx=4, pady=4)
+
+        search_entry = tk.Entry(find_dialog)
+        search_entry.grid(row=0, column=1, padx=4, pady=4)
+
+        tk.Button(find_dialog, text="Find Next", command=lambda: self.find_next(search_entry.get())).grid(row=1, column=0, columnspan=2, pady=4)
+
+    def find_next(self, search_text):
+        # 찾기 기능 구현
+        start_pos = self.keyevent_window.search(search_text, "1.0", tk.END)
+        if not start_pos:
+            print("Text not found")
+            return
+
+        end_pos = f"{start_pos}+{len(search_text)}c"
+
+        # Clear previous highlights
+        self.keyevent_window.tag_remove("highlight", "1.0", tk.END)
+        
+        # Highlight the found text
+        self.keyevent_window.tag_add("highlight", start_pos, end_pos)
+        self.keyevent_window.tag_configure("highlight", background="yellow")
+
+        # Scroll to the found text
+        self.keyevent_window.see(start_pos)    
+
+
+    def create_menu(self):
+        menubar = tk.Menu(self.keyevent_window)
+
+        # 편집 메뉴
+        edit_menu = tk.Menu(menubar, tearoff=0)
+        edit_menu.add_command(label="Search", command=self.search)
+        menubar.add_cascade(label="Edit", menu=edit_menu)
+
+        self.keyevent_window.config(menu=menubar)
+
+    def search(self):
+        print("search is clicked")

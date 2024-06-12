@@ -14,6 +14,9 @@ class LogWindow:
         self.log_window.title("Log")
         self.log_window.geometry(dimension)
 
+        # 메뉴 추가
+        self.create_menu()
+
         # 프레임
         frame = tk.Frame(self.log_window)
         frame.pack(expand=True, fill='both')
@@ -67,3 +70,45 @@ class LogWindow:
 
     def on_vertical_scroll(self, *args):
         self.log_text.yview(*args)
+
+
+    def create_menu(self):
+        menubar = tk.Menu(self.log_window)
+
+        # 편집 메뉴
+        edit_menu = tk.Menu(menubar, tearoff=0)
+        edit_menu.add_command(label="Find", command=self.find)
+        menubar.add_cascade(label="Search", menu=edit_menu)
+
+        self.log_window.config(menu=menubar)
+
+    def find(self):
+        # 찾기 대화 상자를 생성하는 코드
+        find_dialog = tk.Toplevel(self.log_window)
+        find_dialog.title("Find")
+
+        tk.Label(find_dialog, text="Find:").grid(row=0, column=0, padx=4, pady=4)
+
+        search_entry = tk.Entry(find_dialog)
+        search_entry.grid(row=0, column=1, padx=4, pady=4)
+
+        tk.Button(find_dialog, text="Find Next", command=lambda: self.find_next(search_entry.get())).grid(row=1, column=0, columnspan=2, pady=4)
+
+    def find_next(self, search_text):
+        # 찾기 기능 구현
+        start_pos = self.log_text.search(search_text, "1.0", tk.END)
+        if not start_pos:
+            print("Text not found")
+            return
+
+        end_pos = f"{start_pos}+{len(search_text)}c"
+
+        # Clear previous highlights
+        self.log_text.tag_remove("highlight", "1.0", tk.END)
+        
+        # Highlight the found text
+        self.log_text.tag_add("highlight", start_pos, end_pos)
+        self.log_text.tag_configure("highlight", background="yellow")
+
+        # Scroll to the found text
+        self.log_text.see(start_pos)    

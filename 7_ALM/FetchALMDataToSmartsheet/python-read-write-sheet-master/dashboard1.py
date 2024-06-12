@@ -7,7 +7,35 @@
 import smartsheet
 import logging
 import os
+from datetime import datetime
 
+def get_sight(sight_id):
+    try:
+        response = smart.Sights.get_sight(sight_id)
+        return response
+    except Exception as e:
+        print(f"Failed to retrieve sight: {e}")
+        return None
+
+def parse_date(date_str):
+    try:
+        # Smartsheet API 날짜 형식 예시: '2024-02-11T22:54:10+00:00Z'
+        # 'Z'를 '+00:00'으로 대체하여 파싱
+        if date_str.endswith('Z'):
+            date_str = date_str[:-1] + '+00:00'
+        return datetime.fromisoformat(date_str)
+    except Exception as e:
+        print(f"Failed to parse date: {e}")
+        return None
+    
+def update_sight(sight_id, sight_obj):
+    try:
+        response = smart.Sights.update_sight(sight_id, sight_obj)
+        print(f"Successfully updated sight {sight_id}")
+        return response
+    except Exception as e:
+        print(f"Failed to update sight: {e}")
+        return None
 
 # Sight의 Widget 가져오기
 def get_widgets_from_sight(sight_id):
@@ -96,6 +124,8 @@ if(sight_id != 0 ):
                             # print("Widget shortcut:", shortcut)
                             if 'sheetId' in hyperlink:    # hyperlink 에 'sheetId' key 가 있는지 확인
                                 print("label:", shortcut['label'])
+                                # shortcut['label'] = "Test Osprey"
+                                # print("label:", shortcut['label'])
                                 print("hlink sheetId:", hyperlink['sheetId'])
                                 print("hlink url:", hyperlink['url'])
                                 # hyperlink['sheetId'] = 8718536511803268
@@ -104,3 +134,49 @@ if(sight_id != 0 ):
                     # print("Widget Type:", widget['type'])            
 
 
+
+# 
+# sight = get_sight(sight_id)
+
+# if sight:
+#     print("Sight retrieved successfully:")
+#     # print("Jinha", sight)
+#     sight_dict = sight.to_dict()
+#     # print("jinha", sight_dict)
+#     # print("jinha", sight_dict['createdAt'])
+
+# # original time string format error 가 뱅생하여 data 만 assign 함
+#     sight_dict['createdAt'] = '2024-02-11'
+#     # print("jinha1", sight_dict['createdAt'])
+#     sight_dict['modifiedAt'] = '2024-02-11'
+
+#     # Modify the sight as needed
+#     # For example, update a widget's label
+#     for widget in sight_dict.get('widgets', []):
+#         if 'title' in widget and widget['title'] == 'Osprey R4':
+#             for shortcut in widget.get('contents', {}).get('shortcutData', []):
+#                 if 'hyperlink' in shortcut and 'sheetId' in shortcut['hyperlink']:
+#                     print("Current label:", shortcut['label'])
+#                     shortcut['label'] = "New Label"     # 실제로 바꾸는 code 임
+#                     print("Updated label:", shortcut['label'])
+
+#         # erroe 가 발생하여 아래 code 를 추가함
+#         # Ensure the 'contents' attribute has the required 'type' key
+#         if 'contents' in widget and 'type' not in widget['contents']:
+#             widget['contents']['type'] = widget['type']  # Or set a default type if needed
+
+#     # 실제로 위에서 변경한 값이 반영된 것을 확인함
+#     print("jinha2", sight_dict)
+
+#     # Convert back to a Sight object
+#     # error 없이 updated-sight obkect 가 반환되지만 data 를 잃어버린 상테로 반환이 된다.
+#     updated_sight = smartsheet.models.Sight(sight_dict)
+
+#     # print("jinha2", sight_dict) 에서 print 한 것에서 누락이 된 상태가 print 된다. 
+#     print("jinha3", updated_sight)
+
+#     # Update the sight
+#     update_sight(sight_id, updated_sight)
+
+
+    

@@ -27,6 +27,28 @@ def hide_column_in_sheet(sheet_id):
             print("Column ID:", column.id)
 
 
+#confirmed that it works
+def list_filter(sheet_id):
+    try:
+        # 특정 시트의 모든 필터 목록을 가져옵니다.
+        filters = smart.Sheets.list_filters(sheet_id)
+
+        # 필터 목록을 출력합니다.
+        for filter in filters.data:
+            # print("jinha", filter)
+            filter_dict = filter.to_dict()
+            print("jinha", filter_dict)
+
+            # print(f"Filter ID: {filter.id}")
+            # print(f"Filter Name: {filter.name}")
+            # print(f"Filter Criteria: {filter.criteria}")
+            # print('---')
+
+    except smartsheet.exceptions.ApiError as e:
+        print(f"Error: {e}")   
+
+
+# null 이 return 됨
 def create_filter(sheet_id, column_title, target_value):
     # 시트 조회
     sheet = smart.Sheets.get_sheet(sheet_id)
@@ -56,17 +78,19 @@ def create_filter(sheet_id, column_title, target_value):
     return new_filter
 
 
-def apply_filter(sheet_id, new_filter):
+def apply_filter(sheet_id, filter_criteria):
     # 필터를 시트에 적용  ==> 함수가 없다고 error 를 만들고 있다.
-    response = smart.Sheets.create_filter(
+
+    response = smart.Sheets.get_sheet(
         sheet_id,
-        new_filter
+        include=["filters"],
+        row_filter=filter_criteria
     )
 
-    if response.code != 200:
-        print("Failed to apply filter. Status code:", response.code)
-    else:
-        print("Filter applied successfully.")
+    filtered_rows = response.rows
+
+    for row in filtered_rows:
+        print(f"Row ID: {row.id}, Row Data: {row.cells}")    
 
 
 print("Starting ...")
@@ -114,10 +138,14 @@ for workspace in workspaces.data:
                     # print("Sheet ID:", sheet.id)
 
                     if sheet.name == "Copy of osprey_issues_FW01":
-                        hide_column_in_sheet(sheet.id)
+                        # hide_column_in_sheet(sheet.id)
+                        
+                        # 필터 list up
+                        list_filter(sheet.id)
 
-                        # 필터 생성
-                        new_filter = create_filter(sheet.id, 'Assigned To', 'dongwoo.lee')
+                        # # 필터 생성
+                        # new_filter = create_filter(sheet.id, 'Status', 'Submitted')
 
-                        # 생성한 필터를 시트에 적용
-                        apply_filter(sheet.id, new_filter)
+                        # print("jinha",new_filter)
+                        # # 생성한 필터를 시트에 적용
+                        # # apply_filter(sheet.id, new_filter)

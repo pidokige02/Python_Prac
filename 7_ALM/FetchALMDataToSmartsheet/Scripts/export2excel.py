@@ -43,6 +43,7 @@ def spr2excel(sprs, arg_alm_table_header, arg_alm_table_map):
 
         # get maxcolumn 
         maxcolumn = len(arg_alm_table_header) 
+        additional_columns = 3
 
         # append title rowl
         for col, value in arg_alm_table_header.items():
@@ -73,16 +74,16 @@ def spr2excel(sprs, arg_alm_table_header, arg_alm_table_map):
                 visible_text = soup.get_text(separator=' ', strip=True)
                 new_sheet[cell.coordinate].value = visible_text
 
-        # set the property of title
-        for row in new_sheet.iter_rows(min_row=1,max_row=1, min_col=1, max_col=maxcolumn):
+        # set the property of title,  3 is additional three column
+        for row in new_sheet.iter_rows(min_row=1,max_row=1, min_col=1, max_col=maxcolumn+additional_columns):
             for cell in row:
                 cell.alignment = Alignment(horizontal="left", vertical="top", wrap_text=False)
                 new_sheet[cell.coordinate].fill = copy(template_sheet[cell.coordinate].fill)
                 new_sheet[cell.coordinate].font = copy(template_sheet[cell.coordinate].font)
                 new_sheet[cell.coordinate].border = copy(template_sheet[cell.coordinate].border)
 
-        # # set the property of spr contents
-        for row in new_sheet.iter_rows(min_row=2,min_col=1, max_col=maxcolumn):
+        # # set the property of spr contents, 3 is additional three column
+        for row in new_sheet.iter_rows(min_row=2,min_col=1, max_col=maxcolumn+additional_columns):
             for cell in row:
                 cell.alignment = Alignment(horizontal="left", vertical="top", wrap_text=False)
                 new_sheet[cell.coordinate].font = copy(template_sheet[get_column_letter(cell.column)+"2"].font)

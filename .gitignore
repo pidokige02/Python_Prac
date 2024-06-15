@@ -13,4 +13,6 @@ account.py
 **/*.json
 **/.env
 **/*.spec
+**/*.exe
+
 

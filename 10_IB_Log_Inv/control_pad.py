@@ -60,9 +60,22 @@ class ControlPad:
             self.app.logwin.log_text.delete('1.0', tk.END)
             self.app.keyeventwin.keyevent_text.delete('1.0', tk.END)
 
-            try:
-                with open(file_path, 'r') as file:
-                    content = file.read()
+        # 다양한 인코딩 시도
+            encodings = ['utf-8', 'cp949', 'latin1']
+            content = None
+
+            for enc in encodings:           
+                try:
+                    with open(file_path, 'r', encoding=enc) as file:
+                        content = file.read()
+                    break
+                except Exception as e:
+                    last_exception = e
+
+            if content:
+                self.app.logwin.log_text.insert(tk.END, content)
+
+                try:    
                     self.app.logwin.log_text.insert(tk.END, content)
 
                     self.app.log.load_log(file_path, use_columns_log)
@@ -73,16 +86,24 @@ class ControlPad:
                     filtered_df = self.app.log.filter_event(events=['S/W version', 'Product'])
                     self.app.infoWin.update_InfoWindow(filtered_df)
 
-            except Exception as e:
-                self.app.logwin.log_text.insert(tk.END, f"Failed to read file:\n{e}")
+                except Exception as e:
+                    self.app.logwin.log_text.insert(tk.END, f"Failed to read file:\n{e}")
 
 
             self.file_path_keyevent = replace_filename(file_path, 'KeyBoardShadow_1.txt')
-            try:
-                with open(self.file_path_keyevent, 'r') as file:
-                    content = file.read()
-                    self.app.keyeventwin.keyevent_text.insert(tk.END, content)
+            content = None
+            for enc in encodings:
+                try:
+                    with open(self.file_path_keyevent, 'r', encoding=enc) as file:
+                        content = file.read()
+                    break
+                except Exception as e:
+                    last_exception = e
 
+            if content:                
+                self.app.keyeventwin.keyevent_text.insert(tk.END, content)
+
+                try:
                     self.app.log.load_keyevent_log(self.file_path_keyevent, use_columns_keyevent)
                     self.app.log.add_columns_keyevent()
                     filtered_df = self.app.log.filter_event()  # filter out normal event table
@@ -90,17 +111,26 @@ class ControlPad:
                     filtered_df = self.app.log.analyze_keyevent(filtered_df)
                     self.app.eventWin.update_EventWindow(filtered_df)
 
-            except Exception as e:
-                self.app.keyeventwin.keyevent_text.insert(tk.END, f"Failed to read file:\n{e}")
+                except Exception as e:
+                    self.app.keyeventwin.keyevent_text.insert(tk.END, f"Failed to read file:\n{e}")
 
 
             file_path_device = replace_filename(file_path, 'Devices_1.txt')
-            try:
-                with open(file_path_device, 'r') as file:
-                    self.app.log.load_device(file_path_device, use_columns_device)
-                    self.app.periWin.update_PeripheralWindow(self.app.log.df_device)
-            except Exception as e:
-                print(f"Failed to read file:\n{e}")
+            content = None
+            for enc in encodings:
+                try:
+                    with open(file_path_device, 'r', encoding=enc) as file:
+                        self.app.log.load_device(file_path_device, use_columns_device)
+                        self.app.periWin.update_PeripheralWindow(self.app.log.df_device)
+                    break
+                except Exception as e:
+                    last_exception = e
+            if not content:
+                print(f"Failed to read device file:\n{last_exception}")
+
+
+        else:
+            self.app.logwin.log_text.insert(tk.END, f"Failed to read file:\n{last_exception}")
 
 
 
@@ -129,13 +159,13 @@ class ControlPad:
             filtered_df = df[(df['Timestamp_dt'] >= timestamp_from_dt) & (df['Timestamp_dt'] <= timestamp_to_dt)]
 
             # 처음 두 줄을 가져오기
-            with open(self.file_path_keyevent, 'r') as source_file:
+            with open(self.file_path_keyevent, 'r', encoding='utf-8') as source_file:
                 lines = source_file.readlines()
             header_lines = lines[:2]
 
             # 새로운 CSV 파일에 처음 두 줄을 쓰기
             file_path_keyevent_dest = replace_filename(self.file_path_keyevent, 'KeyBoardShadow_1_captured.txt')
-            with open(file_path_keyevent_dest, 'w') as dest_file:
+            with open(file_path_keyevent_dest, 'w', encoding='utf-8') as dest_file:
                 dest_file.writelines(header_lines)
 
                 # 필터링된 행들을 추가 모드로 쓰기

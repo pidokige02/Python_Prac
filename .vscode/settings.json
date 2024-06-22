@@ -1,2 +1,5 @@
 {
+    "terminal.integrated.env.windows": {
+        "SMARTSHEET_ACCESS_TOKEN": "gHR6MVffXz6LkI7LM0QC6LzSvKNmAHJu5hbrt",
+    }
 }

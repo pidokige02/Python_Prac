@@ -16,12 +16,12 @@ class ControlPad:
     def __init__(self, app):
         self.app = app
         self.right_frame = None
-        self.openlog_button = None 
+        self.openlog_button = None
         self.savekeyevent_button = None
-        self.reset_timestamp_button = None        
+        self.reset_timestamp_button = None
         self.timestamp_from = None
         self.timestamp_to = None
-        self.file_path_keyevent = None 
+        self.file_path_keyevent = None
 
 
     def layout_ControlPad(self):
@@ -64,7 +64,7 @@ class ControlPad:
             encodings = ['utf-8', 'cp949', 'latin1']
             content = None
 
-            for enc in encodings:           
+            for enc in encodings:
                 try:
                     with open(file_path, 'r', encoding=enc) as file:
                         content = file.read()
@@ -73,9 +73,8 @@ class ControlPad:
                     last_exception = e
 
             if content:
-                self.app.logwin.log_text.insert(tk.END, content)
 
-                try:    
+                try:
                     self.app.logwin.log_text.insert(tk.END, content)
 
                     self.app.log.load_log(file_path, use_columns_log)
@@ -100,14 +99,14 @@ class ControlPad:
                 except Exception as e:
                     last_exception = e
 
-            if content:                
+            if content:
                 self.app.keyeventwin.keyevent_text.insert(tk.END, content)
 
                 try:
                     self.app.log.load_keyevent_log(self.file_path_keyevent, use_columns_keyevent)
                     self.app.log.add_columns_keyevent()
                     filtered_df = self.app.log.filter_event()  # filter out normal event table
-                    
+
                     filtered_df = self.app.log.analyze_keyevent(filtered_df)
                     self.app.eventWin.update_EventWindow(filtered_df)
 
@@ -116,17 +115,13 @@ class ControlPad:
 
 
             file_path_device = replace_filename(file_path, 'Devices_1.txt')
-            content = None
             for enc in encodings:
                 try:
-                    with open(file_path_device, 'r', encoding=enc) as file:
-                        self.app.log.load_device(file_path_device, use_columns_device)
-                        self.app.periWin.update_PeripheralWindow(self.app.log.df_device)
-                    break
+                    self.app.log.load_device(file_path_device, use_columns_device)
+                    self.app.periWin.update_PeripheralWindow(self.app.log.df_device)
                 except Exception as e:
                     last_exception = e
-            if not content:
-                print(f"Failed to read device file:\n{last_exception}")
+                    print(f"Failed to read device file:\n{last_exception}")
 
 
         else:
@@ -147,7 +142,7 @@ class ControlPad:
             # 타임스탬프 유효성 검사
             if pd.isna(timestamp_from_dt) or pd.isna(timestamp_to_dt):
                 raise ValueError("One or both timestamps are invalid")
-            
+
             print("save_keyevent_log is initiated!!!")
             # CSV 파일 읽기
             df = pd.read_csv(self.file_path_keyevent, sep='\t', dtype=str, low_memory=False)
@@ -170,20 +165,18 @@ class ControlPad:
 
                 # 필터링된 행들을 추가 모드로 쓰기
                 filtered_df.to_csv(dest_file, sep='\t', index=False, header=False, mode='a', columns=df.columns.drop('Timestamp_dt'), lineterminator='\n')
-            
+
             print("save_keyevent_log is completed!!!")
 
         except ValueError as e:
-            print("Invalid timestamp format:", e) 
+            print("Invalid timestamp format:", e)
             messagebox.showerror("Error", f"Invalid timestamp format: {e}")
 
 
-        
+
 
 
 
     def reset_timestamp(self):
         self.timestamp_from.delete(0, tk.END)
-        self.timestamp_to.delete(0, tk.END)        
-
-
+        self.timestamp_to.delete(0, tk.END)

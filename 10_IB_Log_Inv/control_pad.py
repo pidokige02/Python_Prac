@@ -1,3 +1,5 @@
+import os
+import subprocess
 import tkinter as tk
 from tkinter import ttk
 from tkinter import filedialog
@@ -70,7 +72,7 @@ class ControlPad:
             self.app.keyeventwin.keyevent_text.delete('1.0', tk.END)
 
         # 다양한 인코딩 시도
-            encodings = ['utf-8', 'cp949', 'latin1']
+            encodings = ['latin1', 'utf-8', 'cp949']
             content = None
 
             for enc in encodings:
@@ -96,6 +98,8 @@ class ControlPad:
 
                 except Exception as e:
                     self.app.logwin.log_text.insert(tk.END, f"Failed to read file:\n{e}")
+            else:
+                print("No Contents. Last exception was:", last_exception)
 
 
             self.file_path_keyevent = replace_filename(file_path, 'KeyBoardShadow_1.txt')
@@ -132,6 +136,7 @@ class ControlPad:
                     last_exception = e
                     print(f"Failed to read device file:\n{last_exception}")
 
+            self.reset_timestamp()
 
         else:
             self.app.logwin.log_text.insert(tk.END, f"Failed to read file:\n{last_exception}")
@@ -152,8 +157,6 @@ class ControlPad:
             if pd.isna(timestamp_from_dt) or pd.isna(timestamp_to_dt):
                 raise ValueError("One or both timestamps are invalid")
 
-            print("save_keyevent_log is initiated!!!")
-
             # CSV 파일 읽기
             try:
                 df = pd.read_csv(self.file_path_keyevent, sep='\t', dtype=str, low_memory=False, encoding='utf-8')
@@ -166,7 +169,7 @@ class ControlPad:
             # 주어진 타임스탬프 범위에 있는 행들만 필터링
             filtered_df = df[(df['Timestamp_dt'] >= timestamp_from_dt) & (df['Timestamp_dt'] <= timestamp_to_dt)]
 
-            encodings = ['utf-8', 'cp949', 'latin1']
+            encodings = ['latin1', 'utf-8', 'cp949']
             lines = None
             last_exception = None
 
@@ -194,13 +197,18 @@ class ControlPad:
                 initialfile="KeyBoardShadow_1_captured.txt"
             )
 
-            with open(file_path_keyevent_dest, 'w', encoding='utf-8') as dest_file:
-                dest_file.writelines(header_lines)
+            if file_path_keyevent_dest and os.path.isdir(os.path.dirname(file_path_keyevent_dest)):
+                try:
+                    with open(file_path_keyevent_dest, 'w', encoding='utf-8') as dest_file:
+                        dest_file.writelines(header_lines)
 
-                # 필터링된 행들을 추가 모드로 쓰기
-                filtered_df.to_csv(dest_file, sep='\t', index=False, header=False, mode='a', columns=df.columns.drop('Timestamp_dt'), lineterminator='\n')
-
-            print("save_keyevent_log is completed!!!")
+                        # 필터링된 행들을 추가 모드로 쓰기
+                        filtered_df.to_csv(dest_file, sep='\t', index=False, header=False, mode='a', columns=df.columns.drop('Timestamp_dt'), lineterminator='\n')
+                    print(f"File saved successfully to {file_path_keyevent_dest}")
+                except Exception as e:
+                    print(f"An error occurred while writing the file: {e}")
+            else:
+                 print("Invalid file path selected.")
 
         except ValueError as e:
             print("Invalid timestamp format:", e)
@@ -217,4 +225,22 @@ class ControlPad:
 
 
     def keylog_playback(self):
-        file_path = filedialog.askopenfilename()
+        # file_path = filedialog.askopenfilename()
+        command = "ipconfig"
+
+        subprocess.Popen(['cmd', '/k', command])
+
+    def validate_ip(self):
+        ip_address = self.address.get()
+        if self.is_valid_ip(ip_address):
+            messagebox.showinfo("Validation", "The IP address is valid.")
+        else:
+            messagebox.showerror("Validation", "The IP address is not valid.")
+
+    def is_valid_ip(self, ip):
+        # 정규 표현식으로 IPv4 주소 형식 확인
+        pattern = re.compile(r"^(?:[0-9]{1,3}\.){3}[0-9]{1,3}$")
+        if pattern.match(ip):
+            # 각 숫자가 0과 255 사이에 있는지 확인
+            return all(0 <= int(num) <= 255 for num in ip.split('.'))
+        return False

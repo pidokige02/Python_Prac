@@ -36,7 +36,7 @@ class App:
         self.notebook.grid(row=1, column=0, sticky="nsew")
 
         #log window creation
-        self.logwin = LogWindow() 
+        self.logwin = LogWindow()
         self.logwin.layout_LogWindow(root, LOGWIN_DIMENSION)
 
         # keyevent window creation
@@ -59,7 +59,7 @@ class App:
         self.controlpad = ControlPad(self)
         self.controlpad.layout_ControlPad()
 
-        # log object creation for log analysis 
+        # log object creation for log analysis
         self.log = Log()
 
         # # 포커스 및 이벤트 관리
@@ -71,25 +71,30 @@ class App:
         print(f"Scrolled to: {args}")
 
 
-    def on_focus_in(self, event):  
+    def on_focus_in(self, event):
         # 포커스 변경 시 처리할 로직
         widget = self.root.focus_get()
 
         if self.logwin.log_text == widget:
-            print("Log window is focused", self.logwin.log_text)
+            pass
+            # print("Log window is focused", self.logwin.log_text)
         elif self.keyeventwin.keyevent_text == widget:
-            print("KeyEvent window is focused", self.keyeventwin.keyevent_text)
+            pass
+            # print("KeyEvent window is focused", self.keyeventwin.keyevent_text)
         elif self.eventWin.tree == widget:
-            print("Event window is focused", self.eventWin.tree)
+            # print("Event window is focused", self.eventWin.tree)
+            pass
         elif self.infoWin.text == widget:
-            print("infoWin window is focused", self.infoWin.text)
+            # print("infoWin window is focused", self.infoWin.text)
+            pass
         elif self.periWin.tree == widget:
-            print("periWin window is focused", self.periWin.tree)
-        else: 
-            print("Other window is focused", widget, widget.winfo_name(), widget.winfo_class())
-
+            # print("periWin window is focused", self.periWin.tree)
+            pass
+        else:
+            # print("Other window is focused", widget, widget.winfo_name(), widget.winfo_class())
+            pass
 
 if __name__ == "__main__":
     root = tk.Tk()
-    app = App(root)    
+    app = App(root)
     root.mainloop()

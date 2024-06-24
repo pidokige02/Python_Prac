@@ -22,6 +22,8 @@ class ControlPad:
         self.timestamp_from = None
         self.timestamp_to = None
         self.file_path_keyevent = None
+        self.address = None
+        self.keylog_playback_button = None
 
 
     def layout_ControlPad(self):
@@ -39,7 +41,7 @@ class ControlPad:
         self.savekeyevent_button.grid(row=1, column=0, padx=1, pady=1, sticky="w")
 
         # Save Key Event 버튼 추가
-        self.reset_timestamp_button = ttk.Button(self.right_frame, text="Reset TimeS", command=self.reset_timestamp)
+        self.reset_timestamp_button = ttk.Button(self.right_frame, text="Reset Time", command=self.reset_timestamp)
         self.reset_timestamp_button.grid(row=1, column=1, padx=1, pady=1, sticky="w")
 
         ttk.Label(self.right_frame, text="From (YYYY-MM-DD HH:MM:SS.ssssss)").grid(row=2, column=0, padx=1, pady=1, sticky="w")
@@ -49,6 +51,13 @@ class ControlPad:
         ttk.Label(self.right_frame, text="To (YYYY-MM-DD HH:MM:SS.ssssss)").grid(row=4, column=0, padx=1, pady=1, sticky="w")
         self.timestamp_to = ttk.Entry(self.right_frame)
         self.timestamp_to.grid(row=5, column=0, padx=1, pady=1, sticky="w")
+
+        ttk.Label(self.right_frame, text="Address").grid(row=6, column=0, padx=1, pady=1, sticky="w")
+        self.address = ttk.Entry(self.right_frame)
+        self.address.grid(row=7, column=0, padx=1, pady=1, sticky="w")
+
+        self.keylog_playback_button = ttk.Button(self.right_frame, text="Playback", command=self.keylog_playback)
+        self.keylog_playback_button.grid(row=7, column=1, padx=1, pady=1, sticky="w")
 
 
     def open_log(self):
@@ -144,8 +153,12 @@ class ControlPad:
                 raise ValueError("One or both timestamps are invalid")
 
             print("save_keyevent_log is initiated!!!")
+
             # CSV 파일 읽기
-            df = pd.read_csv(self.file_path_keyevent, sep='\t', dtype=str, low_memory=False)
+            try:
+                df = pd.read_csv(self.file_path_keyevent, sep='\t', dtype=str, low_memory=False, encoding='utf-8')
+            except UnicodeDecodeError:
+                df = pd.read_csv(self.file_path_keyevent, sep='\t', dtype=str, low_memory=False, encoding='latin1')
 
             # 타임스탬프 열의 값을 datetime 객체로 변환하여 새로운 열에 저장
             df['Timestamp_dt'] = df['Timestamp'].apply(extract_timestamp)
@@ -153,13 +166,34 @@ class ControlPad:
             # 주어진 타임스탬프 범위에 있는 행들만 필터링
             filtered_df = df[(df['Timestamp_dt'] >= timestamp_from_dt) & (df['Timestamp_dt'] <= timestamp_to_dt)]
 
+            encodings = ['utf-8', 'cp949', 'latin1']
+            lines = None
+            last_exception = None
+
             # 처음 두 줄을 가져오기
-            with open(self.file_path_keyevent, 'r', encoding='utf-8') as source_file:
-                lines = source_file.readlines()
-            header_lines = lines[:2]
+            for enc in encodings:
+                try:
+                    with open(self.file_path_keyevent, 'r',encoding=enc) as source_file:
+                        lines = source_file.readlines()
+                    break
+                except Exception as e:
+                    last_exception = e
+
+            if lines:
+                header_lines = lines[:2]
+            else:
+                print("No lines were read. Last exception was:", last_exception)
 
             # 새로운 CSV 파일에 처음 두 줄을 쓰기
             file_path_keyevent_dest = replace_filename(self.file_path_keyevent, 'KeyBoardShadow_1_captured.txt')
+
+             # 파일 저장 대화 상자를 열고 파일 경로를 가져옴
+            file_path_keyevent_dest = filedialog.asksaveasfilename(
+                defaultextension=".txt",
+                filetypes=[("Text files", "*.txt"), ("All files", "*.*")],
+                initialfile="KeyBoardShadow_1_captured.txt"
+            )
+
             with open(file_path_keyevent_dest, 'w', encoding='utf-8') as dest_file:
                 dest_file.writelines(header_lines)
 
@@ -180,3 +214,7 @@ class ControlPad:
     def reset_timestamp(self):
         self.timestamp_from.delete(0, tk.END)
         self.timestamp_to.delete(0, tk.END)
+
+
+    def keylog_playback(self):
+        file_path = filedialog.askopenfilename()

@@ -225,22 +225,35 @@ class ControlPad:
 
 
     def keylog_playback(self):
-        # file_path = filedialog.askopenfilename()
-        command = "ipconfig"
+        file_path = filedialog.askopenfilename()
 
-        subprocess.Popen(['cmd', '/k', command])
-
-    def validate_ip(self):
-        ip_address = self.address.get()
-        if self.is_valid_ip(ip_address):
-            messagebox.showinfo("Validation", "The IP address is valid.")
+        ip_address = self.get_validated_ip()
+        if(ip_address):
+            command = f"playback.exe -i {file_path} -t {ip_address} -c 1 -m 2"
+            print("Jinha", command)
+            subprocess.Popen(['cmd', '/k', command])
         else:
             messagebox.showerror("Validation", "The IP address is not valid.")
 
+
+    def get_validated_ip(self):
+        ip_address = self.address.get()
+        if self.is_valid_ip(ip_address):
+            return ip_address
+        else:
+            messagebox.showerror("Validation", "The IP address is not valid.")
+            return None
+
     def is_valid_ip(self, ip):
-        # 정규 표현식으로 IPv4 주소 형식 확인
+        ip = ip.strip()  # 앞뒤 공백 제거
         pattern = re.compile(r"^(?:[0-9]{1,3}\.){3}[0-9]{1,3}$")
-        if pattern.match(ip):
-            # 각 숫자가 0과 255 사이에 있는지 확인
-            return all(0 <= int(num) <= 255 for num in ip.split('.'))
+        match = pattern.match(ip)
+        if match:
+            for num in ip.split('.'):
+                if not (0 <= int(num) <= 255):
+                    print(f"범위 초과: {num}")
+                    return False
+            return True
+        else:
+            print("정규 표현식 일치 실패")
         return False

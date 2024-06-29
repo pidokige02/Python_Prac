@@ -5,7 +5,6 @@ from tkinter import ttk
 from tkinter import filedialog
 from datetime import datetime
 
-from configure_data import *
 from Utils import *
 from configure_data import *
 from tkinter import messagebox
@@ -38,6 +37,10 @@ class ControlPad:
         self.openlog_button = ttk.Button(self.right_frame, text="Open Log", command=self.open_log)
         self.openlog_button.grid(row=0, column=0, padx=1, pady=1, sticky="w")
 
+        # # clearlog 버튼 추가
+        # self.clearlog_button = ttk.Button(self.right_frame, text="Clear Log", command=self.clear_log)
+        # self.clearlog_button.grid(row=0, column=1, padx=1, pady=1, sticky="w")
+
         # Save Key Event 버튼 추가
         self.savekeyevent_button = ttk.Button(self.right_frame, text="Save Key Event", command=self.save_keyevent_log)
         self.savekeyevent_button.grid(row=1, column=0, padx=1, pady=1, sticky="w")
@@ -61,6 +64,12 @@ class ControlPad:
         self.keylog_playback_button = ttk.Button(self.right_frame, text="Playback", command=self.keylog_playback)
         self.keylog_playback_button.grid(row=7, column=1, padx=1, pady=1, sticky="w")
 
+
+    # def clear_log(self):
+    #     self.app.log.clear_data()
+    #     self.app.logwin.log_text.delete('1.0', tk.END)
+    #     self.app.keyeventwin.keyevent_text.delete('1.0', tk.END)
+    #     pass
 
     def open_log(self):
         # 파일 선택 대화 상자 열기

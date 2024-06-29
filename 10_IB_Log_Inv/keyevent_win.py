@@ -93,7 +93,9 @@ class KeyEventWindow:
         search_entry = tk.Entry(find_dialog)
         search_entry.grid(row=0, column=1, padx=4, pady=4)
 
-        tk.Button(find_dialog, text="Find Next", command=lambda: self.find_next(search_entry.get())).grid(row=1, column=0, columnspan=2, pady=4)
+        tk.Button(find_dialog, text="Find Prev", command=lambda: self.find_previous(search_entry.get())).grid(row=1, column=0, padx=2, pady=2)
+        tk.Button(find_dialog, text="Find Next", command=lambda: self.find_next(search_entry.get())).grid(row=1, column=1, padx=2, pady=2)
+
 
     def find_next(self, search_text):
         # 찾기 기능 구현
@@ -116,6 +118,28 @@ class KeyEventWindow:
 
         # 마지막 검색 위치 업데이트
         self.last_search_pos = end_pos
+
+    def find_previous(self, search_text):
+        # 역방향 찾기 기능 구현
+        start_pos = self.keyevent_text.search(search_text, self.last_search_pos, "1.0", backwards=True)
+        if not start_pos:
+            print("Text not found")
+            return
+
+        end_pos = f"{start_pos}+{len(search_text)}c"
+
+        # 이전 강조 제거
+        self.keyevent_text.tag_remove("highlight", "1.0", tk.END)
+
+        # 찾은 텍스트 강조
+        self.keyevent_text.tag_add("highlight", start_pos, end_pos)
+        self.keyevent_text.tag_configure("highlight", background="yellow")
+
+        # 찾은 텍스트로 스크롤
+        self.keyevent_text.see(start_pos)
+
+        # 마지막 검색 위치 업데이트
+        self.last_search_pos = start_pos
 
 
     def create_menu(self):

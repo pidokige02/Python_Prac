@@ -4,9 +4,10 @@ from tkinter import font
 class LogWindow:
     def __init__(self):
         self.log_window = None
-        self.log_text = None 
+        self.log_text = None
         self.current_font_size = 10  # 기본 폰트 크기
-        self.text_font = None        
+        self.text_font = None
+        self.last_search_pos = "1.0"  # 마지막 검색 위치
 
     def layout_LogWindow(self, root, dimension):
 
@@ -44,7 +45,7 @@ class LogWindow:
         frame.grid_columnconfigure(0, weight=1)
 
          # 마우스 휠 이벤트 바인딩
-        self.log_text.bind("<Control-MouseWheel>", self.on_mouse_wheel)       
+        self.log_text.bind("<Control-MouseWheel>", self.on_mouse_wheel)
 
 
     def on_mouse_wheel(self, event):
@@ -59,10 +60,10 @@ class LogWindow:
     def scroll_to_line(self, line_number):
         # Clear previous highlights
         self.log_text.tag_remove("highlight", "1.0", "end")
-        
+
         # Scroll to the specified line number
         self.log_text.see(f"{line_number}.0")
-        
+
         # Highlight the specified line
         self.log_text.tag_add("highlight", f"{line_number}.0", f"{line_number}.0 lineend")
         self.log_text.tag_configure("highlight", background="yellow")
@@ -78,7 +79,7 @@ class LogWindow:
         # 편집 메뉴
         edit_menu = tk.Menu(menubar, tearoff=0)
         edit_menu.add_command(label="Find", command=self.find)
-        menubar.add_cascade(label="Search", menu=edit_menu)
+        menubar.add_cascade(label="Edit", menu=edit_menu)
 
         self.log_window.config(menu=menubar)
 
@@ -96,7 +97,7 @@ class LogWindow:
 
     def find_next(self, search_text):
         # 찾기 기능 구현
-        start_pos = self.log_text.search(search_text, "1.0", tk.END)
+        start_pos = self.log_text.search(search_text, self.last_search_pos, tk.END)
         if not start_pos:
             print("Text not found")
             return
@@ -105,10 +106,13 @@ class LogWindow:
 
         # Clear previous highlights
         self.log_text.tag_remove("highlight", "1.0", tk.END)
-        
-        # Highlight the found text
+
+        # 찾은 텍스트 강조
         self.log_text.tag_add("highlight", start_pos, end_pos)
         self.log_text.tag_configure("highlight", background="yellow")
 
-        # Scroll to the found text
-        self.log_text.see(start_pos)    
+        # 찾은 텍스트로 스크롤
+        self.log_text.see(start_pos)
+
+        # 마지막 검색 위치 업데이트
+        self.last_search_pos = end_pos

@@ -75,6 +75,8 @@ class ControlPad:
         # 파일 선택 대화 상자 열기
         file_path = filedialog.askopenfilename()
 
+        last_exception = None  # last_exception 변수를 초기화
+
         if file_path:
             self.app.log.clear_data()
             self.app.logwin.log_text.delete('1.0', tk.END)
@@ -148,8 +150,10 @@ class ControlPad:
             self.reset_timestamp()
 
         else:
-            self.app.logwin.log_text.insert(tk.END, f"Failed to read file:\n{last_exception}")
-
+            if last_exception is not None:
+                print(f"Failed to read device file:\n{last_exception}")
+            else:
+                print(f"No file selected or an unknown error occurred.")
 
 
     def save_keyevent_log(self):
@@ -224,10 +228,6 @@ class ControlPad:
             messagebox.showerror("Error", f"Invalid timestamp format: {e}")
 
 
-
-
-
-
     def reset_timestamp(self):
         self.timestamp_from.delete(0, tk.END)
         self.timestamp_to.delete(0, tk.END)
@@ -250,8 +250,9 @@ class ControlPad:
         if self.is_valid_ip(ip_address):
             return ip_address
         else:
-            messagebox.showerror("Validation", "The IP address is not valid.")
+            print("Validation", "The IP address is not valid.")
             return None
+
 
     def is_valid_ip(self, ip):
         ip = ip.strip()  # 앞뒤 공백 제거

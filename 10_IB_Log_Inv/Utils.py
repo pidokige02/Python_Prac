@@ -23,3 +23,14 @@ def extract_timestamp(timestamp_str):
     except Exception as e:
         print(f"Error parsing timestamp: {timestamp_str}. Error: {e}")
         return pd.NaT
+
+def extract_timestampstring(str):
+
+    pattern = r'\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}\.\d{7}'
+    match = re.search(pattern, str)
+
+    if match:
+        datetime_info = match.group(0)
+        return datetime_info
+    else:
+        print("Datetime information not found in the text.")

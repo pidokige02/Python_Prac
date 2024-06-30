@@ -43,6 +43,11 @@ class App:
         self.keyeventwin =  KeyEventWindow ()
         self.keyeventwin.layout_KeyEventWindow(root, KEYEVENTWIN_DIMENSION)
 
+        # for mutual data exchange
+        self.logwin.set_keyevent_window(self.keyeventwin)
+        self.keyeventwin.set_log_window(self.logwin)
+
+
         # # 첫 번째 Pane EventWindow 생성
         self.eventWin = EventWindow(self.logwin, self.keyeventwin)
         self.eventWin.layout_EventWindow(self.notebook)
@@ -61,6 +66,7 @@ class App:
 
         # log object creation for log analysis
         self.log = Log()
+        self.logwin.set_log_instance (self.log)
 
         # # 포커스 및 이벤트 관리
         self.root.bind_all("<FocusIn>", self.on_focus_in)

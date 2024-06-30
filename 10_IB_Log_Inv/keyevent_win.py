@@ -9,6 +9,10 @@ class KeyEventWindow:
         self.current_font_size = 10  # 기본 폰트 크기
         self.text_font = None
         self.last_search_pos = "1.0"  # 마지막 검색 위치
+        self.log_window = None
+
+    def set_log_window(self, window):
+        self.log_window = window
 
     def layout_KeyEventWindow(self, root, dimension):
 
@@ -119,6 +123,9 @@ class KeyEventWindow:
         # 마지막 검색 위치 업데이트
         self.last_search_pos = end_pos
 
+        self.log_window.scroll_to_line(200)
+
+
     def find_previous(self, search_text):
         # 역방향 찾기 기능 구현
         start_pos = self.keyevent_text.search(search_text, self.last_search_pos, "1.0", backwards=True)
@@ -141,13 +148,4 @@ class KeyEventWindow:
         # 마지막 검색 위치 업데이트
         self.last_search_pos = start_pos
 
-
-    def create_menu(self):
-        menubar = tk.Menu(self.keyevent_window)
-
-        # 편집 메뉴
-        edit_menu = tk.Menu(menubar, tearoff=0)
-        edit_menu.add_command(label="Find", command=self.find)
-        menubar.add_cascade(label="Edit", menu=edit_menu)
-
-        self.keyevent_window.config(menu=menubar)
+        self.log_window.scroll_to_line(100)

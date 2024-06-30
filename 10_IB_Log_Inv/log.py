@@ -7,7 +7,7 @@ from Utils import *
 class Log:
     def __init__(self):
         self.df = None
-        self.filtered_df = None 
+        self.filtered_df = None
 
         self.df_device = None
         self.df_keyevent = None
@@ -36,17 +36,17 @@ class Log:
         for index, row in self.df.iterrows():
             text = row['Text']
             if not isinstance(text, str):
-                continue  # 문자열이 아닌 경우 건너뛰기    
+                continue  # 문자열이 아닌 경우 건너뛰기
             for event, (pattern, isEvent, info_idx, skip) in evant_table_map.items():
                     match = re.search(pattern, row['Text'])
                     if match:
                         if(skip != None ):
                             event_info = match.group(info_idx) if match.lastindex else match.group(0)
-                            if (event_info !='<none>'): 
+                            if (event_info !='<none>'):
                                 self.df.at[index, 'Event'] = event
                                 self.df.at[index, 'Info'] = event_info
                                 self.df.at[index, 'line#'] = index + 2 # 2 is offset
-                        else: 
+                        else:
                             event_info = match.group(info_idx) if match.lastindex else match.group(0)
                             self.df.at[index, 'Event'] = event
                             self.df.at[index, 'Info'] = event_info
@@ -63,9 +63,9 @@ class Log:
         else:
             # 'Event' 열이 빈 문자열이 아닌 행만 선택
             self.filtered_df = self.df[(
-                self.df['Event'] != "") & 
+                self.df['Event'] != "") &
                 (self.df['Event'] != "S/W version") &
-                (self.df['Event'] != "Product") 
+                (self.df['Event'] != "Product")
                 ]
 
         return self.filtered_df
@@ -84,7 +84,7 @@ class Log:
             self.df_keyevent = pd.read_csv(file_path, sep='\t', usecols=use_columns_keyevent, encoding='utf-8')
         except UnicodeDecodeError:
             self.df_keyevent = pd.read_csv(file_path, sep='\t', usecols=use_columns_keyevent, encoding='latin1')
-        
+
         self.df_keyevent['Timestamp'] = self.df_keyevent['Timestamp'].apply(extract_timestamp)
 
 
@@ -106,7 +106,7 @@ class Log:
             # 가장 가까운 타임스탬프 찾기
             closest_index = (self.df_keyevent['Timestamp'] - extract_timestamp(timestamp)).abs().idxmin()
             filtered_df.at[index, 'keyeventline#'] = self.df_keyevent.at[closest_index, 'keyeventline#']
-        
+
         return filtered_df
 
     def clear_data(self):
@@ -114,3 +114,13 @@ class Log:
         self.filtered_df = pd.DataFrame()
         self.df_device = pd.DataFrame()
         self.df_keyevent = pd.DataFrame()
+
+    def locate_keyevent(self, timestamp_str):
+
+        closest_index = (self.df_keyevent['Timestamp'] - extract_timestamp(timestamp_str)).abs().idxmin()
+        if closest_index is not None:  # closest_index가 None이 아닌지 확인
+            print (f"closest_index is {closest_index} found")
+            return closest_index + 2
+        else:
+            print ("closest_index not found")
+            return None

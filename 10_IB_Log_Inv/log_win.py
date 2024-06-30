@@ -1,5 +1,7 @@
 import tkinter as tk
 from tkinter import font
+from Utils import *
+
 
 class LogWindow:
     def __init__(self):
@@ -8,6 +10,15 @@ class LogWindow:
         self.current_font_size = 10  # 기본 폰트 크기
         self.text_font = None
         self.last_search_pos = "1.0"  # 마지막 검색 위치
+        self.keyevent_window = None   # mutual 참조룰 위함
+        self.log_instance = None
+        # 이벤트 수신자 등록
+
+    def set_keyevent_window (self, window):
+        self.keyevent_window = window
+
+    def set_log_instance (self, log):
+        self.log_instance = log
 
     def layout_LogWindow(self, root, dimension):
 
@@ -116,8 +127,27 @@ class LogWindow:
         # 찾은 텍스트로 스크롤
         self.log_text.see(start_pos)
 
+        # start_pos와 end_pos가 있는 라인의 텍스트 전체 얻기
+        line_start = self.log_text.index(start_pos).split('.')[0]
+        line_end = self.log_text.index(end_pos).split('.')[0]
+
+    # 시작 라인부터 끝 라인까지의 모든 텍스트 얻기
+        found_text = ""
+        for line_num in range(int(line_start), int(line_end) + 1):
+            line_text = self.log_text.get(f"{line_num}.0", f"{line_num}.end")
+            found_text += line_text
+
+        timestamp_str = extract_timestampstring(found_text)
+        line_index = self.log_instance.locate_keyevent(timestamp_str)
+        if line_index is not None:  # line_index가 None이 아닌지 확인
+            self.keyevent_window.scroll_to_line(line_index)
+        else:
+            print ("line_index not valid")
         # 마지막 검색 위치 업데이트
         self.last_search_pos = end_pos
+
+
+
 
     def find_previous(self, search_text):
         # 역방향 찾기 기능 구현
@@ -137,6 +167,23 @@ class LogWindow:
 
         # 찾은 텍스트로 스크롤
         self.log_text.see(start_pos)
+
+        # start_pos와 end_pos가 있는 라인의 텍스트 전체 얻기
+        line_start = self.log_text.index(start_pos).split('.')[0]
+        line_end = self.log_text.index(end_pos).split('.')[0]
+
+    # 시작 라인부터 끝 라인까지의 모든 텍스트 얻기
+        found_text = ""
+        for line_num in range(int(line_start), int(line_end) + 1):
+            line_text = self.log_text.get(f"{line_num}.0", f"{line_num}.end")
+            found_text += line_text
+
+        timestamp_str = extract_timestampstring(found_text)
+        line_index = self.log_instance.locate_keyevent(timestamp_str)
+        if line_index is not None:  # line_index가 None이 아닌지 확인
+            self.keyevent_window.scroll_to_line(line_index)
+        else:
+            print ("line_index not valid")
 
         # 마지막 검색 위치 업데이트
         self.last_search_pos = start_pos

@@ -109,11 +109,15 @@ class LogWindow:
         search_entry = tk.Entry(self.find_dialog)
         search_entry.grid(row=0, column=1, padx=4, pady=4)
 
+        # Enter 키 이벤트와 find_next 메서드를 연결합니다.
+        search_entry.bind('<Return>', lambda event: self.find_next(search_entry.get()))
+
         tk.Button(self.find_dialog, text="Find Prev", command=lambda: self.find_previous(search_entry.get())).grid(row=1, column=0, padx=2, pady=2)
         tk.Button(self.find_dialog, text="Find Next", command=lambda: self.find_next(search_entry.get())).grid(row=1, column=1, padx=2, pady=2)
 
 
     def find_next(self, search_text):
+
         # 찾기 기능 구현
         start_pos = self.log_text.search(search_text, self.last_search_pos, tk.END)
         if not start_pos:

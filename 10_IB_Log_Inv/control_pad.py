@@ -25,6 +25,10 @@ class ControlPad:
         self.file_path_keyevent = None
         self.address = None
         self.keylog_playback_button = None
+        self.last_opened_log_file = None
+        self.last_opened_keyevent_file = None
+        self.last_opened_device_file = None
+
 
 
     def layout_ControlPad(self):
@@ -65,55 +69,59 @@ class ControlPad:
         self.keylog_playback_button.grid(row=7, column=1, padx=1, pady=1, sticky="w")
 
 
-    # def clear_log(self):
-    #     self.app.log.clear_data()
-    #     self.app.logwin.log_text.delete('1.0', tk.END)
-    #     self.app.keyeventwin.keyevent_text.delete('1.0', tk.END)
-    #     pass
+    def clear_log(self):
+        self.app.log.clear_data()
+        self.app.logwin.log_text.delete('1.0', tk.END)
+        self.app.keyeventwin.keyevent_text.delete('1.0', tk.END)
+
 
     def open_log(self):
         # 파일 선택 대화 상자 열기
         file_path = filedialog.askopenfilename()
 
-        last_exception = None  # last_exception 변수를 초기화
+        if not file_path:
+            print("No file selected or an unknown error occurred.")
+            return
 
-        if file_path:
-            self.app.log.clear_data()
-            self.app.logwin.log_text.delete('1.0', tk.END)
-            self.app.keyeventwin.keyevent_text.delete('1.0', tk.END)
+        # 로그 파일 다시 열기 방지
+        if file_path == self.last_opened_log_file:
+            print("Same log file is already open.")
+            return
+
+        last_exception = None  # last_exception 변수를 초기화
+        self.clear_log()
+
 
         # 다양한 인코딩 시도
-            encodings = ['latin1', 'utf-8', 'cp949']
-            content = None
+        encodings = ['latin1', 'utf-8', 'cp949']
+        content = None
+        for enc in encodings:
+            try:
+                with open(file_path, 'r', encoding=enc) as file:
+                    content = file.read()
+                break
+            except Exception as e:
+                last_exception = e
 
-            for enc in encodings:
-                try:
-                    with open(file_path, 'r', encoding=enc) as file:
-                        content = file.read()
-                    break
-                except Exception as e:
-                    last_exception = e
+        if content:
+            try:
+                self.app.logwin.log_text.insert(tk.END, content)
+                self.app.log.load_log(file_path, use_columns_log)
+                self.app.log.add_columns_log()
+                self.app.log.analyze_log ()
+                filtered_df = self.app.log.filter_event()
+                self.app.eventWin.update_EventWindow(filtered_df)
+                filtered_df = self.app.log.filter_event(events=['S/W version', 'Product'])
+                self.app.infoWin.update_InfoWindow(filtered_df)
+            except Exception as e:
+                self.app.logwin.log_text.insert(tk.END, f"Failed to read file:\n{e}")
+        else:
+            print("No Contents. Last exception was:", last_exception)
 
-            if content:
-
-                try:
-                    self.app.logwin.log_text.insert(tk.END, content)
-
-                    self.app.log.load_log(file_path, use_columns_log)
-                    self.app.log.add_columns_log()
-                    self.app.log.analyze_log ()
-                    filtered_df = self.app.log.filter_event()
-                    self.app.eventWin.update_EventWindow(filtered_df)
-                    filtered_df = self.app.log.filter_event(events=['S/W version', 'Product'])
-                    self.app.infoWin.update_InfoWindow(filtered_df)
-
-                except Exception as e:
-                    self.app.logwin.log_text.insert(tk.END, f"Failed to read file:\n{e}")
-            else:
-                print("No Contents. Last exception was:", last_exception)
-
-
-            self.file_path_keyevent = replace_filename(file_path, 'KeyBoardShadow_1.txt')
+        self.file_path_keyevent = replace_filename(file_path, 'KeyBoardShadow_1.txt')
+        if self.file_path_keyevent == self.last_opened_keyevent_file:
+            print("Same keyevent file is already open.")
+        else:
             content = None
             for enc in encodings:
                 try:
@@ -122,23 +130,22 @@ class ControlPad:
                     break
                 except Exception as e:
                     last_exception = e
-
             if content:
                 self.app.keyeventwin.keyevent_text.insert(tk.END, content)
-
                 try:
                     self.app.log.load_keyevent_log(self.file_path_keyevent, use_columns_keyevent)
                     self.app.log.add_columns_keyevent()
                     filtered_df = self.app.log.filter_event()  # filter out normal event table
-
                     filtered_df = self.app.log.analyze_keyevent(filtered_df)
                     self.app.eventWin.update_EventWindow(filtered_df)
-
                 except Exception as e:
-                    self.app.keyeventwin.keyevent_text.insert(tk.END, f"Failed to read file:\n{e}")
+                    last_exception = e
+                    print(f"Failed to read keyevent file:\n{last_exception}")
 
-
-            file_path_device = replace_filename(file_path, 'Devices_1.txt')
+        file_path_device = replace_filename(file_path, 'Devices_1.txt')
+        if file_path_device == self.last_opened_device_file:
+            print("Same device file is already open.")
+        else:
             for enc in encodings:
                 try:
                     self.app.log.load_device(file_path_device, use_columns_device)
@@ -147,13 +154,12 @@ class ControlPad:
                     last_exception = e
                     print(f"Failed to read device file:\n{last_exception}")
 
-            self.reset_timestamp()
+        # 마지막으로 열린 파일 경로를 업데이트
+        self.last_opened_log_file = file_path
+        self.last_opened_keyevent_file = self.file_path_keyevent
+        self.last_opened_device_file = file_path_device
+        self.reset_timestamp()
 
-        else:
-            if last_exception is not None:
-                print(f"Failed to read device file:\n{last_exception}")
-            else:
-                print(f"No file selected or an unknown error occurred.")
 
 
     def save_keyevent_log(self):

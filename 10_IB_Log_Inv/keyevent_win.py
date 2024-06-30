@@ -10,6 +10,7 @@ class KeyEventWindow:
         self.text_font = None
         self.last_search_pos = "1.0"  # 마지막 검색 위치
         self.log_window = None
+        self.find_dialog = None
 
     def set_log_window(self, window):
         self.log_window = window
@@ -88,9 +89,13 @@ class KeyEventWindow:
         self.keyevent_window.config(menu=menubar)
 
     def find(self):
+        if self.find_dialog is not None and self.find_dialog.winfo_exists():
+            self.find_dialog.focus()
+            return
+
         # 찾기 대화 상자를 생성하는 코드
         find_dialog = tk.Toplevel(self.keyevent_window)
-        find_dialog.title("Find")
+        find_dialog.title("Find in KeyLog")
 
         tk.Label(find_dialog, text="Find:").grid(row=0, column=0, padx=4, pady=4)
 

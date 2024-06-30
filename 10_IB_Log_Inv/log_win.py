@@ -12,6 +12,7 @@ class LogWindow:
         self.last_search_pos = "1.0"  # 마지막 검색 위치
         self.keyevent_window = None   # mutual 참조룰 위함
         self.log_instance = None
+        self.find_dialog = None
         # 이벤트 수신자 등록
 
     def set_keyevent_window (self, window):
@@ -95,17 +96,21 @@ class LogWindow:
         self.log_window.config(menu=menubar)
 
     def find(self):
+
+        if self.find_dialog is not None and self.find_dialog.winfo_exists():
+            self.find_dialog.focus()
+            return
         # 찾기 대화 상자를 생성하는 코드
-        find_dialog = tk.Toplevel(self.log_window)
-        find_dialog.title("Find")
+        self.find_dialog = tk.Toplevel(self.log_window)
+        self.find_dialog.title("Find in Log")
 
-        tk.Label(find_dialog, text="Find:").grid(row=0, column=0, padx=4, pady=4)
+        tk.Label(self.find_dialog, text="Find:").grid(row=0, column=0, padx=4, pady=4)
 
-        search_entry = tk.Entry(find_dialog)
+        search_entry = tk.Entry(self.find_dialog)
         search_entry.grid(row=0, column=1, padx=4, pady=4)
 
-        tk.Button(find_dialog, text="Find Prev", command=lambda: self.find_previous(search_entry.get())).grid(row=1, column=0, padx=2, pady=2)
-        tk.Button(find_dialog, text="Find Next", command=lambda: self.find_next(search_entry.get())).grid(row=1, column=1, padx=2, pady=2)
+        tk.Button(self.find_dialog, text="Find Prev", command=lambda: self.find_previous(search_entry.get())).grid(row=1, column=0, padx=2, pady=2)
+        tk.Button(self.find_dialog, text="Find Next", command=lambda: self.find_next(search_entry.get())).grid(row=1, column=1, padx=2, pady=2)
 
 
     def find_next(self, search_text):

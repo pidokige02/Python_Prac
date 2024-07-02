@@ -8,7 +8,7 @@ from datetime import datetime
 from Utils import *
 from configure_data import *
 from tkinter import messagebox
-
+from dialog.keylog_player import *
 
 
 
@@ -23,12 +23,12 @@ class ControlPad:
         self.timestamp_from = None
         self.timestamp_to = None
         self.file_path_keyevent = None
-        self.address = None
+        # self.address = None
         self.keylog_playback_button = None
         self.last_opened_log_file = None
         self.last_opened_keyevent_file = None
         self.last_opened_device_file = None
-
+        self.keylogplayer = KeylogPlayer(self.app.root)
 
 
     def layout_ControlPad(self):
@@ -41,9 +41,9 @@ class ControlPad:
         self.openlog_button = ttk.Button(self.right_frame, text="Open Log", command=self.open_log)
         self.openlog_button.grid(row=0, column=0, padx=1, pady=1, sticky="w")
 
-        # # clearlog 버튼 추가
-        # self.clearlog_button = ttk.Button(self.right_frame, text="Clear Log", command=self.clear_log)
-        # self.clearlog_button.grid(row=0, column=1, padx=1, pady=1, sticky="w")
+        # # playback 버튼 추가
+        self.keylog_playback_button = ttk.Button(self.right_frame, text="Play Log", command=self.keylog_playback)
+        self.keylog_playback_button.grid(row=0, column=1, padx=1, pady=1, sticky="w")
 
         # Save Key Event 버튼 추가
         self.savekeyevent_button = ttk.Button(self.right_frame, text="Save Key Event", command=self.save_keyevent_log)
@@ -53,20 +53,18 @@ class ControlPad:
         self.reset_timestamp_button = ttk.Button(self.right_frame, text="Reset Time", command=self.reset_timestamp)
         self.reset_timestamp_button.grid(row=1, column=1, padx=1, pady=1, sticky="w")
 
-        ttk.Label(self.right_frame, text="From (YYYY-MM-DD HH:MM:SS.ssssss)").grid(row=2, column=0, padx=1, pady=1, sticky="w")
+        ttk.Label(self.right_frame, text="From").grid(row=2, column=0, padx=1, pady=1, sticky="w")
         self.timestamp_from = ttk.Entry(self.right_frame)
         self.timestamp_from.grid(row=3, column=0, padx=1, pady=1, sticky="w")
 
-        ttk.Label(self.right_frame, text="To (YYYY-MM-DD HH:MM:SS.ssssss)").grid(row=4, column=0, padx=1, pady=1, sticky="w")
+        ttk.Label(self.right_frame, text="To").grid(row=2, column=1, padx=1, pady=1, sticky="w")
         self.timestamp_to = ttk.Entry(self.right_frame)
-        self.timestamp_to.grid(row=5, column=0, padx=1, pady=1, sticky="w")
+        self.timestamp_to.grid(row=3, column=1, padx=1, pady=1, sticky="w")
 
-        ttk.Label(self.right_frame, text="Address").grid(row=6, column=0, padx=1, pady=1, sticky="w")
-        self.address = ttk.Entry(self.right_frame)
-        self.address.grid(row=7, column=0, padx=1, pady=1, sticky="w")
+        # ttk.Label(self.right_frame, text="Address").grid(row=6, column=0, padx=1, pady=1, sticky="w")
+        # self.address = ttk.Entry(self.right_frame)
+        # self.address.grid(row=7, column=0, padx=1, pady=1, sticky="w")
 
-        self.keylog_playback_button = ttk.Button(self.right_frame, text="Playback", command=self.keylog_playback)
-        self.keylog_playback_button.grid(row=7, column=1, padx=1, pady=1, sticky="w")
 
 
     def clear_log(self):
@@ -240,36 +238,24 @@ class ControlPad:
 
 
     def keylog_playback(self):
+
         file_path = filedialog.askopenfilename()
 
-        ip_address = self.get_validated_ip()
-        if(ip_address):
-            command = f"playback.exe -i {file_path} -t {ip_address} -c 1 -m 2"
-            print("Jinha", command)
-            subprocess.Popen(['cmd', '/k', command])
-        else:
-            messagebox.showerror("Validation", "The IP address is not valid.")
+        if not file_path:  # 파일이 선택되지 않으면 함수 종료
+            print("No file is selected")
+            return
 
+        file_name = os.path.basename(file_path)
+         # 파일 이름만 추출
+        default_ip_address="127.0.0.1"
+        default_option="-c 1 -m 2"
+        default_command=f"playback.exe -i {file_name} -t {default_ip_address} {default_option}"
 
-    def get_validated_ip(self):
-        ip_address = self.address.get()
-        if self.is_valid_ip(ip_address):
-            return ip_address
-        else:
-            print("Validation", "The IP address is not valid.")
-            return None
+        command = self.keylogplayer.show_input_dialog(
+            default_command
+        )
 
-
-    def is_valid_ip(self, ip):
-        ip = ip.strip()  # 앞뒤 공백 제거
-        pattern = re.compile(r"^(?:[0-9]{1,3}\.){3}[0-9]{1,3}$")
-        match = pattern.match(ip)
-        if match:
-            for num in ip.split('.'):
-                if not (0 <= int(num) <= 255):
-                    print(f"범위 초과: {num}")
-                    return False
-            return True
-        else:
-            print("정규 표현식 일치 실패")
-        return False
+        if command is None:
+            return
+        final_command = command.replace(f"{file_name}", f"{file_path}")
+        subprocess.Popen(['start', 'cmd', '/k', final_command], shell=True)

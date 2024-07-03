@@ -1,6 +1,7 @@
 import os
 import re
 import pandas as pd
+import glob
 
 def replace_filename(file_path, new_filename):
     # 파일 경로에서 파일 이름 추출
@@ -34,3 +35,13 @@ def extract_timestampstring(str):
         return datetime_info
     else:
         print("Datetime information not found in the text.")
+
+def find_files(directory, pattern):
+    # 디렉토리와 패턴을 결합하여 경로 생성
+    search_path = os.path.join(directory, pattern)
+    # 패턴에 맞는 모든 파일을 찾음
+    files = glob.glob(search_path)
+    return files
+
+def get_directory_name(file_path):
+    return os.path.dirname(file_path)

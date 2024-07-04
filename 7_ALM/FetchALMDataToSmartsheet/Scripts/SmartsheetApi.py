@@ -635,11 +635,11 @@ def startProcess():
 	logger  = startLog()
 
 	# comment below two line due to acceing cloned SPR status directly
-	# process_Gemini_R3()
-	# process_Gemini_R4()
-	process_Gemini_R5()
 	process_Osprey_R4()
-	
+	process_Gemini_R5()
+	process_Gemini_R4()
+	# process_Gemini_R3()
+	# process_Gemini_R5()
 	return True
 
 

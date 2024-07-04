@@ -62,10 +62,18 @@ class ControlPad:
         self.timestamp_to.grid(row=3, column=1, padx=1, pady=1, sticky="w")
 
 
-    def clear_log(self):
-        self.app.log.clear_data()
+    def clear_eventlog(self):
+        self.app.log.clear_eventdata()
         self.app.logwin.log_text.delete('1.0', tk.END)
+
+
+    def clear_keyeventlog(self):
+        self.app.log.clear_keyeventdata()
         self.app.keyeventwin.keyevent_text.delete('1.0', tk.END)
+
+
+    def clear_devicelog(self):
+        self.app.log.clear_devicedata()
 
 
     def open_mainlog(self):
@@ -82,7 +90,6 @@ class ControlPad:
             return None
 
         last_exception = None  # last_exception 변수를 초기화
-        self.clear_log()
 
         # 다양한 인코딩 시도
         encodings = ['latin1', 'utf-8', 'cp949']
@@ -97,6 +104,7 @@ class ControlPad:
 
         if content:
             try:
+                self.clear_eventlog()
                 self.app.logwin.log_text.insert(tk.END, content)
                 self.app.log.load_log(file_path, use_columns_log)
                 self.app.log.add_columns_log()
@@ -121,49 +129,46 @@ class ControlPad:
         directory_path = get_directory_name(file_path)
         pattern = '*KeyBoardShadow*'
 
-        files = find_files(directory_path, pattern)
+        self.file_path_keyevent = find_files(directory_path, pattern)
+
+        encodings = ['latin1', 'utf-8', 'cp949']
+        last_exception = None
+
+        if self.file_path_keyevent == self.last_opened_keyevent_file:
+            print("Same keyevent files are already open.")
+            return
+
 
         file_contents = []
-        encodings = ['latin1', 'utf-8', 'cp949']
-        
-        for file in files:
-            with open(file, 'r') as f:
-                content = f.read()
-                file_contents.append(content)
 
-        print("Files found:", files)
-        return file_contents
+        for file_path in self.file_path_keyevent:
+            content = None
+            for enc in encodings:
+                try:
+                    with open(file_path, 'r', encoding=enc) as file:
+                        content = file.read()
+                        file_contents.append(content)
+                    break
+                except Exception as e:
+                    last_exception = e          
 
-        # self.file_path_keyevent = replace_filename(file_path, 'KeyBoardShadow_1.txt')
-        # # 다양한 인코딩 시도
-        # encodings = ['latin1', 'utf-8', 'cp949']
-        # content = None
+        if file_contents:
+            self.clear_keyeventlog()
+            combined_content = "\n".join(file_contents)
+            self.app.keyeventwin.keyevent_text.insert(tk.END, combined_content)
+            try:
+                self.app.log.load_keyevent_log(self.file_path_keyevent, use_columns_keyevent)
+                self.app.log.add_columns_keyevent()
+                filtered_df = self.app.log.filter_event()  # filter out normal event table
+                filtered_df = self.app.log.analyze_keyevent(filtered_df)
+                self.app.eventWin.update_EventWindow(filtered_df)
+                self.last_opened_keyevent_file = self.file_path_keyevent
+            except Exception as e:
+                last_exception = e
+                self.last_opened_keyevent_file = []
+                self.file_path_keyevent = []
+                print(f"Failed to read keyevent file:\n{last_exception}")
 
-        # if self.file_path_keyevent == self.last_opened_keyevent_file:
-        #     print("Same keyevent file is already open.")
-        # else:
-        #     content = None
-        #     for enc in encodings:
-        #         try:
-        #             with open(self.file_path_keyevent, 'r', encoding=enc) as file:
-        #                 content = file.read()
-        #             break
-        #         except Exception as e:
-        #             last_exception = e
-        #     if content:
-        #         self.app.keyeventwin.keyevent_text.insert(tk.END, content)
-        #         try:
-        #             self.app.log.load_keyevent_log(self.file_path_keyevent, use_columns_keyevent)
-        #             self.app.log.add_columns_keyevent()
-        #             filtered_df = self.app.log.filter_event()  # filter out normal event table
-        #             filtered_df = self.app.log.analyze_keyevent(filtered_df)
-        #             self.app.eventWin.update_EventWindow(filtered_df)
-        #             self.last_opened_keyevent_file = self.file_path_keyevent
-        #         except Exception as e:
-        #             last_exception = e
-        #             self.last_opened_keyevent_file = None
-        #             self.file_path_keyevent = None
-        #             print(f"Failed to read keyevent file:\n{last_exception}")
 
 
     def open_device_log(self, file_path):
@@ -173,6 +178,7 @@ class ControlPad:
             print("Same device file is already open.")
         else:
             try:
+                self.clear_devicelog()
                 self.app.log.load_device(file_path_device, use_columns_device)
                 self.app.periWin.update_PeripheralWindow(self.app.log.df_device)
                 self.last_opened_device_file = file_path_device
@@ -180,6 +186,7 @@ class ControlPad:
                 last_exception = e
                 self.last_opened_device_file = None
                 print(f"Failed to read device file:\n{last_exception}")
+
 
     def open_log(self):
 

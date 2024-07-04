@@ -78,14 +78,23 @@ class Log:
             self.df_device = pd.read_csv(file_path, sep='\t', usecols=use_columns_device, encoding='latin1')
 
 
-    def load_keyevent_log (self, file_path, use_columns_keyevent):
+    def load_keyevent_log (self, file_paths, use_columns_keyevent):
+        dataframes = []
         # 탭으로 구분된 텍스트 파일을 인코딩을 지정하여 데이터 프레임으로 읽기
-        try:
-            self.df_keyevent = pd.read_csv(file_path, sep='\t', usecols=use_columns_keyevent, encoding='utf-8')
-        except UnicodeDecodeError:
-            self.df_keyevent = pd.read_csv(file_path, sep='\t', usecols=use_columns_keyevent, encoding='latin1')
+        for file_path in file_paths:
+            try:
+                df = pd.read_csv(file_path, sep='\t', usecols=use_columns_keyevent, encoding='utf-8')
+            except UnicodeDecodeError:
+                df = pd.read_csv(file_path, sep='\t', usecols=use_columns_keyevent, encoding='latin1')
 
-        self.df_keyevent['Timestamp'] = self.df_keyevent['Timestamp'].apply(extract_timestamp)
+            df['Timestamp'] = df['Timestamp'].apply(extract_timestamp)
+            dataframes.append(df)
+
+        # Concatenate all dataframes
+        if dataframes:
+            self.df_keyevent = pd.concat(dataframes, ignore_index=True)
+        else:
+            self.df_keyevent = pd.DataFrame(columns=use_columns_keyevent)
 
 
     def add_columns_keyevent (self):
@@ -109,11 +118,18 @@ class Log:
 
         return filtered_df
 
-    def clear_data(self):
+    def clear_eventdata(self):
         self.df = pd.DataFrame()
         self.filtered_df = pd.DataFrame()
+
+
+    def clear_devicedata(self):
         self.df_device = pd.DataFrame()
+
+
+    def clear_keyeventdata(self):
         self.df_keyevent = pd.DataFrame()
+
 
     def locate_keyevent(self, timestamp_str):
 

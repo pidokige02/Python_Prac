@@ -131,26 +131,34 @@ class ControlPad:
 
         self.file_path_keyevent = find_files(directory_path, pattern)
 
+        print("Jinha", self.file_path_keyevent)
         encodings = ['latin1', 'utf-8', 'cp949']
         last_exception = None
 
         if self.file_path_keyevent == self.last_opened_keyevent_file:
             print("Same keyevent files are already open.")
+            filtered_df = self.app.log.filter_event()  # filter out normal event table
+            filtered_df = self.app.log.analyze_keyevent(filtered_df)
+            self.app.eventWin.update_EventWindow(filtered_df)
             return
 
 
         file_contents = []
 
-        for file_path in self.file_path_keyevent:
+        for idx, file_path in enumerate(self.file_path_keyevent):
             content = None
             for enc in encodings:
                 try:
                     with open(file_path, 'r', encoding=enc) as file:
-                        content = file.read()
+                        lines = file.readlines()
+                        if idx >= 1:
+                            content = "".join(lines[2:-3])  # 두 번째 및 그 이후 파일에 대해 처음 두 줄과 마지막 세 줄 건너뛰기
+                        else:
+                            content = "".join(lines[:-3])  # 첫 번째 파일에 대해 마지막 세 줄 건너뛰기
                         file_contents.append(content)
-                    break
+                        break
                 except Exception as e:
-                    last_exception = e          
+                    last_exception = e
 
         if file_contents:
             self.clear_keyeventlog()

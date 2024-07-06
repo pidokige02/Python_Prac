@@ -15,9 +15,9 @@ evant_table_map = {
 
 
 #각 windows 의 dimension
-MAINWIN_DIMENSION="1536x300+0+0"
-LOGWIN_DIMENSION = "968x564+0+350"
-KEYEVENTWIN_DIMENSION = "568x564+968+350"
+# MAINWIN_DIMENSION="1536x300+0+0"
+# LOGWIN_DIMENSION = "968x564+0+350"
+# KEYEVENTWIN_DIMENSION = "568x564+968+350"
 
 # raw log file 에서 특정 열만 읽기
 use_columns_log = ['Timestamp', 'Text']

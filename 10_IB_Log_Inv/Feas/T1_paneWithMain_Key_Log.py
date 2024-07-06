@@ -1,7 +1,7 @@
 import tkinter as tk
 from tkinter import ttk
 from tkinter import filedialog
-from Utils import *
+from Util.Utils import *
 
 
 class App:

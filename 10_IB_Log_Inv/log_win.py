@@ -1,6 +1,6 @@
 import tkinter as tk
 from tkinter import font
-from Utils import *
+from Util.Utils import *
 
 
 class LogWindow:
@@ -118,6 +118,7 @@ class LogWindow:
 
     def find_next(self, search_text):
 
+        print("JInha find_next", search_text)
         # 찾기 기능 구현
         start_pos = self.log_text.search(search_text, self.last_search_pos, tk.END)
         if not start_pos:

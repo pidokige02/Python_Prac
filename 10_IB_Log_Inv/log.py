@@ -1,7 +1,7 @@
 import re
 import pandas as pd
 from configure_data import *
-from Utils import *
+from Util.Utils import *
 
 
 class Log:

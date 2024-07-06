@@ -28,7 +28,7 @@ class App:
         style.configure("Blue.TLabel", foreground="blue", font=("Helvetica", 16, "bold"))
 
         # 제목 라벨
-        title_label = ttk.Label(root, text="Issue Inv Assistant", style="Blue.TLabel")
+        title_label = ttk.Label(root, text="Issue Inv Assistant (ver1)", style="Blue.TLabel")
         title_label.grid(row=0, column=0, padx=10, pady=10, sticky=tk.W)
 
         # Notebook 생성

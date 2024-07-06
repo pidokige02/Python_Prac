@@ -46,7 +46,7 @@ class ControlPad:
         self.keylog_playback_button.grid(row=0, column=1, padx=1, pady=1, sticky="w")
 
         # Save Key Event 버튼 추가
-        self.savekeyevent_button = ttk.Button(self.right_frame, text="Save KB", command=self.save_keyevent_log)
+        self.savekeyevent_button = ttk.Button(self.right_frame, text="Save Log", command=self.save_keyevent_log)
         self.savekeyevent_button.grid(row=1, column=0, padx=1, pady=1, sticky="w")
 
         # Save Key Event 버튼 추가
@@ -78,7 +78,9 @@ class ControlPad:
 
     def open_mainlog(self):
 
-        file_path = filedialog.askopenfilename()
+        file_path = filedialog.askopenfilename(
+            filetypes=[("Text files", "*MainLog*.txt")]
+        )
 
         if not file_path:
             print("No file selected or an unknown error occurred.")
@@ -130,8 +132,8 @@ class ControlPad:
         pattern = '*KeyBoardShadow*'
 
         self.file_path_keyevent = find_files(directory_path, pattern)
+        valid_file_paths = []
 
-        print("Jinha", self.file_path_keyevent)
         encodings = ['latin1', 'utf-8', 'cp949']
         last_exception = None
 
@@ -151,6 +153,12 @@ class ControlPad:
                 try:
                     with open(file_path, 'r', encoding=enc) as file:
                         lines = file.readlines()
+                        if 'Timestamp' not in lines[0]:
+                            print(f"No 'Timestamp' found in the first line of {file_path}. Skipping this file.")
+                            break
+                        # 유효한 파일로 추가
+                        valid_file_paths.append(file_path)                        
+
                         if idx >= 1:
                             content = "".join(lines[2:-3])  # 두 번째 및 그 이후 파일에 대해 처음 두 줄과 마지막 세 줄 건너뛰기
                         else:
@@ -159,6 +167,8 @@ class ControlPad:
                         break
                 except Exception as e:
                     last_exception = e
+
+        self.file_path_keyevent = valid_file_paths
 
         if file_contents:
             self.clear_keyeventlog()
@@ -227,38 +237,18 @@ class ControlPad:
             if pd.isna(timestamp_from_dt) or pd.isna(timestamp_to_dt):
                 raise ValueError("One or both timestamps are invalid")
 
-            # CSV 파일 읽기
-            try:
-                df = pd.read_csv(self.file_path_keyevent, sep='\t', dtype=str, low_memory=False, encoding='utf-8')
-            except UnicodeDecodeError:
-                df = pd.read_csv(self.file_path_keyevent, sep='\t', dtype=str, low_memory=False, encoding='latin1')
-
-            # 타임스탬프 열의 값을 datetime 객체로 변환하여 새로운 열에 저장
-            df['Timestamp_dt'] = df['Timestamp'].apply(extract_timestamp)
 
             # 주어진 타임스탬프 범위에 있는 행들만 필터링
-            filtered_df = df[(df['Timestamp_dt'] >= timestamp_from_dt) & (df['Timestamp_dt'] <= timestamp_to_dt)]
+            filtered_df = self.app.log.df_keyevent[(self.app.log.df_keyevent['Timestamp'] >= timestamp_from_dt) & (self.app.log.df_keyevent['Timestamp'] <= timestamp_to_dt)]
 
-            encodings = ['latin1', 'utf-8', 'cp949']
-            lines = None
-            last_exception = None
+            # 'Timestamp' 열을 원하는 형식으로 변환
+            filtered_df['Timestamp'] = filtered_df['Timestamp'].apply(format_timestamp_with_seven_microseconds)            
 
-            # 처음 두 줄을 가져오기
-            for enc in encodings:
-                try:
-                    with open(self.file_path_keyevent, 'r',encoding=enc) as source_file:
-                        lines = source_file.readlines()
-                    break
-                except Exception as e:
-                    last_exception = e
+            # 'keyeventline#' 열을 제외한 새로운 데이터프레임 생성
+            filtered_df = filtered_df.drop(columns=['keyeventline#'])
 
-            if lines:
-                header_lines = lines[:2]
-            else:
-                print("No lines were read. Last exception was:", last_exception)
-
-            # 새로운 CSV 파일에 처음 두 줄을 쓰기
-            file_path_keyevent_dest = replace_filename(self.file_path_keyevent, 'KeyBoardShadow_1_captured.txt')
+            # get initial file name
+            file_path_keyevent_dest = replace_filename(self.file_path_keyevent[0], 'KeyBoardShadow_1_captured.txt')
 
              # 파일 저장 대화 상자를 열고 파일 경로를 가져옴
             file_path_keyevent_dest = filedialog.asksaveasfilename(
@@ -270,19 +260,20 @@ class ControlPad:
             if file_path_keyevent_dest and os.path.isdir(os.path.dirname(file_path_keyevent_dest)):
                 try:
                     with open(file_path_keyevent_dest, 'w', encoding='utf-8') as dest_file:
-                        dest_file.writelines(header_lines)
+                        # 필터링된 행들을 직접 파일에 쓰기
+                        for index, row in filtered_df.iterrows():
+                            dest_file.write('\t'.join(map(str, row.values)) + '\n')
 
-                        # 필터링된 행들을 추가 모드로 쓰기
-                        filtered_df.to_csv(dest_file, sep='\t', index=False, header=False, mode='a', columns=df.columns.drop('Timestamp_dt'), lineterminator='\n')
                     print(f"File saved successfully to {file_path_keyevent_dest}")
                 except Exception as e:
                     print(f"An error occurred while writing the file: {e}")
             else:
-                 print("Invalid file path selected.")
+                print("Invalid file path selected.")
 
         except ValueError as e:
             print("Invalid timestamp format:", e)
             messagebox.showerror("Error", f"Invalid timestamp format: {e}")
+
 
 
     def reset_timestamp(self):

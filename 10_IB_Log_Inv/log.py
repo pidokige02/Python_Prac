@@ -83,9 +83,11 @@ class Log:
         # 탭으로 구분된 텍스트 파일을 인코딩을 지정하여 데이터 프레임으로 읽기
         for file_path in file_paths:
             try:
-                df = pd.read_csv(file_path, sep='\t', usecols=use_columns_keyevent, encoding='utf-8')
+                # df = pd.read_csv(file_path, sep='\t', usecols=use_columns_keyevent, encoding='utf-8')
+                df = pd.read_csv(file_path, sep='\t',  encoding='utf-8', low_memory=False)    # read the whole field
             except UnicodeDecodeError:
-                df = pd.read_csv(file_path, sep='\t', usecols=use_columns_keyevent, encoding='latin1')
+                # df = pd.read_csv(file_path, sep='\t', usecols=use_columns_keyevent, encoding='latin1')
+                df = pd.read_csv(file_path, sep='\t', encoding='latin1', low_memory=False)    # read the whole field
 
             df['Timestamp'] = df['Timestamp'].apply(extract_timestamp)
             dataframes.append(df)

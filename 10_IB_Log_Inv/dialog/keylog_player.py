@@ -7,7 +7,7 @@ class KeylogPlayer:
         self.root = root
         self.command = None
 
-    def show_input_dialog(self, default_command=""):
+    def show_input_dialog(self, default_command="",x=300, y=300):
         dialog = tk.Toplevel(self.root)
         dialog.title("Enter values")
 
@@ -15,7 +15,7 @@ class KeylogPlayer:
         dialog.resizable(True, False)
 
         # Set dialog size and make it modal
-        dialog.geometry("320x100")
+        dialog.geometry(f"320x100+{x}+{y}")
         dialog.grab_set()
 
         def on_ok():

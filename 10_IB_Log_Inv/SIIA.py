@@ -1,7 +1,8 @@
 import tkinter as tk
 from tkinter import ttk
 
-from Utils import *
+from Util.Utils import *
+from Util.monotor import *
 from event_win import *
 from info_win import *
 from peripheral_win import *
@@ -16,7 +17,14 @@ class App:
     def __init__(self, root):
         self.root = root
         self.root.title("Issue Inv Assistent")
-        self.root.geometry(MAINWIN_DIMENSION)  # 윈도우 크기를 800x600으로 설정
+        monitor_info = get_monitors()
+        largest_monitor = choose_bigger_monitor(monitor_info)
+        x, y, width, height = largest_monitor
+
+        # height/4의 결과를 정수로 변환
+        MAINWIN_DIMENSION = f"{width}x{int(height*0.25)}+{x}+{y}"        
+        print("MAINWIN_DIMENSION", MAINWIN_DIMENSION)
+        self.root.geometry(MAINWIN_DIMENSION)  # 윈도우 크기를  가장 큰 window 에 맞추어서 설정 height 는 window 의 1/4 로
 
         # Grid 레이아웃 설정
         self.root.grid_rowconfigure(1, weight=1)
@@ -37,11 +45,17 @@ class App:
 
         #log window creation
         self.logwin = LogWindow()
-        self.logwin.layout_LogWindow(root, LOGWIN_DIMENSION)
+        LOGWIN_DIMENSION = f"{int(width*0.75)}x{int(height*0.75)}+{x}+{y+int(height*0.25)}"        
+        # self.logwin.layout_LogWindow(root, LOGWIN_DIMENSION)
+        print("LOGWIN_DIMENSION", LOGWIN_DIMENSION)
+        self.logwin.layout_LogWindow(self.notebook, LOGWIN_DIMENSION)
 
         # keyevent window creation
         self.keyeventwin =  KeyEventWindow ()
-        self.keyeventwin.layout_KeyEventWindow(root, KEYEVENTWIN_DIMENSION)
+        KEYEVENTWIN_DIMENSION = f"{int(width*0.25)}x{int(height*0.75)}+{x + int(width*0.75)}+{y+int(height*0.25)}"        
+        # self.keyeventwin.layout_KeyEventWindow(root, KEYEVENTWIN_DIMENSION)
+        print("KEYEVENTWIN_DIMENSION", KEYEVENTWIN_DIMENSION)
+        self.keyeventwin.layout_KeyEventWindow(self.notebook, KEYEVENTWIN_DIMENSION)
 
         # for mutual data exchange
         self.logwin.set_keyevent_window(self.keyeventwin)

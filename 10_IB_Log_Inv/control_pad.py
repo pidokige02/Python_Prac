@@ -5,7 +5,7 @@ from tkinter import ttk
 from tkinter import filedialog
 from datetime import datetime
 
-from Utils import *
+from Util.Utils import *
 from configure_data import *
 from tkinter import messagebox
 from dialog.keylog_player import *
@@ -294,12 +294,14 @@ class ControlPad:
         default_ip_address="127.0.0.1"
         default_option="-c 1 -m 2"
         default_command=f"playback.exe -i {file_name} -t {default_ip_address} {default_option}"
-
+        x=1440
+        y=-810 
         command = self.keylogplayer.show_input_dialog(
-            default_command
+            default_command,x,y 
         )
 
         if command is None:
             return
-        final_command = command.replace(f"{file_name}", f"{file_path}")
+        final_command = command.replace(f"{file_name}", f"{file_path}")     
+        print("JInha", final_command)
         subprocess.Popen(['start', 'cmd', '/k', final_command], shell=True)

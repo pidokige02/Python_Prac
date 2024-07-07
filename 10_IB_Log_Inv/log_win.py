@@ -1,4 +1,5 @@
 import tkinter as tk
+import tkinter as ttk
 from tkinter import font
 from Util.Utils import *
 
@@ -90,30 +91,10 @@ class LogWindow:
 
         # 편집 메뉴
         edit_menu = tk.Menu(menubar, tearoff=0)
-        edit_menu.add_command(label="Find", command=self.find)
+        edit_menu.add_command(label="Find", command=lambda: self.create_find_dialog(self.log_window))
         menubar.add_cascade(label="Edit", menu=edit_menu)
 
         self.log_window.config(menu=menubar)
-
-    def find(self):
-
-        if self.find_dialog is not None and self.find_dialog.winfo_exists():
-            self.find_dialog.focus()
-            return
-        # 찾기 대화 상자를 생성하는 코드
-        self.find_dialog = tk.Toplevel(self.log_window)
-        self.find_dialog.title("Find in Log")
-
-        tk.Label(self.find_dialog, text="Find:").grid(row=0, column=0, padx=4, pady=4)
-
-        search_entry = tk.Entry(self.find_dialog)
-        search_entry.grid(row=0, column=1, padx=4, pady=4)
-
-        # Enter 키 이벤트와 find_next 메서드를 연결합니다.
-        search_entry.bind('<Return>', lambda event: self.find_next(search_entry.get()))
-
-        tk.Button(self.find_dialog, text="Find Prev", command=lambda: self.find_previous(search_entry.get())).grid(row=1, column=0, padx=2, pady=2)
-        tk.Button(self.find_dialog, text="Find Next", command=lambda: self.find_next(search_entry.get())).grid(row=1, column=1, padx=2, pady=2)
 
 
     def find_next(self, search_text):
@@ -157,8 +138,6 @@ class LogWindow:
         self.last_search_pos = end_pos
 
 
-
-
     def find_previous(self, search_text):
         # 역방향 찾기 기능 구현
         start_pos = self.log_text.search(search_text, self.last_search_pos, "1.0", backwards=True)
@@ -197,3 +176,63 @@ class LogWindow:
 
         # 마지막 검색 위치 업데이트
         self.last_search_pos = start_pos
+
+
+    def create_find_dialog(self, parent):
+
+        if self.find_dialog is not None and self.find_dialog.winfo_exists():
+            self.find_dialog.focus()
+            return
+
+        # Create a new top-level window
+        self.find_dialog = tk.Toplevel(parent)
+        self.find_dialog.title("Find in Log")
+
+        # Make the window resizable
+        self.find_dialog.resizable(False, False)
+
+        # Add a label and an entry widget
+        label = ttk.Label(self.find_dialog, text="Find:")
+        label.grid(row=0, column=0, padx=10, pady=10, sticky='w')
+
+        search_entry = ttk.Entry(self.find_dialog)
+        search_entry.grid(row=0, column=1, padx=10, pady=10, sticky='ew')
+
+        # Enter 키 이벤트와 find_next 메서드를 연결합니다.
+        search_entry.bind('<Return>', lambda event: self.find_next(search_entry.get()))
+        
+        # Add the buttons
+        find_prev_button = ttk.Button(self.find_dialog, text="Find Prev", command=lambda: self.find_previous(search_entry.get()))
+        find_prev_button.grid(row=1, column=0, padx=10, pady=10)
+
+        find_next_button = ttk.Button(self.find_dialog, text="Find Next", command=lambda: self.find_next(search_entry.get()))
+        find_next_button.grid(row=1, column=1, padx=10, pady=10)
+
+        # Configure the grid to expand the entry widget
+        self.find_dialog.grid_columnconfigure(1, weight=1)
+
+        # Bind the Escape key to close the dialog
+        self.find_dialog.bind('<Escape>', lambda event: self.find_dialog.destroy())
+
+        # Center the dialog on the screen
+        self.find_dialog.update_idletasks()
+
+        parent.update_idletasks()  # Ensure the parent window size and position are updated
+
+        parent_x = parent.winfo_rootx()
+        parent_y = parent.winfo_rooty()
+        parent_width = parent.winfo_width()
+        parent_height = parent.winfo_height()
+
+        dialog_width = self.find_dialog.winfo_width()
+        dialog_height = self.find_dialog.winfo_height()
+
+        x = parent_x + (parent_width // 2) - (dialog_width // 2)
+        y = parent_y + (parent_height // 2) - (dialog_height // 2)
+
+        self.find_dialog.geometry(f'{dialog_width}x{dialog_height}+{x}+{y}')
+
+        # Return the dialog to the main loop
+        self.find_dialog.transient(parent)
+        # self.find_dialog.grab_set()   # make it modess
+        parent.wait_window(self.find_dialog)

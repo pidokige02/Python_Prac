@@ -214,7 +214,7 @@ class LogWindow:
         # Bind the Escape key to close the dialog
         self.find_dialog.bind('<Escape>', lambda event: self.find_dialog.destroy())
 
-        # Center the dialog on the screen
+        # position the dialog on the screen
         self.find_dialog.update_idletasks()
 
         parent.update_idletasks()  # Ensure the parent window size and position are updated
@@ -222,17 +222,16 @@ class LogWindow:
         parent_x = parent.winfo_rootx()
         parent_y = parent.winfo_rooty()
         parent_width = parent.winfo_width()
-        parent_height = parent.winfo_height()
 
         dialog_width = self.find_dialog.winfo_width()
         dialog_height = self.find_dialog.winfo_height()
 
-        x = parent_x + (parent_width // 2) - (dialog_width // 2)
-        y = parent_y + (parent_height // 2) - (dialog_height // 2)
+        x = parent_x + parent_width - dialog_width
+        y = parent_y
 
         self.find_dialog.geometry(f'{dialog_width}x{dialog_height}+{x}+{y}')
 
         # Return the dialog to the main loop
         self.find_dialog.transient(parent)
-        # self.find_dialog.grab_set()   # make it modess
+        # self.find_dialog.grab_set()   # make it modal
         parent.wait_window(self.find_dialog)

@@ -173,21 +173,19 @@ class KeyEventWindow:
         # Bind the Escape key to close the dialog
         self.find_dialog.bind('<Escape>', lambda event: self.find_dialog.destroy())
 
-        # Center the dialog on the screen
+        # position the dialog on the screen
         self.find_dialog.update_idletasks()
 
         parent.update_idletasks()  # Ensure the parent window size and position are updated
 
         parent_x = parent.winfo_rootx()
         parent_y = parent.winfo_rooty()
-        parent_width = parent.winfo_width()
-        parent_height = parent.winfo_height()
 
         dialog_width = self.find_dialog.winfo_width()
         dialog_height = self.find_dialog.winfo_height()
 
-        x = parent_x + (parent_width // 2) - (dialog_width // 2)
-        y = parent_y + (parent_height // 2) - (dialog_height // 2)
+        x = parent_x - dialog_width  #  position find dialog on the right side of parent window 
+        y = parent_y  #  
 
         self.find_dialog.geometry(f'{dialog_width}x{dialog_height}+{x}+{y}')
 

@@ -23,7 +23,6 @@ class ControlPad:
         self.timestamp_from = None
         self.timestamp_to = None
         self.file_path_keyevent = []
-        # self.address = None
         self.keylog_playback_button = None
         self.last_opened_log_file = None
         self.last_opened_keyevent_file = []
@@ -294,10 +293,9 @@ class ControlPad:
         default_ip_address="127.0.0.1"
         default_option="-c 1 -m 2"
         default_command=f"playback.exe -i {file_name} -t {default_ip_address} {default_option}"
-        x=1440
-        y=-810 
         command = self.keylogplayer.show_input_dialog(
-            default_command,x,y 
+            self.right_frame,
+            default_command 
         )
 
         if command is None:

@@ -90,6 +90,8 @@ class Log:
                 df = pd.read_csv(file_path, sep='\t', encoding='latin1', low_memory=False)    # read the whole field
 
             df['Timestamp'] = df['Timestamp'].apply(extract_timestamp)
+            df['Timestamp'] = pd.to_datetime(df['Timestamp'], utc=True)
+
             dataframes.append(df)
 
         # Concatenate all dataframes

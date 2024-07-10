@@ -106,7 +106,9 @@ class ControlPad:
         if content:
             try:
                 self.clear_eventlog()
+                self.app.logwin.log_text.config(state=tk.NORMAL)
                 self.app.logwin.log_text.insert(tk.END, content)
+                self.app.logwin.log_text.config(state=tk.DISABLED)
                 self.app.log.load_log(file_path, use_columns_log)
                 self.app.log.add_columns_log()
                 self.app.log.analyze_log ()
@@ -172,14 +174,18 @@ class ControlPad:
         if file_contents:
             self.clear_keyeventlog()
             combined_content = "\n".join(file_contents)
+            self.app.keyeventwin.keyevent_text.config(state=tk.NORMAL)
             self.app.keyeventwin.keyevent_text.insert(tk.END, combined_content)
+            self.app.keyeventwin.keyevent_text.config(state=tk.DISABLED)
             try:
+                self.app.keyeventwin.keyevent_window.iconify()
                 self.app.log.load_keyevent_log(self.file_path_keyevent, use_columns_keyevent)
                 self.app.log.add_columns_keyevent()
                 filtered_df = self.app.log.filter_event()  # filter out normal event table
                 filtered_df = self.app.log.analyze_keyevent(filtered_df)
                 self.app.eventWin.update_EventWindow(filtered_df)
                 self.last_opened_keyevent_file = self.file_path_keyevent
+                self.app.keyeventwin.keyevent_window.deiconify()
             except Exception as e:
                 last_exception = e
                 self.last_opened_keyevent_file = []
@@ -300,6 +306,7 @@ class ControlPad:
 
         if command is None:
             return
-        final_command = command.replace(f"{file_name}", f"{file_path}")     
-        print("JInha", final_command)
+        final_command = command.replace(f"{file_name}", f"{file_path}")
+        # script_dir = os.path.dirname(os.path.abspath(__file__))
+        # os.chdir(script_dir)             
         subprocess.Popen(['start', 'cmd', '/k', final_command], shell=True)

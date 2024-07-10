@@ -33,7 +33,7 @@ use_columns_device = ['Name', 'ProductName', 'MfgName', 'Status']
 
 
 #event window 에서 보여줄 column 정보
-event_columns = [('col1','Timestamp', 100),('col2','Event', 50),('col3','Info', 50),('col4','line#', 50),('col5','keyeventline#', 50)]
+event_columns = [('col1','Timestamp', 50),('col2','Event', 50),('col3','Info', 500),('col4','line#', 15),('col5','keyeventline#', 15)]
 
 peripheral_columns = [('col1','Name', 100),('col2','ProductName', 100),('col3','MfgName',100),('col4','Status',100)]
 

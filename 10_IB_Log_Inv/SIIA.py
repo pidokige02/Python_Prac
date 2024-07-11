@@ -20,6 +20,7 @@ class App:
         monitor_info = get_monitors()
         largest_monitor = choose_bigger_monitor(monitor_info)
         x, y, width, height = largest_monitor
+        print("MONITOR_DIMENSION", f"{width}x{height}+{x}+{y}")
 
         # height/4의 결과를 정수로 변환
         MAINWIN_DIMENSION = f"{width}x{int(height*0.25)}+{x}+{y}"        
@@ -36,7 +37,7 @@ class App:
         style.configure("Blue.TLabel", foreground="blue", font=("Helvetica", 16, "bold"))
 
         # 제목 라벨
-        title_label = ttk.Label(root, text="Issue Inv Assistant (ver1)", style="Blue.TLabel")
+        title_label = ttk.Label(root, text="Issue Inv Assistant (ver 1)", style="Blue.TLabel")
         title_label.grid(row=0, column=0, padx=10, pady=10, sticky=tk.W)
 
         # Notebook 생성
@@ -45,15 +46,13 @@ class App:
 
         #log window creation
         self.logwin = LogWindow()
-        LOGWIN_DIMENSION = f"{int(width*0.75)}x{int(height*0.75)}+{x}+{y+int(height*0.25)}"        
-        # self.logwin.layout_LogWindow(root, LOGWIN_DIMENSION)
+        LOGWIN_DIMENSION = f"{int(width*0.75)}x{int(height*0.65)}+{x}+{y+int(height*0.3)}"        
         print("LOGWIN_DIMENSION", LOGWIN_DIMENSION)
         self.logwin.layout_LogWindow(self.notebook, LOGWIN_DIMENSION)
 
         # keyevent window creation
         self.keyeventwin =  KeyEventWindow ()
-        KEYEVENTWIN_DIMENSION = f"{int(width*0.25)}x{int(height*0.75)}+{x + int(width*0.75)}+{y+int(height*0.25)}"        
-        # self.keyeventwin.layout_KeyEventWindow(root, KEYEVENTWIN_DIMENSION)
+        KEYEVENTWIN_DIMENSION = f"{int(width*0.25)}x{int(height*0.65)}+{x + int(width*0.75)}+{y+int(height*0.3)}"        
         print("KEYEVENTWIN_DIMENSION", KEYEVENTWIN_DIMENSION)
         self.keyeventwin.layout_KeyEventWindow(self.notebook, KEYEVENTWIN_DIMENSION)
 

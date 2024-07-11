@@ -41,7 +41,11 @@ class Log:
                     match = re.search(pattern, row['Text'])
                     if match:
                         if(skip != None ):
-                            event_info = match.group(info_idx) if match.lastindex else match.group(0)
+                            if event == 'RunState':
+                                # 'RunState' 이벤트의 경우 여러 그룹을 결합하여 event_info를 구성
+                                event_info = f"{match.group(1)} / {match.group(2)} / {match.group(3)}"
+                            else:
+                                event_info = match.group(info_idx) if match.lastindex else match.group(0)
                             if (event_info !='<none>'):
                                 self.df.at[index, 'Event'] = event
                                 self.df.at[index, 'Info'] = event_info

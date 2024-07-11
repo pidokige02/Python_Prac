@@ -63,12 +63,16 @@ class ControlPad:
 
     def clear_eventlog(self):
         self.app.log.clear_eventdata()
+        self.app.logwin.log_text.config(state=tk.NORMAL)
         self.app.logwin.log_text.delete('1.0', tk.END)
+        self.app.logwin.log_text.config(state=tk.DISABLED)
 
 
     def clear_keyeventlog(self):
         self.app.log.clear_keyeventdata()
+        self.app.keyeventwin.keyevent_text.config(state=tk.NORMAL)
         self.app.keyeventwin.keyevent_text.delete('1.0', tk.END)
+        self.app.keyeventwin.keyevent_text.config(state=tk.DISABLED)
 
 
     def clear_devicelog(self):
@@ -158,7 +162,7 @@ class ControlPad:
                             print(f"No 'Timestamp' found in the first line of {file_path}. Skipping this file.")
                             break
                         # 유효한 파일로 추가
-                        valid_file_paths.append(file_path)                        
+                        valid_file_paths.append(file_path)
 
                         if idx >= 1:
                             content = "".join(lines[2:-3])  # 두 번째 및 그 이후 파일에 대해 처음 두 줄과 마지막 세 줄 건너뛰기
@@ -272,7 +276,7 @@ class ControlPad:
                     for line in lines_to_save:
                         file.write(line + '\n')
                 print(f"파일이 성공적으로 저장되었습니다: {file_path_keyevent_dest}")
- 
+
             else:
                 print("Invalid file path selected.")
 
@@ -302,12 +306,12 @@ class ControlPad:
         default_command=f"playback.exe -i {file_name} -t {default_ip_address} {default_option}"
         command = self.keylogplayer.show_input_dialog(
             self.right_frame,
-            default_command 
+            default_command
         )
 
         if command is None:
             return
         final_command = command.replace(f"{file_name}", f"{file_path}")
         # script_dir = os.path.dirname(os.path.abspath(__file__))
-        # os.chdir(script_dir)             
+        # os.chdir(script_dir)
         subprocess.Popen(['start', 'cmd', '/k', final_command], shell=True)

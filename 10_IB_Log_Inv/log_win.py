@@ -186,6 +186,7 @@ class LogWindow:
 
         # Create a new top-level window
         self.find_dialog = tk.Toplevel(parent)
+        self.find_dialog.withdraw()
         self.find_dialog.title("Find in Log")
 
         # Make the window resizable
@@ -230,6 +231,9 @@ class LogWindow:
         y = parent_y
 
         self.find_dialog.geometry(f'{dialog_width}x{dialog_height}+{x}+{y}')
+
+        # 위치 설정 후 대화상자를 보이도록 설정
+        self.find_dialog.deiconify()
 
         # Return the dialog to the main loop
         self.find_dialog.transient(parent)

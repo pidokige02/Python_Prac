@@ -91,7 +91,6 @@ class KeyEventWindow:
 
 
     def find_next(self, search_text):
-        print("JInha 2 find_next", search_text)
         # 찾기 기능 구현
         start_pos = self.keyevent_text.search(search_text, self.last_search_pos, tk.END)
         if not start_pos:
@@ -145,6 +144,7 @@ class KeyEventWindow:
 
         # Create a new top-level window
         self.find_dialog = tk.Toplevel(parent)
+        self.find_dialog.withdraw()
         self.find_dialog.title("Find in KeyLog")
 
         # Make the window resizable
@@ -189,6 +189,9 @@ class KeyEventWindow:
 
         self.find_dialog.geometry(f'{dialog_width}x{dialog_height}+{x}+{y}')
 
+        # 위치 설정 후 대화상자를 보이도록 설정
+        self.find_dialog.deiconify()
+        
         # Return the dialog to the main loop
         self.find_dialog.transient(parent)
         # self.find_dialog.grab_set()   # make it modess

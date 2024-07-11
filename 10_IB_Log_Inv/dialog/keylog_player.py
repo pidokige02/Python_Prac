@@ -10,6 +10,7 @@ class KeylogPlayer:
 
     def show_input_dialog(self, parent, default_command=""):
         self.dialog = tk.Toplevel(parent)
+        self.dialog.withdraw()  # 먼저 창을 숨김
         self.dialog.title("Enter values")
 
         # 창 크기 조절 비활성화
@@ -65,6 +66,9 @@ class KeylogPlayer:
         y = parent_y + parent_height 
 
         self.dialog.geometry(f'{dialog_width}x{dialog_height}+{x}+{y}')
+
+        # 위치 설정 후 대화상자를 보이도록 설정
+        self.dialog.deiconify()
 
         # Return the dialog to the main loop
         self.dialog.transient(parent)

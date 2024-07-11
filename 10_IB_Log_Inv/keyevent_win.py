@@ -22,6 +22,9 @@ class KeyEventWindow:
         self.keyevent_window.title("Key Log")
         self.keyevent_window.geometry(dimension)
 
+        # 닫기 버튼 비활성화
+        self.keyevent_window.protocol("WM_DELETE_WINDOW", self.disable_close_button)
+
         # 메뉴 추가
         self.create_menu()
 
@@ -191,8 +194,43 @@ class KeyEventWindow:
 
         # 위치 설정 후 대화상자를 보이도록 설정
         self.find_dialog.deiconify()
-        
+
         # Return the dialog to the main loop
         self.find_dialog.transient(parent)
         # self.find_dialog.grab_set()   # make it modess
         parent.wait_window(self.find_dialog)
+
+
+    def disable_close_button(self):
+        pass  # 아무 동작도 하지 않음
+
+
+    def get_matching_lines(self, search_text):
+        start_pos = "1.0"
+        matching_lines = []
+
+        while True:
+            start_pos = self.keyevent_text.search(search_text, start_pos, tk.END)
+            if not start_pos:
+                break
+            line_number = start_pos.split(".")[0]
+            matching_lines.append(line_number)
+            start_pos = f"{start_pos}+1c"
+
+        return matching_lines 
+    
+
+    def get_matching_lines_with_text(self, search_text):
+        start_pos = "1.0"
+        matching_lines = []
+
+        while True:
+            start_pos = self.keyevent_text.search(search_text, start_pos, tk.END)
+            if not start_pos:
+                break
+            line_number = start_pos.split(".")[0]
+            line_text = self.keyevent_text.get(f"{line_number}.0", f"{line_number}.0 lineend")
+            matching_lines.append((line_number, line_text))
+            start_pos = f"{start_pos}+1c"
+
+        return matching_lines

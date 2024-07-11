@@ -28,6 +28,9 @@ class LogWindow:
         self.log_window.title("Log")
         self.log_window.geometry(dimension)
 
+        # 닫기 버튼 비활성화
+        self.log_window.protocol("WM_DELETE_WINDOW", self.disable_close_button)
+
         # 메뉴 추가
         self.create_menu()
 
@@ -239,3 +242,7 @@ class LogWindow:
         self.find_dialog.transient(parent)
         # self.find_dialog.grab_set()   # make it modal
         parent.wait_window(self.find_dialog)
+
+
+    def disable_close_button(self):
+        pass  # 아무 동작도 하지 않음

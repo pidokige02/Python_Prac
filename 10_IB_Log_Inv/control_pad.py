@@ -242,15 +242,20 @@ class ControlPad:
             if pd.isna(timestamp_from_dt) or pd.isna(timestamp_to_dt):
                 raise ValueError("One or both timestamps are invalid")
 
+            from_lines = self.app.keyeventwin.get_matching_lines(timestamp_from_value)
+            to_lines = self.app.keyeventwin.get_matching_lines(timestamp_to_value)
 
-            # 주어진 타임스탬프 범위에 있는 행들만 필터링
-            filtered_df = self.app.log.df_keyevent[(self.app.log.df_keyevent['Timestamp'] >= timestamp_from_dt) & (self.app.log.df_keyevent['Timestamp'] <= timestamp_to_dt)]
+            from_line_number = int(from_lines[0])  # 첫 번째 라인의 번호
+            to_line_number = int(to_lines[-1])     # 마지막 라인의 번호
 
-            # 'Timestamp' 열을 원하는 형식으로 변환
-            filtered_df['Timestamp'] = filtered_df['Timestamp'].apply(format_timestamp_with_seven_microseconds)            
+            # 저장할 라인들을 담을 리스트를 초기화합니다.
+            lines_to_save = []
+            keyevent_text_widget = self.app.keyeventwin.keyevent_text
 
-            # 'keyeventline#' 열을 제외한 새로운 데이터프레임 생성
-            filtered_df = filtered_df.drop(columns=['keyeventline#'])
+            # from_line_number부터 to_line_number까지의 라인을 추출하여 리스트에 저장합니다.
+            for line_number in range(from_line_number, to_line_number + 1):
+                line = keyevent_text_widget.get(f"{line_number}.0", f"{line_number}.end")
+                lines_to_save.append(line)
 
             # get initial file name
             file_path_keyevent_dest = replace_filename(self.file_path_keyevent[0], 'KeyBoardShadow_1_captured.txt')
@@ -263,15 +268,11 @@ class ControlPad:
             )
 
             if file_path_keyevent_dest and os.path.isdir(os.path.dirname(file_path_keyevent_dest)):
-                try:
-                    with open(file_path_keyevent_dest, 'w', encoding='utf-8') as dest_file:
-                        # 필터링된 행들을 직접 파일에 쓰기
-                        for index, row in filtered_df.iterrows():
-                            dest_file.write('\t'.join(map(str, row.values)) + '\n')
-
-                    print(f"File saved successfully to {file_path_keyevent_dest}")
-                except Exception as e:
-                    print(f"An error occurred while writing the file: {e}")
+                with open(file_path_keyevent_dest, 'w', encoding='utf-8') as file:
+                    for line in lines_to_save:
+                        file.write(line + '\n')
+                print(f"파일이 성공적으로 저장되었습니다: {file_path_keyevent_dest}")
+ 
             else:
                 print("Invalid file path selected.")
 

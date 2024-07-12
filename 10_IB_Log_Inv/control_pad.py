@@ -293,13 +293,19 @@ class ControlPad:
 
     def keylog_playback(self):
 
-        file_path = filedialog.askopenfilename()
+        file_path = filedialog.askopenfilename(
+        title="Select a KeyBoardShadow log file",
+        filetypes=[("Log Files", "*KeyBoardShadow*")])
 
         if not file_path:  # 파일이 선택되지 않으면 함수 종료
             print("No file is selected")
             return
 
         file_name = os.path.basename(file_path)
+        if "KeyBoardShadow" not in file_name:
+            messagebox.showerror("Invalid File", "The selected file does not contain 'KeyBoardShadow' in its name.")
+            return        
+
          # 파일 이름만 추출
         default_ip_address="127.0.0.1"
         default_option="-c 1 -m 2"

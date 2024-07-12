@@ -1,5 +1,6 @@
 import tkinter as tk
 import tkinter as ttk
+from tkinter import ttk, messagebox
 from tkinter import font
 
 # keyboard 의 history 를 보여주는 window.
@@ -141,6 +142,11 @@ class KeyEventWindow:
 
     def create_find_dialog(self, parent):
 
+        # log_text에 내용이 있는지 확인
+        if not self.keyevent_text.get(1.0, tk.END).strip():
+            messagebox.showwarning("Warning", "Log content is empty. Cannot open Find dialog.")
+            return
+
         if self.find_dialog is not None and self.find_dialog.winfo_exists():
             self.find_dialog.focus()
             return
@@ -220,17 +226,3 @@ class KeyEventWindow:
         return matching_lines 
     
 
-    def get_matching_lines_with_text(self, search_text):
-        start_pos = "1.0"
-        matching_lines = []
-
-        while True:
-            start_pos = self.keyevent_text.search(search_text, start_pos, tk.END)
-            if not start_pos:
-                break
-            line_number = start_pos.split(".")[0]
-            line_text = self.keyevent_text.get(f"{line_number}.0", f"{line_number}.0 lineend")
-            matching_lines.append((line_number, line_text))
-            start_pos = f"{start_pos}+1c"
-
-        return matching_lines

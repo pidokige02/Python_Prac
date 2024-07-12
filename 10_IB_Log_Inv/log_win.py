@@ -1,5 +1,6 @@
 import tkinter as tk
 import tkinter as ttk
+from tkinter import ttk, messagebox
 from tkinter import font
 from Util.Utils import *
 
@@ -182,6 +183,11 @@ class LogWindow:
 
 
     def create_find_dialog(self, parent):
+
+        # log_text에 내용이 있는지 확인
+        if not self.log_text.get(1.0, tk.END).strip():
+            messagebox.showwarning("Warning", "Log content is empty. Cannot open Find dialog.")
+            return
 
         if self.find_dialog is not None and self.find_dialog.winfo_exists():
             self.find_dialog.focus()

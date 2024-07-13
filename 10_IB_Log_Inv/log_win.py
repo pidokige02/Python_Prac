@@ -121,9 +121,17 @@ class LogWindow:
         self.log_window.config(menu=menubar)
 
 
+    def find_next_from_entry(self, search_entry):
+        search_text = search_entry.get()
+        self.find_next(search_text)
+
+    def find_previous_from_entry(self, search_entry):
+        search_text = search_entry.get()
+        self.find_previous(search_text)
+
+
     def find_next(self, search_text):
 
-        print("JInha find_next", search_text)
         # 찾기 기능 구현
         start_pos = self.log_text.search(search_text, self.last_search_pos, tk.END)
         if not start_pos:
@@ -229,13 +237,14 @@ class LogWindow:
         search_entry.grid(row=0, column=1, padx=10, pady=10, sticky='ew')
 
         # Enter 키 이벤트와 find_next 메서드를 연결합니다.
-        search_entry.bind('<Return>', lambda event: self.find_next(search_entry.get()))
+        search_entry.bind('<Return>', lambda event: self.find_next_from_entry(search_entry))
+
         
         # Add the buttons
-        find_prev_button = ttk.Button(self.find_dialog, text="Find Prev", command=lambda: self.find_previous(search_entry.get()))
+        find_prev_button = ttk.Button(self.find_dialog, text="Find Prev", command=lambda: self.find_previous_from_entry(search_entry))
         find_prev_button.grid(row=1, column=0, padx=10, pady=10)
 
-        find_next_button = ttk.Button(self.find_dialog, text="Find Next", command=lambda: self.find_next(search_entry.get()))
+        find_next_button = ttk.Button(self.find_dialog, text="Find Next", command=lambda: self.find_next_from_entry(search_entry))
         find_next_button.grid(row=1, column=1, padx=10, pady=10)
 
         # Configure the grid to expand the entry widget

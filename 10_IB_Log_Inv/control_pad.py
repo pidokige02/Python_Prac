@@ -1,5 +1,6 @@
 import os
 import subprocess
+import shlex
 import tkinter as tk
 from tkinter import ttk
 from tkinter import filedialog
@@ -322,7 +323,10 @@ class ControlPad:
 
         if command is None:
             return
-        final_command = command.replace(f"{file_name}", f"{file_path}")
-        # script_dir = os.path.dirname(os.path.abspath(__file__))
-        # os.chdir(script_dir)
+        
+        # 파일 경로에 큰따옴표 추가하여 명령어 생성
+        quoted_file_path = shlex.quote(file_path)        
+        final_command = command.replace(f"{file_name}", quoted_file_path)
+
+        print("Jinha", final_command)    
         subprocess.Popen(['start', 'cmd', '/k', final_command], shell=True)

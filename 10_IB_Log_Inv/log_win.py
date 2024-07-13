@@ -64,6 +64,12 @@ class LogWindow:
          # 마우스 휠 이벤트 바인딩
         self.log_text.bind("<Control-MouseWheel>", self.on_mouse_wheel)
 
+        # 화살표 키 이벤트 바인딩
+        self.log_text.bind("<Up>", self.on_arrow_key)
+        self.log_text.bind("<Down>", self.on_arrow_key)
+        self.log_text.bind("<Prior>", self.page_up)
+        self.log_text.bind("<Next>", self.page_down)
+
 
     def on_mouse_wheel(self, event):
         if event.delta > 0:
@@ -72,6 +78,20 @@ class LogWindow:
             self.current_font_size -= 1  # 폰트 크기 감소
         self.text_font.configure(size=self.current_font_size)
         self.log_text.configure(font=self.text_font)
+
+
+    def on_arrow_key(self, event):
+        if event.keysym == "Up":
+            self.log_text.yview_scroll(-1, "units")
+        elif event.keysym == "Down":
+            self.log_text.yview_scroll(1, "units")
+
+
+    def page_up(self, event):
+        self.log_text.yview_scroll(-1, "pages")
+
+    def page_down(self, event):
+        self.log_text.yview_scroll(1, "pages")
 
 
     def scroll_to_line(self, line_number):

@@ -57,6 +57,13 @@ class KeyEventWindow:
 
          # 마우스 휠 이벤트 바인딩
         self.keyevent_text.bind("<Control-MouseWheel>", self.on_mouse_wheel)
+        # 화살표 키 이벤트 바인딩
+        self.keyevent_text.bind("<Up>", self.scroll_up)
+        self.keyevent_text.bind("<Down>", self.scroll_down)
+
+        # 페이지 업/다운 키 이벤트 바인딩
+        self.keyevent_text.bind("<Prior>", self.page_up)
+        self.keyevent_text.bind("<Next>", self.page_down)
 
 
     def on_mouse_wheel(self, event):
@@ -68,6 +75,18 @@ class KeyEventWindow:
         self.keyevent_text.configure(font=self.text_font)
 
 
+    def scroll_up(self, event):
+        self.keyevent_text.yview_scroll(-1, "units")
+
+    def scroll_down(self, event):
+        self.keyevent_text.yview_scroll(1, "units")
+
+    def page_up(self, event):
+        self.keyevent_text.yview_scroll(-1, "pages")
+
+    def page_down(self, event):
+        self.keyevent_text.yview_scroll(1, "pages")
+        
     def scroll_to_line(self, line_number):
         # Clear previous highlights
         self.keyevent_text.tag_remove("highlight", "1.0", "end")

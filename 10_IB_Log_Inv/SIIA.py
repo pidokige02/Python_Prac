@@ -119,8 +119,11 @@ class App:
             pass
 
     def on_root_focus_in(self, event):
-        self.logwin.log_text.focus_set()
-        self.keyeventwin.keyevent_text.focus_set()
+        # if self.logwin.log_text.winfo_ismapped():
+        #     self.logwin.log_window.deiconify()
+        # if self.keyeventwin.keyevent_text.winfo_ismapped():
+        #     self.keyeventwin.keyevent_window.deiconify()
+        pass
 
     def on_minimize(self, event):
         self.logwin.log_window.iconify()

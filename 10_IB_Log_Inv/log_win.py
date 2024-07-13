@@ -136,6 +136,7 @@ class LogWindow:
         start_pos = self.log_text.search(search_text, self.last_search_pos, tk.END)
         if not start_pos:
             print("Text not found")
+            self.last_search_pos = "1.0"  # initialize last_search_pos.
             return
 
         end_pos = f"{start_pos}+{len(search_text)}c"
@@ -175,6 +176,7 @@ class LogWindow:
         start_pos = self.log_text.search(search_text, self.last_search_pos, "1.0", backwards=True)
         if not start_pos:
             print("Text not found")
+            self.last_search_pos = "1.0"  # initialize last_search_pos.
             return
 
         end_pos = f"{start_pos}+{len(search_text)}c"
@@ -221,6 +223,7 @@ class LogWindow:
             self.find_dialog.focus()
             return
 
+        self.last_search_pos = "1.0"  # initialize last_search_pos.  
         # Create a new top-level window
         self.find_dialog = tk.Toplevel(parent)
         self.find_dialog.withdraw()

@@ -86,6 +86,10 @@ class App:
         # main window 에 focus 가 오면 log window 와 key log window 도 같이 activate 되도록 함.
         self.root.bind("<FocusIn>", self.on_root_focus_in)
 
+        # Bind Unmap and Map events to handle minimize and restore
+        self.root.bind("<Unmap>", self.on_minimize)
+        self.root.bind("<Map>", self.on_restore)
+
 
     def on_vertical_scroll(self, *args):
         print(f"Scrolled to: {args}")
@@ -117,6 +121,14 @@ class App:
     def on_root_focus_in(self, event):
         self.logwin.log_text.focus_set()
         self.keyeventwin.keyevent_text.focus_set()
+
+    def on_minimize(self, event):
+        self.logwin.log_window.iconify()
+        self.keyeventwin.keyevent_window.iconify()
+
+    def on_restore(self, event):
+        self.logwin.log_window.deiconify()
+        self.keyeventwin.keyevent_window.deiconify()
 
 
 if __name__ == "__main__":

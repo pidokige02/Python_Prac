@@ -83,7 +83,8 @@ class App:
 
         # # 포커스 및 이벤트 관리
         self.root.bind_all("<FocusIn>", self.on_focus_in)
-
+        # main window 에 focus 가 오면 log window 와 key log window 도 같이 activate 되도록 함.
+        self.root.bind("<FocusIn>", self.on_root_focus_in)
 
 
     def on_vertical_scroll(self, *args):
@@ -112,6 +113,11 @@ class App:
         else:
             # print("Other window is focused", widget, widget.winfo_name(), widget.winfo_class())
             pass
+
+    def on_root_focus_in(self, event):
+        self.logwin.log_text.focus_set()
+        self.keyeventwin.keyevent_text.focus_set()
+
 
 if __name__ == "__main__":
     root = tk.Tk()

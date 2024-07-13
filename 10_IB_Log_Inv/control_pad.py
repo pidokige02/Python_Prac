@@ -174,6 +174,7 @@ class ControlPad:
                     last_exception = e
 
         self.file_path_keyevent = valid_file_paths
+        print ("Jinha",self.file_path_keyevent)
 
         if file_contents:
             self.clear_keyeventlog()
@@ -248,6 +249,9 @@ class ControlPad:
 
             from_lines = self.app.keyeventwin.get_matching_lines(timestamp_from_value)
             to_lines = self.app.keyeventwin.get_matching_lines(timestamp_to_value)
+            
+            if len(from_lines) == 0 or len(to_lines) == 0:
+                raise ValueError("from_lines or to_lines are invalid")
 
             from_line_number = int(from_lines[0])  # 첫 번째 라인의 번호
             to_line_number = int(to_lines[-1])     # 마지막 라인의 번호

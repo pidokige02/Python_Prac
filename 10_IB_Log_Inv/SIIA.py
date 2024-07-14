@@ -84,7 +84,6 @@ class App:
         # # 포커스 및 이벤트 관리
         self.root.bind_all("<FocusIn>", self.on_focus_in)
         # main window 에 focus 가 오면 log window 와 key log window 도 같이 activate 되도록 함.
-        self.root.bind("<FocusIn>", self.on_root_focus_in)
 
         # Bind Unmap and Map events to handle minimize and restore
         self.root.bind("<Unmap>", self.on_minimize)
@@ -118,20 +117,16 @@ class App:
             # print("Other window is focused", widget, widget.winfo_name(), widget.winfo_class())
             pass
 
-    def on_root_focus_in(self, event):
-        # if self.logwin.log_text.winfo_ismapped():
-        #     self.logwin.log_window.deiconify()
-        # if self.keyeventwin.keyevent_text.winfo_ismapped():
-        #     self.keyeventwin.keyevent_window.deiconify()
-        pass
 
     def on_minimize(self, event):
-        self.logwin.log_window.iconify()
-        self.keyeventwin.keyevent_window.iconify()
+        if str(event.widget) == str(self.root):
+            self.logwin.log_window.withdraw()
+            self.keyeventwin.keyevent_window.withdraw()
 
     def on_restore(self, event):
-        self.logwin.log_window.deiconify()
-        self.keyeventwin.keyevent_window.deiconify()
+        if str(event.widget) == str(self.root):
+            self.logwin.log_window.deiconify()
+            self.keyeventwin.keyevent_window.deiconify() 
 
 
 if __name__ == "__main__":

@@ -132,13 +132,50 @@ class ControlPad:
             self.last_opened_log_file = None
             return None
 
-    def open_KB_log(self, file_path):
+
+    def sort_filename_order_by_timestamp(self, file_path):
 
         directory_path = get_directory_name(file_path)
         pattern = '*KeyBoardShadow*'
 
-        self.file_path_keyevent = find_files(directory_path, pattern)
-        valid_file_paths = []
+        file_paths = find_files(directory_path, pattern)
+
+        encodings = ['latin1', 'utf-8', 'cp949']
+        last_exception = None
+        sorted_file_paths = []
+
+        for idx, file_path in enumerate(file_paths):
+
+            content = []
+            for enc in encodings:
+                try:
+                    with open(file_path, 'r', encoding=enc) as file:
+                        for _ in range(3):  # 처음 3줄만 읽기
+                            line = file.readline()
+                            if line:
+                                content.append(line.strip())
+                            else:
+                                break
+
+                        if 'Timestamp' not in content[0]:
+                            print(f"No 'Timestamp' found in the first line of {file_path}. Skipping this file.")
+                            break                        # 유효한 파일로 추가
+
+                        timestamp = content[2].split('\t')[0]
+                        sorted_file_paths.append((timestamp, file_path))
+                        break
+                except Exception as e:
+                    last_exception = e
+                    print(f"Failed to read keyevent file:\n{last_exception}")
+
+        # 타임스탬프를 기준으로 파일 경로들을 정렬
+        sorted_file_paths.sort()
+        return [file_path for _, file_path in sorted_file_paths]
+
+
+    def open_KB_log(self, file_path):
+
+        self.file_path_keyevent = self.sort_filename_order_by_timestamp(file_path)
 
         encodings = ['latin1', 'utf-8', 'cp949']
         last_exception = None
@@ -150,6 +187,7 @@ class ControlPad:
             self.app.eventWin.update_EventWindow(filtered_df)
             return
 
+        self.sort_filename_order_by_timestamp(file_path)
 
         file_contents = []
 
@@ -159,11 +197,6 @@ class ControlPad:
                 try:
                     with open(file_path, 'r', encoding=enc) as file:
                         lines = file.readlines()
-                        if 'Timestamp' not in lines[0]:
-                            print(f"No 'Timestamp' found in the first line of {file_path}. Skipping this file.")
-                            break
-                        # 유효한 파일로 추가
-                        valid_file_paths.append(file_path)
 
                         if idx >= 1:
                             content = "".join(lines[2:-2]).rstrip("\n")  # 두 번째 및 그 이후 파일에 대해 처음 두 줄과 마지막 두 줄 건너뛰기, line을 모두 합친다음 다지막 개항문제를 제거
@@ -174,9 +207,6 @@ class ControlPad:
                         break
                 except Exception as e:
                     last_exception = e
-
-        self.file_path_keyevent = valid_file_paths
-        print ("Jinha",self.file_path_keyevent)
 
         if file_contents:
             self.clear_keyeventlog()

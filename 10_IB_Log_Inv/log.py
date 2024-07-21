@@ -11,6 +11,10 @@ class Log:
 
         self.df_device = None
         self.df_keyevent = None
+        
+        # crash data의 첫번째 lnne만 잃어서 표시하기 위하여 
+        self.first_lines_with_timestamps = {}
+
 
 
     def load_log (self, file_path, use_columns_log):
@@ -19,6 +23,17 @@ class Log:
             self.df = pd.read_csv(file_path, sep='\t', usecols=use_columns_log, encoding='utf-8')
         except UnicodeDecodeError:
             self.df = pd.read_csv(file_path, sep='\t', usecols=use_columns_log, encoding='latin1')
+
+        # self.df['Timestamp'] = self.df['Timestamp'].apply(extract_timestamp)
+
+        # # Get the timezone of the first valid timestamp if not already set
+        # if target_tz is None:
+        #     first_valid_timestamp = self.df['Timestamp'].dropna().iloc[0]
+        #     target_tz = first_valid_timestamp.tz
+        # # Convert all timestamps to the target timezone
+        # self.df['Timestamp'] = self.df['Timestamp'].apply(lambda x: x.astimezone(target_tz) if pd.notnull(x) else x)
+
+        print("load_log", self.df)
 
 
     # 새로운 열 추가 - 예: 새로운 열 'NewColumn'에 기본값 0 할당
@@ -84,6 +99,8 @@ class Log:
 
     def load_keyevent_log (self, file_paths, use_columns_keyevent):
         dataframes = []
+        target_tz = None
+
         # 탭으로 구분된 텍스트 파일을 인코딩을 지정하여 데이터 프레임으로 읽기
         for file_path in file_paths:
             try:
@@ -94,7 +111,17 @@ class Log:
                 # df = pd.read_csv(file_path, sep='\t', encoding='latin1', low_memory=False)    # read the whole field
 
             df['Timestamp'] = df['Timestamp'].apply(extract_timestamp)
-            df['Timestamp'] = pd.to_datetime(df['Timestamp'], utc=True)
+
+            # Remove rows with invalid or unnecessary content, such as "(200000 rows affected)"
+            df = df[pd.notnull(df['Timestamp'])]
+
+            # Get the timezone of the first valid timestamp if not already set
+            if target_tz is None:
+                first_valid_timestamp = df['Timestamp'].dropna().iloc[0]
+                target_tz = first_valid_timestamp.tz
+
+            # Convert all timestamps to the target timezone
+            df['Timestamp'] = df['Timestamp'].apply(lambda x: x.astimezone(target_tz) if pd.notnull(x) else x)
 
             dataframes.append(df)
 
@@ -139,9 +166,61 @@ class Log:
         self.df_keyevent = pd.DataFrame()
 
 
-    def locate_keyevent(self, timestamp_str):
+    def clear_crashdata(self):
+        self.first_lines_with_timestamps = {}    
 
-        closest_index = (self.df_keyevent['Timestamp'] - extract_timestamp(timestamp_str)).abs().idxmin()
+
+    def locate_keyevent(self, timestamp_str):
+        if '.' in timestamp_str and '+' in timestamp_str:  # 2024-05-03 15:21:45.0460000 +05:30
+            timestamp = extract_timestamp(timestamp_str)
+        else:
+            timestamp = extract_simpler_timestamp(timestamp_str)  # 2024-05-03 15:21:45
+            # Assuming the dataframe timestamps are tz-aware, make the extracted timestamp tz-aware
+            if not self.df_keyevent['Timestamp'].dt.tz is None:
+                timezone = self.df_keyevent['Timestamp'].dt.tz
+                # Use replace to add timezone information
+                timestamp = timestamp.replace(tzinfo=timezone)
+            else:
+                # Handle the case where the dataframe timestamps are not tz-aware
+                # This should ideally not happen if the data is consistent
+                pass
+
+        closest_index = (self.df_keyevent['Timestamp'] - timestamp).abs().idxmin()
+        if closest_index is not None:  # closest_index가 None이 아닌지 확인
+            print (f"closest_index is {closest_index} found")
+            return closest_index + 2
+        else:
+            print ("closest_index not found")
+            return None
+        
+    
+    def load_crashdata(self, file_paths, timestamps):
+        for file_path, timestamp in zip(file_paths, timestamps):
+            try:
+                with open(file_path, 'r') as file:
+                    first_line = file.readline().strip()
+                    self.first_lines_with_timestamps[(file_path, timestamp)] = first_line
+                    # file_path 와 timestamp 를 index 로 하여 first line 정보를 저장함
+            except Exception as e:
+                self.first_lines_with_timestamps[(file_path, timestamp)] = f"Error: {e}"
+
+
+    def locate_logeventt(self, timestamp_str):
+        if '.' in timestamp_str and '+' in timestamp_str:  # 2024-05-03 15:21:45.0460000 +05:30
+            timestamp = extract_timestamp(timestamp_str)
+        else:
+            timestamp = extract_simpler_timestamp(timestamp_str)  # 2024-05-03 15:21:45
+            # Assuming the dataframe timestamps are tz-aware, make the extracted timestamp tz-aware
+            if not self.df['Timestamp'].dt.tz is None:
+                timezone = self.df['Timestamp'].dt.tz
+                # Use replace to add timezone information
+                timestamp = timestamp.replace(tzinfo=timezone)
+            else:
+                # Handle the case where the dataframe timestamps are not tz-aware
+                # This should ideally not happen if the data is consistent
+                pass
+
+        closest_index = (self.df['Timestamp'] - timestamp).abs().idxmin()
         if closest_index is not None:  # closest_index가 None이 아닌지 확인
             print (f"closest_index is {closest_index} found")
             return closest_index + 2

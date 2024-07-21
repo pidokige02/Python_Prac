@@ -210,9 +210,9 @@ class ControlPad:
                         lines = file.readlines()
 
                         if idx >= 1:
-                            content = "".join(lines[2:-2]).rstrip("\n")  # 두 번째 및 그 이후 파일에 대해 처음 두 줄과 마지막 두 줄 건너뛰기, line을 모두 합친다음 다지막 개항문제를 제거
+                            content = "".join(lines[2:-1]).rstrip("\n")  # 두 번째 및 그 이후 파일에 대해 처음 두 줄과 마지막 한 줄 건너뛰기, line을 모두 합친다음 다지막 개항문제를 제거
                         else:
-                            content = "".join(lines[:-2]).rstrip("\n") # 첫 번째 파일에 대해 마지막 두 줄 건너뛰기,line을 모두 합친다음 다지막 개항문제를 제거
+                            content = "".join(lines[:-1]).rstrip("\n") # 첫 번째 파일에 대해 마지막 한 줄 건너뛰기,line을 모두 합친다음 다지막 개항문제를 제거
 
                         file_contents.append(content)
                         break

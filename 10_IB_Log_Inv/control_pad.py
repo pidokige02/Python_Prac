@@ -28,6 +28,9 @@ class ControlPad:
         self.last_opened_log_file = None
         self.last_opened_keyevent_file = []
         self.last_opened_device_file = None
+        self.last_opened_device_file = None
+        self.last_opened_crash_files = []
+
         self.keylogplayer = KeylogPlayer(self.app.root)
 
 
@@ -78,6 +81,13 @@ class ControlPad:
 
     def clear_devicelog(self):
         self.app.log.clear_devicedata()
+        
+
+    def  clear_crashlog(self):
+        self.app.log.clear_crashdata()
+        self.app.crashwin.crash_text.config(state=tk.NORMAL)
+        self.app.crashwin.crash_text.delete('1.0', tk.END)
+        self.app.crashwin.crash_text.config(state=tk.DISABLED)
 
 
     def open_mainlog(self):
@@ -94,6 +104,8 @@ class ControlPad:
         if file_path == self.last_opened_log_file and self.last_opened_log_file is not None:
             print("Same log file is already open.")
             return None
+
+        file_name = os.path.basename(file_path)
 
         last_exception = None  # last_exception 변수를 초기화
 
@@ -121,6 +133,7 @@ class ControlPad:
                 self.app.eventWin.update_EventWindow(filtered_df)
                 filtered_df = self.app.log.filter_event(events=['S/W version', 'Product'])
                 self.app.infoWin.update_InfoWindow(filtered_df)
+                self.app.logwin.log_window.title(file_name)  # filename is displayed on the title
                 self.last_opened_log_file = file_path
                 return file_path
             except Exception as e:
@@ -186,8 +199,6 @@ class ControlPad:
             filtered_df = self.app.log.analyze_keyevent(filtered_df)
             self.app.eventWin.update_EventWindow(filtered_df)
             return
-
-        self.sort_filename_order_by_timestamp(file_path)
 
         file_contents = []
 
@@ -259,6 +270,8 @@ class ControlPad:
         self.open_KB_log(file_path)
 
         self.open_device_log(file_path)
+
+        self.open_crash_log(file_path)
 
         self.last_opened_keyevent_file = self.file_path_keyevent
         self.reset_timestamp()
@@ -360,3 +373,41 @@ class ControlPad:
 
         print("Jinha", final_command)    
         subprocess.Popen(['start', 'cmd', '/k', final_command], shell=True)
+
+
+    def open_crash_log(self, file_path):
+        # Get the directory name of the provided file path
+        directory_path = get_directory_name(file_path)
+
+        # Get the parent directory of the directory path
+        parent_directory_path = os.path.dirname(directory_path)
+
+        # Define the CrashDump directory path
+        crash_dump_directory_path = os.path.join(parent_directory_path, 'CrashDump')
+
+        pattern = '*CrashDump*'
+
+        file_paths_crash = find_files(crash_dump_directory_path, pattern)
+
+        crash_files_with_timestamps = []
+        for file_path in file_paths_crash:
+            file_name = os.path.basename(file_path)
+            timestamp = extract_timestamp_string_from_filename(file_name)
+            if timestamp:
+                crash_files_with_timestamps.append((file_path, timestamp))
+
+        file_paths_crash = [ft[0] for ft in crash_files_with_timestamps]
+        timestamps = [ft[1] for ft in crash_files_with_timestamps]
+
+        if file_paths_crash == self.last_opened_crash_files:
+            print("Same crash file is already open.")
+        else:
+            try:
+                self.clear_crashlog()
+                self.app.log.load_crashdata(file_paths_crash, timestamps)
+                self.app.crashwin.update_crash_window(self.app.log.first_lines_with_timestamps)
+                self.last_opened_crash_files = file_paths_crash
+            except Exception as e:
+                last_exception = e
+                self.last_opened_crash_files = None
+                print(f"Failed to read crash file:\n{last_exception}")

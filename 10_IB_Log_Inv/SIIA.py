@@ -2,12 +2,13 @@ import tkinter as tk
 from tkinter import ttk
 
 from Util.Utils import *
-from Util.monotor import *
+from Util.monitor import *
 from event_win import *
 from info_win import *
 from peripheral_win import *
 from log_win import *
 from keyevent_win import *
+from crash_win import *
 from log import *
 from configure_data import *
 from control_pad import *
@@ -60,11 +61,25 @@ class App:
         self.logwin.set_keyevent_window(self.keyeventwin)
         self.keyeventwin.set_log_window(self.logwin)
 
+        self.crashwin = CrashWindow()
+        crash_width = 200
+        crash_height = 300
+        crash_win_x = x + int(width*0.75) - crash_width
+        crash_win_y = y+int(height*0.35)
+        CRASHWIN_DIMENSION = f"{crash_width}x{crash_height}+{crash_win_x}+{crash_win_y}"
+        print("CRASHWIN_DIMENSION", CRASHWIN_DIMENSION)
+        self.crashwin.layout_CrashWindow(self.notebook, CRASHWIN_DIMENSION)
+
+        # for mutual data exchange
+        self.crashwin.set_keyevent_window(self.keyeventwin)
+        self.crashwin.set_log_window(self.logwin)
+
 
         # # 첫 번째 Pane EventWindow 생성
         self.eventWin = EventWindow(self.logwin, self.keyeventwin)
         self.eventWin.layout_EventWindow(self.notebook)
-
+        self.crashwin.set_event_pane(self.eventWin)
+        
         # 두 번째 Pane InfoWindow 생성
         self.infoWin = InfoWindow()
         self.infoWin.layout_InfoWindow(self.notebook)
@@ -80,6 +95,7 @@ class App:
         # log object creation for log analysis
         self.log = Log()
         self.logwin.set_log_instance (self.log)
+        self.crashwin.set_log_instance (self.log)
 
         # # 포커스 및 이벤트 관리
         self.root.bind_all("<FocusIn>", self.on_focus_in)

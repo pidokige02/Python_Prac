@@ -2,6 +2,7 @@ import os
 import re
 import pandas as pd
 import glob
+from datetime import datetime
 
 def replace_filename(file_path, new_filename):
     # 파일 경로에서 파일 이름 추출
@@ -27,6 +28,8 @@ def extract_timestamp(timestamp_str):
         print(f"Error parsing timestamp: {timestamp_str}. Error: {e}")
         return pd.NaT
 
+
+# datetime 객체로 변환하지는 않는다.
 def extract_timestampstring(timestamp_str):
     # 패턴을 수정하여 시간대 정보를 포함하도록 함
     pattern = r'\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}\.\d{6,7} [+-]\d{2}:\d{2}'
@@ -38,7 +41,8 @@ def extract_timestampstring(timestamp_str):
     else:
         print("Datetime information not found in the text.")
         return None
-    
+
+
 def find_files(directory, pattern):
     # 디렉토리와 패턴을 결합하여 경로 생성
     search_path = os.path.join(directory, pattern)
@@ -46,8 +50,10 @@ def find_files(directory, pattern):
     files = glob.glob(search_path)
     return files
 
+
 def get_directory_name(file_path):
     return os.path.dirname(file_path)
+
 
 def format_timestamp_with_seven_microseconds(timestamp):
     iso_str = timestamp.isoformat()
@@ -61,3 +67,27 @@ def format_timestamp_with_seven_microseconds(timestamp):
     else:
         formatted_str = iso_str
     return formatted_str
+
+#extract timestamp from filename (ex: CrashDump_20240503_192416.txt)
+def extract_timestamp_string_from_filename(file_name):
+    # Define the regex pattern to extract the timestamp from the file name
+    pattern = re.compile(r'CrashDump_(\d{8}_\d{6})')
+    match = pattern.search(file_name)
+    if match:
+        timestamp_str = match.group(1)
+        # Convert the extracted timestamp to a datetime object
+        timestamp = datetime.strptime(timestamp_str, '%Y%m%d_%H%M%S')
+        # Convert the datetime object back to a string in the desired format
+        timestamp_string = timestamp.strftime('%Y-%m-%d %H:%M:%S')        
+        return timestamp_string
+    
+    return None
+
+# input string is like this (ex: "2024-05-03 19:24:16")
+def extract_simpler_timestamp(timestamp_str):
+    try:
+        # 문자열을 datetime 객체로 변환
+        return datetime.strptime(timestamp_str, '%Y-%m-%d %H:%M:%S')
+    except ValueError as e:
+        print(f"Error parsing timestamp: {timestamp_str}. Error: {e}")
+        return None

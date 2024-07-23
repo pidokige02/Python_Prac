@@ -24,10 +24,10 @@ class ControlPad:
         self.timestamp_from = None
         self.timestamp_to = None
         self.file_path_keyevent = []
+        self.file_path_mainevent = []
         self.keylog_playback_button = None
-        self.last_opened_log_file = None
-        self.last_opened_keyevent_file = []
-        self.last_opened_device_file = None
+        self.last_opened_mainevent_files = []
+        self.last_opened_keyevent_files = []
         self.last_opened_device_file = None
         self.last_opened_crash_files = []
 
@@ -100,56 +100,71 @@ class ControlPad:
             print("No file selected or an unknown error occurred.")
             return None
 
+
         # 로그 파일 다시 열기 방지
-        if file_path == self.last_opened_log_file and self.last_opened_log_file is not None:
-            print("Same log file is already open.")
+        if self.last_opened_mainevent_files is not None and file_path in self.last_opened_mainevent_files:
+            print("Same log files are already open.")
             return None
 
-        file_name = os.path.basename(file_path)
+        self.file_path_mainevent = self.sort_filename_order_by_timestamp(file_path, '*MainLog*')
+        print("file_path_mainevent", self.file_path_mainevent)
+        # file_name = os.path.basename(file_path)
 
         last_exception = None  # last_exception 변수를 초기화
 
         # 다양한 인코딩 시도
         encodings = ['latin1', 'utf-8', 'cp949']
-        content = None
-        for enc in encodings:
-            try:
-                with open(file_path, 'r', encoding=enc) as file:
-                    content = file.read()
-                break
-            except Exception as e:
-                last_exception = e
 
-        if content:
+        file_contents = []
+
+        for idx, file_path in enumerate(self.file_path_mainevent):
+            content = None
+            for enc in encodings:
+                try:
+                    with open(file_path, 'r', encoding=enc) as file:
+                        lines = file.readlines()
+
+                        if idx >= 1:
+                            content = "".join(lines[2:-1]).rstrip("\n")  # 두 번째 및 그 이후 파일에 대해 처음 두 줄과 마지막 한 줄 건너뛰기, line을 모두 합친다음 다지막 개항문제를 제거
+                        else:
+                            content = "".join(lines[:-1]).rstrip("\n") # 첫 번째 파일에 대해 마지막 한 줄 건너뛰기,line을 모두 합친다음 다지막 개항문제를 제거
+
+                        file_contents.append(content)
+                        break
+                except Exception as e:
+                    last_exception = e
+
+        if file_contents:
             try:
                 self.clear_eventlog()
+                combined_content = "\n".join(file_contents)
                 self.app.logwin.log_text.config(state=tk.NORMAL)
-                self.app.logwin.log_text.insert(tk.END, content)
+                self.app.logwin.log_text.insert(tk.END, combined_content)
                 self.app.logwin.log_text.config(state=tk.DISABLED)
-                self.app.log.load_log(file_path, use_columns_log)
+
+                self.app.log.load_log(self.file_path_mainevent, use_columns_log)
                 self.app.log.add_columns_log()
                 self.app.log.analyze_log ()
-                filtered_df = self.app.log.filter_event()
-                self.app.eventWin.update_EventWindow(filtered_df)
-                filtered_df = self.app.log.filter_event(events=['S/W version', 'Product'])
-                self.app.infoWin.update_InfoWindow(filtered_df)
-                self.app.logwin.log_window.title(file_name)  # filename is displayed on the title
-                self.last_opened_log_file = file_path
+                df_filtered = self.app.log.filter_event()
+                self.app.eventWin.update_EventWindow(df_filtered)
+                df_filtered = self.app.log.filter_event(events=['S/W version', 'Product'])
+                self.app.infoWin.update_InfoWindow(df_filtered)
+                # self.app.logwin.log_window.title(file_name)  # filename is displayed on the title
+                self.last_opened_mainevent_files = self.file_path_mainevent
                 return file_path
             except Exception as e:
                 print("Failed to read file:\n{e}")
-                self.last_opened_log_file = None
+                self.last_opened_mainevent_files = []
                 return None
         else:
             print("No Contents. Last exception was:", last_exception)
-            self.last_opened_log_file = None
+            self.last_opened_mainevent_files = []
             return None
 
 
-    def sort_filename_order_by_timestamp(self, file_path):
+    def sort_filename_order_by_timestamp(self, file_path, pattern):
 
         directory_path = get_directory_name(file_path)
-        pattern = '*KeyBoardShadow*'
 
         file_paths = find_files(directory_path, pattern)
 
@@ -170,12 +185,19 @@ class ControlPad:
                             else:
                                 break
 
-                        if 'Timestamp' not in content[0]:
+                        # 'Timestamp'가 첫 번째 라인에 있는지 확인
+                        header = content[0].split('\t')
+                        if 'Timestamp' not in header:
                             print(f"No 'Timestamp' found in the first line of {file_path}. Skipping this file.")
-                            break                        # 유효한 파일로 추가
+                            break
 
-                        timestamp = content[2].split('\t')[0]
+                        # Timestamp의 인덱스를 찾음
+                        timestamp_index = header.index('Timestamp')
+
+                        # 세 번째 라인에서 타임스탬프를 추출
+                        timestamp = content[2].split('\t')[timestamp_index]
                         sorted_file_paths.append((timestamp, file_path))
+                                            # 'Timestamp'가 첫 번째 라인에 있는지 확인
                         break
                 except Exception as e:
                     last_exception = e
@@ -188,16 +210,16 @@ class ControlPad:
 
     def open_KB_log(self, file_path):
 
-        self.file_path_keyevent = self.sort_filename_order_by_timestamp(file_path)
+        self.file_path_keyevent = self.sort_filename_order_by_timestamp(file_path, '*KeyBoardShadow*')
 
         encodings = ['latin1', 'utf-8', 'cp949']
         last_exception = None
 
-        if self.file_path_keyevent == self.last_opened_keyevent_file:
+        if self.file_path_keyevent == self.last_opened_keyevent_files:
             print("Same keyevent files are already open.")
-            filtered_df = self.app.log.filter_event()  # filter out normal event table
-            filtered_df = self.app.log.analyze_keyevent(filtered_df)
-            self.app.eventWin.update_EventWindow(filtered_df)
+            df_filtered = self.app.log.filter_event()  # filter out normal event table
+            df_filtered = self.app.log.analyze_keyevent(df_filtered)
+            self.app.eventWin.update_EventWindow(df_filtered)
             return
 
         file_contents = []
@@ -229,14 +251,14 @@ class ControlPad:
                 self.app.keyeventwin.keyevent_window.iconify()
                 self.app.log.load_keyevent_log(self.file_path_keyevent, use_columns_keyevent)
                 self.app.log.add_columns_keyevent()
-                filtered_df = self.app.log.filter_event()  # filter out normal event table
-                filtered_df = self.app.log.analyze_keyevent(filtered_df)
-                self.app.eventWin.update_EventWindow(filtered_df)
-                self.last_opened_keyevent_file = self.file_path_keyevent
+                df_filtered = self.app.log.filter_event()  # filter out normal event table
+                df_filtered = self.app.log.analyze_keyevent(df_filtered)
+                self.app.eventWin.update_EventWindow(df_filtered)
+                self.last_opened_keyevent_files = self.file_path_keyevent
                 self.app.keyeventwin.keyevent_window.deiconify()
             except Exception as e:
                 last_exception = e
-                self.last_opened_keyevent_file = []
+                self.last_opened_keyevent_files = []
                 self.file_path_keyevent = []
                 print(f"Failed to read keyevent file:\n{last_exception}")
 
@@ -273,7 +295,7 @@ class ControlPad:
 
         self.open_crash_log(file_path)
 
-        self.last_opened_keyevent_file = self.file_path_keyevent
+        self.last_opened_keyevent_files = self.file_path_keyevent
         self.reset_timestamp()
 
 

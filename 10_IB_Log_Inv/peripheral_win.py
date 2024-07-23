@@ -37,14 +37,14 @@ class PeripheralWindow:
         self.tree.bind("<<TreeviewSelect>>", self.on_tree_select)
 
 
-    def update_PeripheralWindow (self, filtered_df):
+    def update_PeripheralWindow (self, df_filtered):
 
         # 기존 데이터를 모두 제거
         for item in self.tree.get_children():
             self.tree.delete(item)
 
         # DataFrame의 각 행을 Treeview에 삽입
-        for index, row in filtered_df.iterrows():
+        for index, row in df_filtered.iterrows():
             self.tree.insert("", tk.END, values=(row['Name'], row['ProductName'], row['MfgName'], row['Status']))
 
 

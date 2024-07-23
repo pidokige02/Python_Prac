@@ -120,11 +120,11 @@ class CrashWindow:
             else:
                 print ("keyevent_index not valid")
                 
-            # logevent_index = self.log_instance.locate_logeventt(timestamp_str)
-            # if logevent_index is not None:  # line_index가 None이 아닌지 확인
-            #     self.log_window.scroll_to_line(logevent_index)
-            # else:
-            #     print ("logevent_index not valid")
+            logevent_index = self.log_instance.locate_logeventt(timestamp_str)
+            if logevent_index is not None:  # line_index가 None이 아닌지 확인
+                self.log_window.scroll_to_line(logevent_index)
+            else:
+                print ("logevent_index not valid")
 
 
         else:

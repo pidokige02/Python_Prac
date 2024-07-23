@@ -30,13 +30,13 @@ class InfoWindow:
         self.pane1.grid_columnconfigure(0, weight=1)        
    
    
-    def update_InfoWindow (self, filtered_df):
+    def update_InfoWindow (self, df_filtered):
 
         # Text 위젯의 텍스트를 지우고 (임시로 'normal' 상태로 변경하여) 새로운 텍스트를 삽입
         self.text.config(state='normal')
         self.text.delete('1.0', tk.END)  # 기존 텍스트 삭제
         
-        for index, row in filtered_df.iterrows():
+        for index, row in df_filtered.iterrows():
             info_text = f"Timestamp: {row['Timestamp']}\nEvent: {row['Event']}\nInfo: {row['Info']}\nLine#: {row['line#']}\n\n"
             self.text.insert(tk.END, info_text)  # 새로운 텍스트 삽입
 

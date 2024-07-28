@@ -6,14 +6,17 @@ from Util.Utils import *
 
 class Log:
     def __init__(self):
-        self.df_mainlog = None
-        self.df_filtered = None
+        self.df_mainlog = pd.DataFrame()
+        self.df_filtered = pd.DataFrame()
 
-        self.df_device = None
-        self.df_keyevent = None
+        self.df_device = pd.DataFrame()
+        self.df_keyevent = pd.DataFrame()
         
         # crash data의 첫번째 line 만 읽어서 표시하기 위하여 
         self.first_lines_with_timestamps = {}
+
+        # from_timestamp, to_timestamp 를 file 이름과 mapping 함
+        self.file_timestamp_mapping = []
 
 
 
@@ -79,12 +82,12 @@ class Log:
                             if (event_info !='<none>'):
                                 self.df_mainlog.at[index, 'Event'] = event
                                 self.df_mainlog.at[index, 'Info'] = event_info
-                                self.df_mainlog.at[index, 'line#'] = index + 2 # 2 is offset
+                                self.df_mainlog.at[index, 'line#'] = index + 3 # 3 is offset
                         else:
                             event_info = match.group(info_idx) if match.lastindex else match.group(0)
                             self.df_mainlog.at[index, 'Event'] = event
                             self.df_mainlog.at[index, 'Info'] = event_info
-                            self.df_mainlog.at[index, 'line#'] = index + 2 # 2 is offset
+                            self.df_mainlog.at[index, 'line#'] = index + 3 # 3 is offset
                         break
 
 
@@ -155,7 +158,7 @@ class Log:
             timestamp = row['Timestamp']
             if pd.isna(timestamp):
                 continue  # 유효하지 않은 타임스탬프는 건너뛰기
-            self.df_keyevent.at[index, 'keyeventline#'] = index + 2
+            self.df_keyevent.at[index, 'keyeventline#'] = index + 3
 
 
     def analyze_keyevent (self, df_filtered):
@@ -220,7 +223,7 @@ class Log:
                 self.first_lines_with_timestamps[(file_path, timestamp)] = f"Error: {e}"
 
 
-    def locate_logeventt(self, timestamp_str):
+    def locate_logevent(self, timestamp_str):
         if '.' in timestamp_str and '+' in timestamp_str:  # 2024-05-03 15:21:45.0460000 +05:30
             timestamp = extract_timestamp(timestamp_str)
         else:
@@ -242,3 +245,107 @@ class Log:
         else:
             print ("closest_index not found")
             return None
+
+
+    def load_overview(self, file_paths):
+
+        for file_path in file_paths:
+            third_line = None
+            third_to_last_line = None
+            lines = []
+
+            try:
+                with open(file_path, 'r', encoding='utf-8') as f:
+                    for i, line in enumerate(f):
+                        if i == 2:
+                            third_line = line.strip()
+                        lines.append(line.strip())
+                        if len(lines) > 3:
+                            lines.pop(0)
+            except UnicodeDecodeError:
+                try:
+                    with open(file_path, 'r', encoding='latin1') as f:
+                        for i, line in enumerate(f):
+                            if i == 2:
+                                third_line = line.strip()
+                            lines.append(line.strip())
+                            if len(lines) > 3:
+                                lines.pop(0)
+                except UnicodeDecodeError as e:
+                    print(f"Error decoding file {file_path}: {e}")
+                    continue
+
+            if third_line is None or len(lines) < 3:
+                continue  # Skip files with less than 3 lines
+
+            third_to_last_line = lines[0]  # This will be the third-to-last line
+
+            first_timestamp = extract_timestamp_from_line(third_line.strip())
+            last_timestamp = extract_timestamp_from_line(third_to_last_line.strip())
+
+            for (path, ts), line in self.first_lines_with_timestamps.items():
+                crash_timestamp = extract_simpler_timestamp(ts)
+                if not self.df_keyevent['Timestamp'].dt.tz is None:
+                    timezone = self.df_keyevent['Timestamp'].dt.tz
+                    # Use replace to add timezone information
+                    crash_timestamp = crash_timestamp.replace(tzinfo=timezone)
+                else:
+                    # Handle the case where the dataframe timestamps are not tz-aware
+                    # This should ideally not happen if the data is consistent
+                    pass
+
+                file_name = os.path.basename(file_path)
+                entry = {
+                    'file_path': file_path,
+                    'from_timestamp': first_timestamp,
+                    'to_timestamp': last_timestamp,
+                    'crash_timestamp': crash_timestamp,
+                    'Crash': line,
+                }                
+                if first_timestamp <= crash_timestamp <= last_timestamp:
+                    pass
+                    # print(f"Timestamp {crash_timestamp} from crash data is within range for file {file_name}.")
+                else:
+                    # print(f"Timestamp {crash_timestamp} from crash data is NOT within range for file {file_name}.")
+                    entry.pop('crash_timestamp', None)
+                    entry.pop('Crash', None)
+
+                self.file_timestamp_mapping.append(entry)
+
+
+    def check_specific_crash_timestamp(self, crash_timestamp, opened_file_path):
+        # Optional: Ensure crash_timestamp has the correct timezone if needed
+        if not self.df_keyevent['Timestamp'].dt.tz is None:
+            timezone = self.df_keyevent['Timestamp'].dt.tz
+            crash_timestamp = crash_timestamp.replace(tzinfo=timezone)
+
+        # Normalize the opened file path
+        opened_file_path = os.path.normpath(opened_file_path).strip().lower()
+
+        # Find the entry corresponding to opened_file_path
+        matching_entry = None
+        for entry in self.file_timestamp_mapping:
+            # Normalize the entry file path
+            entry_file_path = os.path.normpath(entry['file_path']).strip().lower()
+            if entry_file_path == opened_file_path:
+                matching_entry = entry
+                print("matching_entry", "break")
+                break
+
+        if matching_entry is None:
+            print(f"No entry found for file {opened_file_path}.")
+            return False
+
+        from_timestamp = matching_entry.get('from_timestamp')
+        to_timestamp = matching_entry.get('to_timestamp')
+
+        if from_timestamp is not None and to_timestamp is not None:
+            if from_timestamp <= crash_timestamp <= to_timestamp:
+                print(f"Crash timestamp {crash_timestamp} is within range for file {opened_file_path}.")
+                return True
+            else:
+                print(f"Crash timestamp {crash_timestamp} is NOT within range for file {opened_file_path}.")
+                return False
+
+        print(f"Missing timestamps in entry for file {opened_file_path}.")
+        return False

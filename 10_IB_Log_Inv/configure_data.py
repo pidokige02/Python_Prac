@@ -13,19 +13,11 @@ evant_table_map = {
 
 
 
-
-#각 windows 의 dimension
-# MAINWIN_DIMENSION="1536x300+0+0"
-# LOGWIN_DIMENSION = "968x564+0+350"
-# KEYEVENTWIN_DIMENSION = "568x564+968+350"
-
 # raw log file 에서 특정 열만 읽기
 use_columns_log = ['Timestamp', 'Text']
-# # analysis 후 아래 columne 을 추가하여 필요한 정보를 추가함
-# custom_column = ['Event','Info', 'line#']
 
 # raw keyevent file 에서 특정 열만 읽기
-use_columns_keyevent = ['Timestamp', 'EventName']
+use_columns_keyevent = ['Timestamp']
 
 
 # raw  Devices_1 에서 특정 열만 읽기
@@ -38,3 +30,5 @@ event_columns = [('col1','Timestamp', 60),('col2','Event', 50),('col3','Info', 5
 peripheral_columns = [('col1','Name', 100),('col2','ProductName', 100),('col3','MfgName',100),('col4','Status',100)]
 
 treeview_index = ("col1", "col2", "col3", "col4", "col5")
+
+overview_columns = [('col1','Mainlog', 50),('col2','from', 40),('col3','To', 40),('col4','Crash', 300),('col5','crash Time', 40)]

@@ -13,7 +13,8 @@ class KeyEventWindow:
         self.last_search_pos = "1.0"  # 마지막 검색 위치
         self.log_window = None
         self.find_dialog = None
-
+        self.last_opened_keyevent_files = []
+        
     def set_log_window(self, window):
         self.log_window = window
 

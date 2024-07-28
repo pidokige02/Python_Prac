@@ -15,6 +15,8 @@ class LogWindow:
         self.keyevent_window = None   # mutual 참조룰 위함
         self.log_instance = None
         self.find_dialog = None
+        self.last_opened_mainevent_files = []
+
         # 이벤트 수신자 등록
 
     def set_keyevent_window (self, window):

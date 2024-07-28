@@ -91,3 +91,18 @@ def extract_simpler_timestamp(timestamp_str):
     except ValueError as e:
         print(f"Error parsing timestamp: {timestamp_str}. Error: {e}")
         return None
+    
+
+def extract_timestamp_from_line(line):
+    try:
+        # 정규 표현식을 사용하여 타임스탬프 부분을 추출
+        match = re.search(r'(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}\.\d{6,7} [+-]\d{2}:\d{2})', line)
+        if match:
+            timestamp_str = match.group(1)
+            return extract_timestamp(timestamp_str)
+        else:
+            print(f"No valid timestamp found in line: {line}")
+            return pd.NaT
+    except Exception as e:
+        print(f"Error extracting timestamp from line: {line}. Error: {e}")
+        return pd.NaT

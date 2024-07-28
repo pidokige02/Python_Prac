@@ -7,6 +7,7 @@ class PeripheralWindow:
     def __init__(self):
         self.pane1 = None
         self.tree = None 
+        self.last_opened_device_file = None
 
 
     def layout_PeripheralWindow(self, root):

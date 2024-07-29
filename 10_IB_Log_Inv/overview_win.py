@@ -14,6 +14,7 @@ class OverviewWindow:
         self.log_window = None          # mutual 참조룰 위함
         self.keyevent_window = None     # mutual 참조룰 위함
         self.log_instance = None
+        self.last_opened_main_log = []
 
 
     def layout_Overview_Window(self, root):
@@ -44,6 +45,9 @@ class OverviewWindow:
 
         # Ctrl+C 키 이벤트 바인딩
         self.tree.bind("<Control-c>", self.on_copy)
+
+        # Double-click 이벤트 바인딩
+        self.tree.bind("<Double-1>", self.on_double_click)
 
 
     def set_keyevent_window (self, key_log_win):
@@ -76,9 +80,11 @@ class OverviewWindow:
             crash_event = data.get('Crash', '')
 
             
-            # get file_name from file_path
+            # Get file_name from file_path
             if file_path:
-               file_name = os.path.basename(file_path)    
+                file_name = os.path.basename(file_path)
+            else:
+                file_name = ''
             # Format the timestamps
             if from_timestamp:
                 from_timestamp = from_timestamp.strftime('%Y-%m-%d %H:%M:%S')
@@ -88,13 +94,15 @@ class OverviewWindow:
                 crash_timestamp = crash_timestamp.strftime('%Y-%m-%d %H:%M:%S')
 
             # Find the start of the module information
-            module_start_index = crash_event.find('in module')
-            
-            if module_start_index != -1:
-                # Extract the substring starting from 'in module'
-                module_info = crash_event[module_start_index:].strip()
+            if crash_event:
+                module_start_index = crash_event.find('in module')
+                if module_start_index != -1:
+                    # Extract the substring starting from 'in module'
+                    module_info = crash_event[module_start_index:].strip()
+                else:
+                    module_info = crash_event
             else:
-                module_info = crash_event
+                module_info = ''
 
             # Insert the row into the Treeview if there is a crash event
             if crash_event:
@@ -112,34 +120,47 @@ class OverviewWindow:
         if selected_item:
             item = self.tree.item(selected_item)
             values = item['values']
+            crash_timestamp_str = values[4] if len(values) > 4 else None  # Ensure index is within bounds
 
-            if len(values) > 4 and values[4]:  # crash_timestamp이 리스트에 있는지 및 값이 있는지 확인
-                crash_timestamp = values[4]  # crash_timestamp이 Treeview의 5번째 열에 있다고 가정
-                self.find_closest_events(crash_timestamp)
+            if crash_timestamp_str:  # Check if crash_timestamp is present and non-empty
+                try:
+                    # Validate the crash_timestamp format
+                    crash_timestamp = datetime.strptime(crash_timestamp_str, '%Y-%m-%d %H:%M:%S')
+                    self.find_closest_events(crash_timestamp_str)
+                except ValueError:
+                    print("crash_timestamp is not in the correct format")
+                    self.keyevent_window.clear_highlight()
+                    self.log_window.clear_highlight()            
             else:
+                self.keyevent_window.clear_highlight()
+                self.log_window.clear_highlight()
                 print("crash_timestamp is not available or empty")
 
 
     def find_closest_events(self, crash_timestamp_str):
 
-        crash_timestam = extract_simpler_timestamp(crash_timestamp_str)
+        crash_timestamp = extract_simpler_timestamp(crash_timestamp_str)
 
-        is_timestamp_within_range = self.log_instance.check_specific_crash_timestamp(crash_timestam, self.log_window.last_opened_mainevent_files[0])
+        is_timestamp_within_range = self.log_instance.check_specific_crash_timestamp(crash_timestamp, self.log_window.last_opened_mainevent_files[0])
 
         if is_timestamp_within_range :
             keyevent_index = self.log_instance.locate_keyevent(crash_timestamp_str)
             if keyevent_index is not None:  # line_index가 None이 아닌지 확인
                 self.keyevent_window.scroll_to_line(keyevent_index)
             else:
+                self.keyevent_window.clear_highlight()
                 print ("keyevent_index not valid")
                 
             logevent_index = self.log_instance.locate_logevent(crash_timestamp_str)
             if logevent_index is not None:  # line_index가 None이 아닌지 확인
                 self.log_window.scroll_to_line(logevent_index)
             else:
+                self.log_window.clear_highlight()
                 print ("logevent_index not valid")
 
         else:
+            self.keyevent_window.clear_highlight()
+            self.log_window.clear_highlight()
             print("No valid timestamp found")
 
 
@@ -159,3 +180,14 @@ class OverviewWindow:
         root.update()  # 클립보드에 복사된 내용을 업데이트
 
     
+    def on_double_click(self, event):
+        selected_item = self.tree.selection()
+        if selected_item:
+            item = self.tree.item(selected_item)
+            values = item['values']
+            if values:
+                file_name = values[0]  # values 리스트의 첫 번째 항목이 filename이라고 가정
+                print("Double clicked file:", file_name)
+                # 원하는 처리를 여기에 추가하십시오
+            else:
+                print("No values found for the selected item")

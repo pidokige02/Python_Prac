@@ -259,3 +259,6 @@ class KeyEventWindow:
         return matching_lines 
     
 
+    def clear_highlight(self):
+        # Remove all highlights
+        self.keyevent_text.tag_remove("highlight", "1.0", "end")

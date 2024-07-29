@@ -64,6 +64,7 @@ class ControlPad:
 
     def clear_eventlog(self):
         self.app.log.clear_eventdata()
+        self.app.keyeventwin.clear_highlight()
         self.app.logwin.log_text.config(state=tk.NORMAL)
         self.app.logwin.log_text.delete('1.0', tk.END)
         self.app.logwin.log_text.config(state=tk.DISABLED)
@@ -82,6 +83,11 @@ class ControlPad:
 
     def  clear_crashlog(self):
         self.app.log.clear_crashdata()
+
+
+    def  clear_overviewlog(self):
+        self.app.log.clear_overviewdata()
+
 
     def open_mainlog(self):
 
@@ -407,34 +413,45 @@ class ControlPad:
 
         file_paths_crash = find_files(crash_dump_directory_path, pattern)
 
-        crash_files_with_timestamps = []
-        for file_path in file_paths_crash:
-            file_name = os.path.basename(file_path)
-            timestamp = extract_timestamp_string_from_filename(file_name)
-            if timestamp:
-                crash_files_with_timestamps.append((file_path, timestamp))
+        if file_paths_crash:  
+            crash_files_with_timestamps = []
+            for file_path in file_paths_crash:
+                file_name = os.path.basename(file_path)
+                timestamp = extract_timestamp_string_from_filename(file_name)
+                if timestamp:
+                    crash_files_with_timestamps.append((file_path, timestamp))
 
-        file_paths_crash = [ft[0] for ft in crash_files_with_timestamps]
-        timestamps = [ft[1] for ft in crash_files_with_timestamps]
+            file_paths_crash = [ft[0] for ft in crash_files_with_timestamps]
+            timestamps = [ft[1] for ft in crash_files_with_timestamps]
 
-        if file_paths_crash == self.last_opened_crash_files:
-            print("Same crash file is already open.")
+            if file_paths_crash == self.last_opened_crash_files:
+                print("Same crash file is already open.")
+            else:
+                try:
+                    self.clear_crashlog()
+                    self.app.log.load_crashdata(file_paths_crash, timestamps)
+                    self.last_opened_crash_files = file_paths_crash
+                except Exception as e:
+                    last_exception = e
+                    self.last_opened_crash_files = None
+                    self.clear_crashlog()
+                    print(f"Failed to read crash file:\n{last_exception}")
         else:
-            try:
-                self.clear_crashlog()
-                self.app.log.load_crashdata(file_paths_crash, timestamps)
-                self.last_opened_crash_files = file_paths_crash
-            except Exception as e:
-                last_exception = e
-                self.last_opened_crash_files = None
-                print(f"Failed to read crash file:\n{last_exception}")
+            print("No crash file.")
+            self.clear_crashlog()
+            self.last_opened_crash_files = None
 
 
     def open_overview_log(self, file_path):
 
         file_path_mainlog = self.sort_filename_order_by_timestamp(file_path, '*MainLog*')
-
-        self.app.log.load_overview(file_path_mainlog)
         
-        self.app.overviewWin.update_Overview_Window(self.app.log.file_timestamp_mapping)
+        if self.app.overviewWin.last_opened_main_log == file_path_mainlog: 
+            print("Same overview_log is already open.")
+        else:
+            self.clear_overviewlog()    
+            self.app.log.load_overview(file_path_mainlog)
+            self.app.overviewWin.update_Overview_Window(self.app.log.file_timestamp_mapping)
+
+            self.app.overviewWin.last_opened_main_log = file_path_mainlog 
 

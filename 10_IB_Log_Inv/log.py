@@ -188,6 +188,10 @@ class Log:
         self.first_lines_with_timestamps = {}    
 
 
+    def clear_overviewdata(self):
+        self.file_timestamp_mapping = []
+
+
     def locate_keyevent(self, timestamp_str):
         if '.' in timestamp_str and '+' in timestamp_str:  # 2024-05-03 15:21:45.0460000 +05:30
             timestamp = extract_timestamp(timestamp_str)
@@ -254,26 +258,22 @@ class Log:
             third_to_last_line = None
             lines = []
 
-            try:
-                with open(file_path, 'r', encoding='utf-8') as f:
-                    for i, line in enumerate(f):
-                        if i == 2:
-                            third_line = line.strip()
-                        lines.append(line.strip())
-                        if len(lines) > 3:
-                            lines.pop(0)
-            except UnicodeDecodeError:
+            for encoding in ('utf-8', 'latin1'):
                 try:
-                    with open(file_path, 'r', encoding='latin1') as f:
+                    with open(file_path, 'r', encoding=encoding) as f:
                         for i, line in enumerate(f):
+                            line = line.strip()
                             if i == 2:
-                                third_line = line.strip()
-                            lines.append(line.strip())
+                                third_line = line
+                            lines.append(line)
                             if len(lines) > 3:
                                 lines.pop(0)
-                except UnicodeDecodeError as e:
-                    print(f"Error decoding file {file_path}: {e}")
+                    break  # Exit the loop if reading was successful
+                except UnicodeDecodeError:
                     continue
+            else:
+                print(f"Error decoding file {file_path}")
+                continue  # Skip this file if both encodings fail
 
             if third_line is None or len(lines) < 3:
                 continue  # Skip files with less than 3 lines
@@ -283,34 +283,43 @@ class Log:
             first_timestamp = extract_timestamp_from_line(third_line.strip())
             last_timestamp = extract_timestamp_from_line(third_to_last_line.strip())
 
-            for (path, ts), line in self.first_lines_with_timestamps.items():
-                crash_timestamp = extract_simpler_timestamp(ts)
-                if not self.df_keyevent['Timestamp'].dt.tz is None:
-                    timezone = self.df_keyevent['Timestamp'].dt.tz
-                    # Use replace to add timezone information
-                    crash_timestamp = crash_timestamp.replace(tzinfo=timezone)
-                else:
-                    # Handle the case where the dataframe timestamps are not tz-aware
-                    # This should ideally not happen if the data is consistent
-                    pass
-
-                file_name = os.path.basename(file_path)
+            if not self.first_lines_with_timestamps:
                 entry = {
                     'file_path': file_path,
                     'from_timestamp': first_timestamp,
                     'to_timestamp': last_timestamp,
-                    'crash_timestamp': crash_timestamp,
-                    'Crash': line,
+                    'crash_timestamp': None,
+                    'Crash': None,
                 }                
-                if first_timestamp <= crash_timestamp <= last_timestamp:
-                    pass
-                    # print(f"Timestamp {crash_timestamp} from crash data is within range for file {file_name}.")
-                else:
-                    # print(f"Timestamp {crash_timestamp} from crash data is NOT within range for file {file_name}.")
-                    entry.pop('crash_timestamp', None)
-                    entry.pop('Crash', None)
-
                 self.file_timestamp_mapping.append(entry)
+            else:          
+                for (path, ts), line in self.first_lines_with_timestamps.items():
+                    crash_timestamp = extract_simpler_timestamp(ts)
+                    if not self.df_keyevent['Timestamp'].dt.tz is None:
+                        timezone = self.df_keyevent['Timestamp'].dt.tz
+                        # Use replace to add timezone information
+                        crash_timestamp = crash_timestamp.replace(tzinfo=timezone)
+
+                    if first_timestamp <= crash_timestamp <= last_timestamp:
+                        entry = {
+                            'file_path': file_path,
+                            'from_timestamp': first_timestamp,
+                            'to_timestamp': last_timestamp,
+                            'crash_timestamp': crash_timestamp,
+                            'Crash': line,
+                        }                
+                        # print(f"Timestamp {crash_timestamp} from crash data is within range for file {file_name}.")
+                    else:
+                        # print(f"Timestamp {crash_timestamp} from crash data is NOT within range for file {file_name}.")
+                        entry = {
+                            'file_path': file_path,
+                            'from_timestamp': first_timestamp,
+                            'to_timestamp': last_timestamp,
+                            'crash_timestamp': None,
+                            'Crash': None,
+                        }                
+                   
+                    self.file_timestamp_mapping.append(entry)
 
 
     def check_specific_crash_timestamp(self, crash_timestamp, opened_file_path):
@@ -329,7 +338,6 @@ class Log:
             entry_file_path = os.path.normpath(entry['file_path']).strip().lower()
             if entry_file_path == opened_file_path:
                 matching_entry = entry
-                print("matching_entry", "break")
                 break
 
         if matching_entry is None:
@@ -341,10 +349,10 @@ class Log:
 
         if from_timestamp is not None and to_timestamp is not None:
             if from_timestamp <= crash_timestamp <= to_timestamp:
-                print(f"Crash timestamp {crash_timestamp} is within range for file {opened_file_path}.")
+                # print(f"Crash timestamp {crash_timestamp} is within range for file {opened_file_path}.")
                 return True
             else:
-                print(f"Crash timestamp {crash_timestamp} is NOT within range for file {opened_file_path}.")
+                # print(f"Crash timestamp {crash_timestamp} is NOT within range for file {opened_file_path}.")
                 return False
 
         print(f"Missing timestamps in entry for file {opened_file_path}.")

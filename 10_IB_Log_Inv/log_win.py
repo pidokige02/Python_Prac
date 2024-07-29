@@ -286,3 +286,8 @@ class LogWindow:
 
     def disable_close_button(self):
         pass  # 아무 동작도 하지 않음
+
+
+    def clear_highlight(self):
+        # Remove all highlights
+        self.log_text.tag_remove("highlight", "1.0", "end")

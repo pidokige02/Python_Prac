@@ -25,6 +25,10 @@ class LogWindow:
     def set_log_instance (self, log):
         self.log_instance = log
 
+    def resize_LogWindow(self, dimension):
+        self.log_window.geometry(dimension)
+
+
     def layout_LogWindow(self, root, dimension):
 
         self.log_window = tk.Toplevel(root)
@@ -166,7 +170,8 @@ class LogWindow:
         timestamp_str = extract_timestampstring(found_text)
         line_index = self.log_instance.locate_keyevent(timestamp_str)
         if line_index is not None:  # line_index가 None이 아닌지 확인
-            self.keyevent_window.scroll_to_line(line_index)
+            if self.keyevent_window.keyevent_window: 
+                self.keyevent_window.scroll_to_line(line_index)
         else:
             print ("line_index not valid")
         # 마지막 검색 위치 업데이트
@@ -206,7 +211,8 @@ class LogWindow:
         timestamp_str = extract_timestampstring(found_text)
         line_index = self.log_instance.locate_keyevent(timestamp_str)
         if line_index is not None:  # line_index가 None이 아닌지 확인
-            self.keyevent_window.scroll_to_line(line_index)
+            if self.keyevent_window.keyevent_window: 
+                self.keyevent_window.scroll_to_line(line_index)
         else:
             print ("line_index not valid")
 

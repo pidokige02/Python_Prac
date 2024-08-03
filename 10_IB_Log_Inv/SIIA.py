@@ -45,17 +45,29 @@ class App:
         self.notebook = ttk.Notebook(root)
         self.notebook.grid(row=1, column=0, sticky="nsew")
 
+        # control pad 생성
+        self.controlpad = ControlPad(self)
+        self.controlpad.layout_ControlPad()
+
         #log window creation
         self.logwin = LogWindow()
-        LOGWIN_DIMENSION = f"{int(width*0.75)}x{int(height*0.65)}+{x}+{y+int(height*0.3)}"        
-        print("LOGWIN_DIMENSION", LOGWIN_DIMENSION)
-        self.logwin.layout_LogWindow(self.notebook, LOGWIN_DIMENSION)
-
-        # keyevent window creation
         self.keyeventwin =  KeyEventWindow ()
-        KEYEVENTWIN_DIMENSION = f"{int(width*0.25)}x{int(height*0.65)}+{x + int(width*0.75)}+{y+int(height*0.3)}"        
-        print("KEYEVENTWIN_DIMENSION", KEYEVENTWIN_DIMENSION)
-        self.keyeventwin.layout_KeyEventWindow(self.notebook, KEYEVENTWIN_DIMENSION)
+        LOGWIN_DIMENSION = None
+        KEYEVENTWIN_DIMENSION = None
+
+        if self.controlpad.enable_keylog_value.get():
+            LOGWIN_DIMENSION = f"{int(width*0.75)}x{int(height*0.65)}+{x}+{y+int(height*0.3)}"        
+            print("LOGWIN_DIMENSION", LOGWIN_DIMENSION)
+            self.logwin.layout_LogWindow(self.notebook, LOGWIN_DIMENSION)
+
+            # keyevent window creation
+            KEYEVENTWIN_DIMENSION = f"{int(width*0.25)}x{int(height*0.65)}+{x + int(width*0.75)}+{y+int(height*0.3)}"        
+            print("KEYEVENTWIN_DIMENSION", KEYEVENTWIN_DIMENSION)
+            self.keyeventwin.layout_KeyEventWindow(self.notebook, KEYEVENTWIN_DIMENSION)
+        else:
+            LOGWIN_DIMENSION = f"{int(width)}x{int(height*0.65)}+{x}+{y+int(height*0.3)}"        
+            print("LOGWIN_DIMENSION", LOGWIN_DIMENSION)
+            self.logwin.layout_LogWindow(self.notebook, LOGWIN_DIMENSION)
 
         # for mutual data exchange
         self.logwin.set_keyevent_window(self.keyeventwin)
@@ -79,10 +91,6 @@ class App:
         # 네 번째 Pane peripheral_win 생성
         self.periWin  = PeripheralWindow()
         self.periWin.layout_PeripheralWindow(self.notebook)
-
-        # control pad 생성
-        self.controlpad = ControlPad(self)
-        self.controlpad.layout_ControlPad()
 
         # log object creation for log analysis
         self.log = Log()
@@ -129,12 +137,14 @@ class App:
     def on_minimize(self, event):
         if str(event.widget) == str(self.root):
             self.logwin.log_window.withdraw()
-            self.keyeventwin.keyevent_window.withdraw()
+            if self.keyeventwin.keyevent_window:
+                self.keyeventwin.keyevent_window.withdraw()
 
     def on_restore(self, event):
         if str(event.widget) == str(self.root):
             self.logwin.log_window.deiconify()
-            self.keyeventwin.keyevent_window.deiconify() 
+            if self.keyeventwin.keyevent_window: 
+                self.keyeventwin.keyevent_window.deiconify() 
 
 
 if __name__ == "__main__":

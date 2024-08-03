@@ -40,6 +40,9 @@ class EventWindow:
         # TreeviewSelect 이벤트 바인딩
         self.tree.bind("<<TreeviewSelect>>", self.on_tree_select)
 
+        # CTRL+C를 복사 기능에 바인딩
+        self.tree.bind("<Control-c>", self.copy_selection)
+
 
     def update_EventWindow (self, df_filtered):
 
@@ -61,5 +64,21 @@ class EventWindow:
             keyevent_line_number = item_text[4]  # keyeventline# is the 5th column 
             print(f"Selected item: {item_text}")
             self.logwin.scroll_to_line(line_number)
-            self.keycodewin.scroll_to_line(keyevent_line_number)
+            if self.keycodewin.keyevent_window:
+                self.keycodewin.scroll_to_line(keyevent_line_number)
             
+
+    def copy_selection(self, event):
+        # 선택된 항목들 가져오기
+        selected_items = self.tree.selection()
+        items_text = []
+        for item in selected_items:
+            item_text = self.tree.item(item, "values")
+            items_text.append("\t".join(item_text))
+
+        # 텍스트를 클립보드에 복사
+        clipboard_text = "\n".join(items_text)
+        self.pane1.clipboard_clear()
+        self.pane1.clipboard_append(clipboard_text)
+        print("Copied to clipboard:", clipboard_text)
+        return "break"  # 이벤트의 기본 동작을 막기 위해 "break" 반환

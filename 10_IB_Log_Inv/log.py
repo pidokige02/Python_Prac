@@ -193,6 +193,10 @@ class Log:
 
 
     def locate_keyevent(self, timestamp_str):
+        if 'Timestamp' not in self.df_keyevent.columns:
+            print("Error: 'Timestamp' column not found in dataframe")
+            return None
+            
         if '.' in timestamp_str and '+' in timestamp_str:  # 2024-05-03 15:21:45.0460000 +05:30
             timestamp = extract_timestamp(timestamp_str)
         else:
@@ -295,8 +299,8 @@ class Log:
             else:          
                 for (path, ts), line in self.first_lines_with_timestamps.items():
                     crash_timestamp = extract_simpler_timestamp(ts)
-                    if not self.df_keyevent['Timestamp'].dt.tz is None:
-                        timezone = self.df_keyevent['Timestamp'].dt.tz
+                    if not self.df_mainlog['Timestamp'].dt.tz is None:
+                        timezone = self.df_mainlog['Timestamp'].dt.tz
                         # Use replace to add timezone information
                         crash_timestamp = crash_timestamp.replace(tzinfo=timezone)
 
@@ -324,8 +328,8 @@ class Log:
 
     def check_specific_crash_timestamp(self, crash_timestamp, opened_file_path):
         # Optional: Ensure crash_timestamp has the correct timezone if needed
-        if not self.df_keyevent['Timestamp'].dt.tz is None:
-            timezone = self.df_keyevent['Timestamp'].dt.tz
+        if not self.df_mainlog['Timestamp'].dt.tz is None:
+            timezone = self.df_mainlog['Timestamp'].dt.tz
             crash_timestamp = crash_timestamp.replace(tzinfo=timezone)
 
         # Normalize the opened file path

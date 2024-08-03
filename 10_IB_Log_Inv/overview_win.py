@@ -129,10 +129,12 @@ class OverviewWindow:
                     self.find_closest_events(crash_timestamp_str)
                 except ValueError:
                     print("crash_timestamp is not in the correct format")
-                    self.keyevent_window.clear_highlight()
+                    if self.keyevent_window.keyevent_window:
+                        self.keyevent_window.clear_highlight()
                     self.log_window.clear_highlight()            
             else:
-                self.keyevent_window.clear_highlight()
+                if self.keyevent_window.keyevent_window:
+                    self.keyevent_window.clear_highlight()
                 self.log_window.clear_highlight()
                 print("crash_timestamp is not available or empty")
 
@@ -146,9 +148,11 @@ class OverviewWindow:
         if is_timestamp_within_range :
             keyevent_index = self.log_instance.locate_keyevent(crash_timestamp_str)
             if keyevent_index is not None:  # line_index가 None이 아닌지 확인
-                self.keyevent_window.scroll_to_line(keyevent_index)
+                if self.keyevent_window.keyevent_window:
+                    self.keyevent_window.scroll_to_line(keyevent_index)
             else:
-                self.keyevent_window.clear_highlight()
+                if self.keyevent_window.keyevent_window:
+                    self.keyevent_window.clear_highlight()
                 print ("keyevent_index not valid")
                 
             logevent_index = self.log_instance.locate_logevent(crash_timestamp_str)
@@ -159,7 +163,8 @@ class OverviewWindow:
                 print ("logevent_index not valid")
 
         else:
-            self.keyevent_window.clear_highlight()
+            if self.keyevent_window.keyevent_window:
+                self.keyevent_window.clear_highlight()
             self.log_window.clear_highlight()
             print("No valid timestamp found")
 

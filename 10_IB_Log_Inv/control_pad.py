@@ -7,6 +7,7 @@ from tkinter import filedialog
 from datetime import datetime
 
 from Util.Utils import *
+from Util.monitor import *
 from configure_data import *
 from tkinter import messagebox
 from dialog.keylog_player import *
@@ -61,10 +62,43 @@ class ControlPad:
         self.timestamp_to = ttk.Entry(self.right_frame)
         self.timestamp_to.grid(row=3, column=1, padx=1, pady=1, sticky="w")
 
+        # Checkbox 추가
+        self.enable_keylog_value = tk.BooleanVar(value=False)
+        self.checkbox = ttk.Checkbutton(self.right_frame, text="Enable KBlog", variable=self.enable_keylog_value)
+        self.checkbox.grid(row=4, column=0, padx=1, pady=1, sticky="w")
+
+        # # Callback to update label text when checkbox value changes
+        self.enable_keylog_value.trace_add("write", self.update_log_window_dimension)
+
+
+    def update_log_window_dimension(self, *args):
+
+        monitor_info = get_monitors()
+        largest_monitor = choose_bigger_monitor(monitor_info)
+        x, y, width, height = largest_monitor
+
+        if self.enable_keylog_value.get():
+            LOGWIN_DIMENSION = f"{int(width*0.75)}x{int(height*0.65)}+{x}+{y+int(height*0.3)}"        
+            self.app.logwin.resize_LogWindow(LOGWIN_DIMENSION)
+            KEYEVENTWIN_DIMENSION = f"{int(width*0.25)}x{int(height*0.65)}+{x + int(width*0.75)}+{y+int(height*0.3)}"        
+            if not self.app.keyeventwin.keyevent_window:
+                self.app.keyeventwin.layout_KeyEventWindow(self.app.notebook, KEYEVENTWIN_DIMENSION)
+            else:
+                self.app.keyeventwin.resize_KeyEventWindow(KEYEVENTWIN_DIMENSION)
+        else:
+            LOGWIN_DIMENSION = f"{int(width)}x{int(height*0.65)}+{x}+{y+int(height*0.3)}"        
+            print("LOGWIN_DIMENSION", LOGWIN_DIMENSION)
+            self.app.logwin.resize_LogWindow(LOGWIN_DIMENSION)
+            self.clear_keyeventlog()
+            if self.app.keyeventwin.keyevent_window: 
+                self.app.keyeventwin.keyevent_window.destroy()
+                self.app.keyeventwin.keyevent_window = None
+
 
     def clear_eventlog(self):
         self.app.log.clear_eventdata()
-        self.app.keyeventwin.clear_highlight()
+        if self.app.keyeventwin.keyevent_window:
+            self.app.keyeventwin.clear_highlight()
         self.app.logwin.log_text.config(state=tk.NORMAL)
         self.app.logwin.log_text.delete('1.0', tk.END)
         self.app.logwin.log_text.config(state=tk.DISABLED)
@@ -72,9 +106,11 @@ class ControlPad:
 
     def clear_keyeventlog(self):
         self.app.log.clear_keyeventdata()
-        self.app.keyeventwin.keyevent_text.config(state=tk.NORMAL)
-        self.app.keyeventwin.keyevent_text.delete('1.0', tk.END)
-        self.app.keyeventwin.keyevent_text.config(state=tk.DISABLED)
+        if self.app.keyeventwin.keyevent_window:
+            self.app.keyeventwin.keyevent_text.config(state=tk.NORMAL)
+            self.app.keyeventwin.keyevent_text.delete('1.0', tk.END)
+            self.app.keyeventwin.keyevent_text.config(state=tk.DISABLED)
+            self.app.keyeventwin.last_opened_keyevent_files = []
 
 
     def clear_devicelog(self):
@@ -103,7 +139,7 @@ class ControlPad:
         # 로그 파일 다시 열기 방지
         if self.app.logwin.last_opened_mainevent_files is not None and file_path in self.app.logwin.last_opened_mainevent_files:
             print("Same log files are already open.")
-            return None
+            return file_path
 
         # below code is commented, As only selected file will be read
         # self.file_path_mainevent = self.sort_filename_order_by_timestamp(file_path, '*MainLog*')
@@ -244,21 +280,25 @@ class ControlPad:
         if file_contents:
             self.clear_keyeventlog()
             combined_content = "\n".join(file_contents)
-            self.app.keyeventwin.keyevent_text.config(state=tk.NORMAL)
-            self.app.keyeventwin.keyevent_text.insert(tk.END, combined_content)
-            self.app.keyeventwin.keyevent_text.config(state=tk.DISABLED)
+            if self.app.keyeventwin.keyevent_window:
+                self.app.keyeventwin.keyevent_text.config(state=tk.NORMAL)
+                self.app.keyeventwin.keyevent_text.insert(tk.END, combined_content)
+                self.app.keyeventwin.keyevent_text.config(state=tk.DISABLED)
             try:
-                self.app.keyeventwin.keyevent_window.iconify()
+                if self.app.keyeventwin.keyevent_window:                
+                    self.app.keyeventwin.keyevent_window.iconify()
                 self.app.log.load_keyevent_log(self.file_path_keyevent, use_columns_keyevent)
                 self.app.log.add_columns_keyevent()
                 df_filtered = self.app.log.filter_event()  # filter out normal event table
                 df_filtered = self.app.log.analyze_keyevent(df_filtered)
                 self.app.eventWin.update_EventWindow(df_filtered)
-                self.app.keyeventwin.last_opened_keyevent_files = self.file_path_keyevent
-                self.app.keyeventwin.keyevent_window.deiconify()
+                if self.app.keyeventwin.keyevent_window:                
+                    self.app.keyeventwin.last_opened_keyevent_files = self.file_path_keyevent
+                    self.app.keyeventwin.keyevent_window.deiconify()
             except Exception as e:
                 last_exception = e
-                self.app.keyeventwin.last_opened_keyevent_files = []
+                if self.app.keyeventwin.keyevent_window:                
+                    self.app.keyeventwin.last_opened_keyevent_files = []
                 self.file_path_keyevent = []
                 print(f"Failed to read keyevent file:\n{last_exception}")
 
@@ -288,8 +328,9 @@ class ControlPad:
         if not file_path:
             print("open_mainlog failed.")
             return None
-
-        self.open_KB_log(file_path)
+    
+        if  self.enable_keylog_value.get():
+            self.open_KB_log(file_path)
 
         self.open_device_log(file_path)
 

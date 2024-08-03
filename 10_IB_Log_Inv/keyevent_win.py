@@ -18,6 +18,10 @@ class KeyEventWindow:
     def set_log_window(self, window):
         self.log_window = window
 
+    def resize_KeyEventWindow(self, dimension):
+        self.keyevent_window.geometry(dimension)
+
+
     def layout_KeyEventWindow(self, root, dimension):
 
         self.keyevent_window = tk.Toplevel(root)
@@ -65,6 +69,7 @@ class KeyEventWindow:
         # 페이지 업/다운 키 이벤트 바인딩
         self.keyevent_text.bind("<Prior>", self.page_up)
         self.keyevent_text.bind("<Next>", self.page_down)
+
 
 
     def on_mouse_wheel(self, event):

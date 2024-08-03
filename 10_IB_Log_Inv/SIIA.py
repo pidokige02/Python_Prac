@@ -1,5 +1,6 @@
 import tkinter as tk
 from tkinter import ttk
+import datetime
 
 from Util.Utils import *
 from Util.monitor import *
@@ -12,6 +13,7 @@ from overview_win import *
 from log import *
 from configure_data import *
 from control_pad import *
+import build_info  # 빌드 타임스탬프를 포함한 파일
 
 
 class App:
@@ -38,7 +40,7 @@ class App:
         style.configure("Blue.TLabel", foreground="blue", font=("Helvetica", 16, "bold"))
 
         # 제목 라벨
-        title_label = ttk.Label(root, text="Issue Inv Assistant (ver 1)", style="Blue.TLabel")
+        title_label = ttk.Label(root, text=f"Issue Inv Assistant (ver 1) build {build_info.BUILD_TIMESTAMP}", style="Blue.TLabel")           
         title_label.grid(row=0, column=0, padx=10, pady=10, sticky=tk.W)
 
         # Notebook 생성

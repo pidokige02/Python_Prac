@@ -51,8 +51,7 @@ alm_table_map = {
 
 
 class AlmRestApi:
-    # almURL = "https://hc-alm.health.ge.com/qcbin/"   # not a valid link @2024 
-    almURL = "https://hc-alm16.cloud.health.ge.com/qcbin/"
+    almURL = "https://alm16.apps.ge-healthcare.net/qcbin/"
     
     almDomain = "ULTRASOUND"
     almProject = "GI"

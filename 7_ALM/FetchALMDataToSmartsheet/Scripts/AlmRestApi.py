@@ -8,7 +8,7 @@ from .almtable import *
 
 
 class AlmRestApi:
-	almURL = "https://hc-alm16.cloud.health.ge.com/qcbin/"
+	almURL = "https://alm16.apps.ge-healthcare.net/qcbin/"
 
 	almDomain = "ULTRASOUND"
 	almProject = "GI"

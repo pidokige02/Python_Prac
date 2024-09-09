@@ -505,7 +505,7 @@ def process_Gemini_R5():
 	##################################################################
 	## fetch the whole defect entities for Gemini R5 for feasibility testing.
 	fields = list(alm_table_map.keys())
-	filter = r"{user-01['Gemini R5' or 'Gemini R5 Future' or 'Osprey R5' or 'Peregrine R5' or 'Swallow R5']}"
+	filter = r"{user-01['Gemini R5' or 'Gemini R5 Future' or 'Osprey R5' or 'Peregrine R5' or 'Swallow R5' or 'Hawk R5']}"
 	sprs = alm.get_defects_product(filter, fields, 25)
 	if (len(sprs)):
 		spr2excel(sprs,alm_table_header, alm_table_map)
